@@ -21,6 +21,8 @@ class CreateUtilityTable extends Migration
             $table->decimal('electric_money');
             $table->smallInteger('year', false, true);
             $table->tinyInteger('month', false, true);
+            $table->tinyInteger('is_charged', false, true)->default(0);
+            $table->timestamp('charge_time');
             $table->string('utility_remark');
             $table->timestamps();
         });

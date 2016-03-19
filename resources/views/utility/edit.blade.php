@@ -1,18 +1,18 @@
 @extends('header')
 
-@section('title', '修改房间')
+@section('title', '修改水电费')
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/room/edit.css') }}"/>
+    <link rel="stylesheet" href="{{ url('/css/utility/edit.css') }}"/>
 
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">修改房间</a></li>
+        <li role="presentation" class="active"><a href="#">修改水电费</a></li>
     </ul>
     <div id="return-btn">
-        <a href="{{ url('room/index') }}"><< 返回列表页</a>
+        <a href="{{ url('utility/index') }}"><< 返回列表页</a>
         <a href="" class="refresh"></a>
     </div>
 @endsection
@@ -20,12 +20,28 @@
     <div class="table-responsive">
         <form id="form">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-            <input type="hidden" name="room_id" value="{{ $room->room_id }}"/>
+            <input type="hidden" name="utility_id" value="{{ $utility->utility_id }}"/>
             <table class="table table-hover table-condensed">
                 <tr class="no-border">
                     <th width="10%">房间号</th>
                     <td width="20%">
-                        {{ $room->building.'-'.$room->room_number }}
+                        {{ $utility->building }}-{{ $utility->room_number }}
+                    </td>
+                    <td width="10%"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>电费</th>
+                    <td width="20%">
+                        <input type="text" class="form-control input-sm" value="{{ $utility->electric_money }}" name="electric_money"/>
+                    </td>
+                    <td width="10%"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>水费</th>
+                    <td width="20%">
+                        <input type="text" class="form-control input-sm" value="{{ $utility->water_money }}" name="water_money"/>
                     </td>
                     <td width="10%"></td>
                     <td></td>
@@ -33,7 +49,9 @@
                 <tr>
                     <th>备注</th>
                     <td colspan="2" width="30%">
-                        <textarea name="room_remark" class="form-control" cols="30" rows="3">{{ $room->room_remark }}</textarea>
+                        <textarea name="utility_remark" class="form-control" cols="30" rows="3">
+                            {{ $utility->utility_remark }}
+                        </textarea>
                     </td>
                     <td></td>
                 </tr>

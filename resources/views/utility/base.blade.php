@@ -56,7 +56,7 @@
                     <td>{{ $base->record_time }}</td>
                     <td>{{ $base->u_base_remark }}</td>
                     <td>
-                        <a href="{{ url('utility/edit/') }}" class="btn btn-success btn-xs">修改</a>
+                        <a href="{{ url('utility/edit-base/'.$base->u_base_id) }}" class="btn btn-success btn-xs">修改</a>
                         <a href="javascript:;" room_id="" class="btn btn-danger btn-xs">删除</a>
                     </td>
                 </tr>

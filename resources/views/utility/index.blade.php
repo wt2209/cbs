@@ -42,40 +42,47 @@
                 <th>电费</th>
                 <th>水费</th>
                 <th>合计</th>
+                <th>是否缴费</th>
+                <th>缴费时间</th>
                 <th>备注</th>
                 <th>操作</th>
             </tr>
             </thead>
-
+            @foreach($utilities as $utility)
                 <tr>
-                    <td>1-101</td>
-                    <td>海博</td>
-                    <td>正常</td>
-                    <td>2016-1—2016-2</td>
-                    <td>123</td>
-                    <td>20</td>
-                    <td>153</td>
-                    <td>我是备注</td>
+                    <td>{{ $utility->building }}-{{ $utility->room_number }}</td>
+                    <td>{{ $utility->company_name }}</td>
                     <td>
-                        <a href="{{ url('utility/edit/') }}" class="btn btn-success btn-xs">修改</a>
+                        @if($utility->is_quit === 1)
+                            <span style="color:red">已退租</span>
+                        @elseif($utility->is_quit === 0)
+                            正常
+                        @endif
+                    </td>
+                    <td>{{ $utility->year }}-{{ $utility->month }}</td>
+                    <td>{{ $utility->electric_money }}</td>
+                    <td>{{ $utility->water_money }}</td>
+                    <td>{{ $utility->water_money + $utility->electric_money }}</td>
+                    <td>
+                        @if($utility->is_charged === 1)
+                            √
+                        @elseif($utility->is_charged === 0)
+                            <span style="color:red">×</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($utility->is_charged)
+                            {{ $utility->charge_time }}
+                        @endif
+                    </td>
+                    <td>{{ $utility->utility_remark }}</td>
+                    <td>
+                        <a href="{{ url('utility/charge/'.$utility->utility_id) }}" class="btn btn-success btn-xs">缴费</a>
+                        <a href="{{ url('utility/edit/'.$utility->utility_id) }}" class="btn btn-primary btn-xs">修改</a>
                         <a href="javascript:;" room_id="" class="btn btn-danger btn-xs">删除</a>
                     </td>
                 </tr>
-                <tr>
-                    <td>1-101</td>
-                    <td>春波</td>
-                    <td><span style="color: red">已退租</span></td>
-                    <td>2016-1—2016-2</td>
-                    <td>123</td>
-                    <td>20</td>
-                    <td>153</td>
-                    <td>我是备注</td>
-                    <td>
-                        <a href="{{ url('utility/edit/') }}" class="btn btn-success btn-xs">修改</a>
-                        <a href="javascript:;" room_id="" class="btn btn-danger btn-xs">删除</a>
-                    </td>
-                </tr>
-
+            @endforeach
         </table>
     </div>
 

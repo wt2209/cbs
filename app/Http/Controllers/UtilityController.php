@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use App\Model\Company;
+use App\Model\Utility;
 use App\Model\Room;
 use App\Model\UtilityBase;
 use Illuminate\Http\Request;
@@ -26,7 +27,11 @@ class UtilityController extends Controller{
      */
     public function getIndex()
     {
-        return view('utility.index');
+        $utilities = DB::table('utility')
+            ->join('room', 'utility.room_id', '=', 'room.room_id')
+            ->join('company', 'company.company_id', '=', 'room.company_id')
+            ->get();
+        return view('utility.index', ['utilities'=>$utilities]);
     }
 
 
@@ -50,15 +55,6 @@ class UtilityController extends Controller{
             $bases[$k]['room'] = $idToRoom[$base['room_id']];
         }
         return view('utility.base', ['bases'=>$bases]);
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -84,12 +80,12 @@ class UtilityController extends Controller{
 
         $roomToId = $this->setRoomToId();
         $i = 1;
-        $tmp = [];
+        $insert = [];
 
         while (isset($result[(string)$i]['room'])) {
             $currentRoom = addslashes(strip_tags($result[(string)$i]['room']));
             if (isset($roomToId[$currentRoom])) {
-                $tmp[] = [
+                $insert[] = [
                     'room_id'       =>intval($roomToId[$currentRoom]),
                     'electric_base'=>intval($result[(string)$i]['electric_base']),
                     'water_base'    =>intval($result[(string)$i]['water_base']),
@@ -104,7 +100,7 @@ class UtilityController extends Controller{
         }
 
         DB::beginTransaction();
-        if (DB::table('utility_base')->insert($tmp)) {
+        if (DB::table('utility_base')->insert($insert)) {
             DB::commit();
             return response()->json(['message'=>'操作成功！', 'status'=>1]);
         }
@@ -133,64 +129,97 @@ class UtilityController extends Controller{
         if (!$year || !$month || $month > 12 || $month < 1) {
             return response()->json(['message'=>"错误：请输入正确的年份和月份！", 'status'=>0]);
         }
-        if ($month = 1) {
+
+        $insert = $this->setInsertData($year, $month);
+
+        DB::beginTransaction();
+        //如果有以前录入的重复的数据，则删除
+        DB::table('utility')
+                ->where('year', $year)
+                ->where('month', $month)
+                ->whereIn('room_id', array_keys($insert))
+                ->delete();
+
+        if (DB::table('utility')->insert($insert)) {
+            DB::commit();
+            return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        }
+        DB::rollBack();
+        return response()->json(['message'=>'错误：数据添加失败，请重试...', 'status'=>0]);
+    }
+
+    /**
+     * 组合出需要插入到数据库中的数组
+     * @param $year
+     * @param $month
+     * @return array
+     */
+    private function setInsertData($year, $month)
+    {
+        $insert = [];
+        $items = $this->setUtilityItem($year, $month);
+        //TODO 水电费单价以及精度应该设置配置项
+        foreach ($items as $roomId => $item) {
+            //必须两个月的水电的、底数都存在才能计算水电费
+            if (!isset($item['current']) || !isset($item['pre'])) {
+                continue;
+            }
+            $allRoomIds[] = $roomId;
+            $insert[$roomId] = [
+                'room_id'=>$roomId,
+                'company_id'=>$item['current']['company_id'],
+                'water_money'
+                =>round(3.35*($item['current']['water_base'] - $item['pre']['water_base']), 2),
+                'electric_money'
+                =>round(0.55*($item['current']['electric_base'] - $item['pre']['electric_base']), 2),
+                'year'=>$year,
+                'month'=>$month
+            ];
+        }
+        return $insert;
+    }
+
+    /**
+     * 查找相关底数
+     * @param $year
+     * @param $month
+     * @return array
+     */
+    private function setUtilityItem($year, $month)
+    {
+        if ($month == 1) {
             $preYear = $year - 1;
             $preMonth = 12;
         } else {
             $preYear = $year;
             $preMonth = $month - 1;
         }
+        //相关的两个月的水电底数
+        $utilityBases = DB::table('utility_base')
+            ->leftJoin('room', 'utility_base.room_id', '=', 'room.room_id')
+            ->where('room.company_id', '!=', 0)
+            ->whereIn('year', [$year, $preYear])
+            ->whereIn('month', [$month, $preMonth])
+            ->get();
 
-        //只计算非空房间的水电费
-        $utilityBase = DB::table('utility_base')
-                                ->leftJoin('room', 'room_id', '=', 'room.room_id')
-                                ->where('room.company_id', '!=', 0)
-                                ->where(function ($query){
-                                    $query->where('year', 2015)
-                                    ->orWhere('year', 2015);
-                                })
-                                ->get();
-
-        return response()->json(['message'=>$utilityBase, 'status'=>0]);
-
-      /*  $preMonthUtilityBase = DB::table('utility_base')
-                                        ->join('room', 'room_id', '=', 'room.room_id')
-                                        ->where([
-                                            ['year', $preYear],
-                                            ['month', $preMonth],
-                                            ['room.company_id', '!=', 0]
-                                        ])
-                                        ->get();*/
-
-        /*$notEmptyRooms = DB::table('room')->where('company_id', '!=', 0)->lists('room_id');
-
-        //查找水电底数
-        $currentMonthUtilityBase = DB::table('utility_base')
-                            ->where([
-                                ['year', $year],
-                                ['month', $month]
-                            ])
-                            ->whereIn('room_id', $notEmptyRooms)
-                            ->get();
-        $preMonthUtilityBase = DB::table('utility_base')
-                            ->where([
-                                ['year', $preYear],
-                                ['month', $preMonth]
-                            ])
-                            ->whereIn('room_id', $notEmptyRooms)
-                            ->get();*/
-
-
-    }
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
+        $items = [];
+        foreach ($utilityBases as $utilityBase) {
+            if ($utilityBase->year == $year
+                && $utilityBase->month == $month) {
+                $items[$utilityBase->room_id]['current'] = [
+                    'company_id'    => $utilityBase->company_id,
+                    'water_base'    => $utilityBase->water_base,
+                    'electric_base' =>$utilityBase->electric_base
+                ];
+            } else {
+                $items[$utilityBase->room_id]['pre'] = [
+                    'company_id'    => $utilityBase->company_id,
+                    'water_base'    => $utilityBase->water_base,
+                    'electric_base' =>$utilityBase->electric_base
+                ];
+            }
+        }
+        return $items;
     }
 
     /**
@@ -199,9 +228,17 @@ class UtilityController extends Controller{
      * @param  int  $id
      * @return Response
      */
-    public function edit($id)
+    public function getEdit($UtilityId)
     {
-        //
+        $utility = Utility::join('room', 'room.room_id', '=', 'utility.room_id')
+                        ->find($UtilityId);
+        return view('utility.edit', ['utility'=>$utility]);
+    }
+
+
+    public function getEditBase()
+    {
+        echo '修改底数';
     }
 
     /**
@@ -211,9 +248,14 @@ class UtilityController extends Controller{
      * @param  int  $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function postUpdate(Request $request, $id)
     {
         //
+    }
+
+    public function postUpdateBase()
+    {
+
     }
 
     /**

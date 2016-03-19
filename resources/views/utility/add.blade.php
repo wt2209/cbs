@@ -8,6 +8,7 @@
         <li role="presentation" class="active"><a href="#">录入底数</a></li>
     </ul>
     <div id="return-btn">
+        <a href="{{ url('utility/base') }}"><< 返回底数页</a>
         <a href="" class="refresh"></a>
     </div>
     <nav class="navbar navbar-default navbar-small">
