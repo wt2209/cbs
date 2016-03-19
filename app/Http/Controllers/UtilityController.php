@@ -8,7 +8,6 @@ use App\Model\Utility;
 use App\Model\Room;
 use App\Model\UtilityBase;
 use Illuminate\Http\Request;
-use App\Http\Controllers\CompanyLogController;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -21,8 +20,7 @@ class UtilityController extends Controller{
     }
 
     /**
-     * Display a listing of the resource.
-     *
+     * 水电费首页
      * @return Response
      */
     public function getIndex()
@@ -34,9 +32,9 @@ class UtilityController extends Controller{
         return view('utility.index', ['utilities'=>$utilities]);
     }
 
-
     /**
-     * 录入水电底数
+     * 录入底数
+     * @return \Illuminate\View\View
      */
     public function getAdd()
     {
@@ -44,7 +42,8 @@ class UtilityController extends Controller{
     }
 
     /**
-     * 水电表底数
+     * 水电表底数首页
+     * @return \Illuminate\View\View
      */
     public function getBase()
     {
@@ -66,8 +65,6 @@ class UtilityController extends Controller{
     public function postStore(Request $request)
     {
         $result = $request->all();
-
-
         $year = intval($result['year']);
         $month = intval($result['month']);
         $recorder = addslashes(strip_tags($result['recorder']));
@@ -81,7 +78,6 @@ class UtilityController extends Controller{
         $roomToId = $this->setRoomToId();
         $i = 1;
         $insert = [];
-
         while (isset($result[(string)$i]['room'])) {
             $currentRoom = addslashes(strip_tags($result[(string)$i]['room']));
             if (isset($roomToId[$currentRoom])) {
@@ -108,20 +104,11 @@ class UtilityController extends Controller{
         return response()->json(['message'=>'错误：数据添加失败，请重试...', 'status'=>0]);
     }
 
-    private function setRoomToId()
-    {
-        $rooms = Room::all();
-        if(!$rooms) {
-            return false;
-        }
-        $roomToId = [];
-        foreach ($rooms as $room) {
-            $roomToId[$room['building'] . '-' . $room['room_number']] = $room['room_id'];
-        }
-        return $roomToId;
-    }
-
-
+    /**
+     * 计算水电费
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function postCalculate(Request $request)
     {
         $year = $request->year ? intval($request->year) : 0;
@@ -146,6 +133,102 @@ class UtilityController extends Controller{
         }
         DB::rollBack();
         return response()->json(['message'=>'错误：数据添加失败，请重试...', 'status'=>0]);
+    }
+
+    /**
+     * 编辑水电费
+     * @param  int  $id
+     * @return Response
+     */
+    public function getEdit($UtilityId)
+    {
+        $utility = Utility::join('room', 'room.room_id', '=', 'utility.room_id')
+                        ->find($UtilityId);
+        return view('utility.edit', ['utility'=>$utility]);
+    }
+
+    /**
+     * 编辑水电底数
+     * @param $UtilityBaseId
+     * @return \Illuminate\View\View
+     */
+    public function getEditBase($UtilityBaseId)
+    {
+        $utilityBase = UtilityBase::join('room', 'room.room_id', '=', 'utility_base.room_id')
+            ->find($UtilityBaseId);
+        return view('utility.editBase', ['utilityBase'=>$utilityBase]);
+    }
+
+    /**
+     *  更新水电费
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
+     */
+    public function postUpdate(Request $request)
+    {
+        if (is_numeric($request->utility_id)
+                && is_numeric($request->water_money)
+                && is_numeric($request->electric_money)) {
+            Utility::where('utility_id', intval($request->utility_id))
+                ->update([
+                    'water_money'=>$request->water_money,
+                    'electric_money'=>$request->electric_money,
+                    'utility_remark'=>addslashes(strip_tags(trim($request->utility_remark)))
+                ]);
+            return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        }
+        return response()->json(['message'=>'错误：请输入正确的信息！', 'status'=>0]);
+    }
+
+    /**
+     * 更新水电底数
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postUpdateBase(Request $request)
+    {
+        if (is_numeric($request->u_base_id)) {
+            UtilityBase::where('u_base_id', intval($request->u_base_id))
+                ->update([
+                    'water_base'=>intval($request->water_base),
+                    'electric_base'=>intval($request->electric_base),
+                    'year'=>intval($request->year),
+                    'month'=>intval($request->month),
+                    'recorder'=>addslashes(strip_tags(trim($request->recorder))),
+                    'u_base_remark'=>addslashes(strip_tags(trim($request->u_base_remark)))
+                ]);
+            return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        }
+        return response()->json(['message'=>'错误：请输入正确的信息！', 'status'=>0]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+
+    /**
+     * 建立房间名与房间id的映射
+     * @return array|bool
+     */
+    private function setRoomToId()
+    {
+        $rooms = Room::all();
+        if(!$rooms) {
+            return false;
+        }
+        $roomToId = [];
+        foreach ($rooms as $room) {
+            $roomToId[$room['building'] . '-' . $room['room_number']] = $room['room_id'];
+        }
+        return $roomToId;
     }
 
     /**
@@ -220,52 +303,5 @@ class UtilityController extends Controller{
             }
         }
         return $items;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function getEdit($UtilityId)
-    {
-        $utility = Utility::join('room', 'room.room_id', '=', 'utility.room_id')
-                        ->find($UtilityId);
-        return view('utility.edit', ['utility'=>$utility]);
-    }
-
-
-    public function getEditBase()
-    {
-        echo '修改底数';
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return Response
-     */
-    public function postUpdate(Request $request, $id)
-    {
-        //
-    }
-
-    public function postUpdateBase()
-    {
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

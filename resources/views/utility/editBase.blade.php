@@ -1,16 +1,18 @@
 @extends('header')
 
-@section('title', '修改水电费')
+@section('title', '修改水电底数')
+
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/utility/edit.css') }}"/>
+    <link rel="stylesheet" href="{{ url('/css/utility/editBase.css') }}"/>
+
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">修改水电费</a></li>
+        <li role="presentation" class="active"><a href="#">修改水电底数</a></li>
     </ul>
     <div id="return-btn">
-        <a href="{{ url('utility/index') }}"><< 返回列表页</a>
+        <a href="{{ url('utility/base') }}"><< 返回底数页</a>
         <a href="" class="refresh"></a>
     </div>
 @endsection
@@ -18,28 +20,52 @@
     <div class="table-responsive">
         <form id="form">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-            <input type="hidden" name="utility_id" value="{{ $utility->utility_id }}"/>
+            <input type="hidden" name="u_base_id" value="{{ $utilityBase->u_base_id }}"/>
             <table class="table table-hover table-condensed">
                 <tr class="no-border">
                     <th width="10%">房间号</th>
                     <td width="20%">
-                        {{ $utility->building }}-{{ $utility->room_number }}
+                        {{ $utilityBase->building }}-{{ $utilityBase->room_number }}
                     </td>
                     <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>电费</th>
+                    <th>年份</th>
                     <td width="20%">
-                        <input type="text" class="form-control input-sm" value="{{ $utility->electric_money }}" name="electric_money"/>
+                        <input type="text" class="form-control input-sm" value="{{ $utilityBase->year }}" name="year"/>
                     </td>
                     <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>水费</th>
+                    <th>月份</th>
                     <td width="20%">
-                        <input type="text" class="form-control input-sm" value="{{ $utility->water_money }}" name="water_money"/>
+                        <input type="text" class="form-control input-sm" value="{{ $utilityBase->month }}" name="month"/>
+                    </td>
+                    <td width="10%"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>电表数</th>
+                    <td width="20%">
+                        <input type="text" class="form-control input-sm" value="{{ $utilityBase->electric_base }}" name="electric_base"/>
+                    </td>
+                    <td width="10%"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>水表数</th>
+                    <td width="20%">
+                        <input type="text" class="form-control input-sm" value="{{ $utilityBase->water_base }}" name="water_base"/>
+                    </td>
+                    <td width="10%"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>抄表人</th>
+                    <td width="20%">
+                        <input type="text" class="form-control input-sm" value="{{ $utilityBase->recorder }}" name="recorder"/>
                     </td>
                     <td width="10%"></td>
                     <td></td>
@@ -47,7 +73,7 @@
                 <tr>
                     <th>备注</th>
                     <td colspan="2" width="30%">
-                        <textarea name="utility_remark" class="form-control" cols="30" rows="3">{{ $utility->utility_remark }}</textarea>
+                        <textarea name="u_base_remark" class="form-control" cols="30" rows="3">{{ $utilityBase->u_base_remark }}</textarea>
                     </td>
                     <td></td>
                 </tr>
@@ -74,7 +100,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('utility/update') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('utility/update-base') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             /*返回并刷新原页面*/
