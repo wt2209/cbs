@@ -1,0 +1,83 @@
+@charset "UTF-8";
+a:hover {
+  text-decoration: none; }
+
+body {
+  margin-top: 35px; }
+
+.nav-fixed {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 30px;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  z-index: 3000; }
+
+.nav-small {
+  line-height: 12px;
+  margin-bottom: 8px; }
+  .nav-small li > a {
+    padding: 5px 15px; }
+
+.no-bold {
+  font-weight: normal; }
+
+table tr.no-border {
+  border: none; }
+  table tr.no-border td,
+  table tr.no-border th {
+    border-bottom: none;
+    border-top: none; }
+
+#return-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 3001; }
+  #return-btn a {
+    height: 20px;
+    float: left;
+    display: block; }
+  #return-btn .refresh {
+    width: 20px;
+    background: url("../../images/refresh.png");
+    margin-left: 20px; }
+
+#popdown {
+  padding: 40px 20px 6px;
+  float: left;
+  position: fixed;
+  font-size: 16px;
+  color: #FFFFFF;
+  top: -100px;
+  left: 50%;
+  margin-left: -50px;
+  border-radius: 5px;
+  z-index: 9999; }
+
+.validate_error {
+  color: red;
+  font-weight: normal; }
+
+/*表单提交后的遮蔽层*/
+#mask {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 2000;
+  opacity: 0.6;
+  filter: Alpha(Opacity=60); }
+  #mask .loading_icon {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url("../../images/load.gif");
+    background-size: 40px 40px;
+    background-repeat: no-repeat; }
+
+/*# sourceMappingURL=common.css.map */

@@ -1,0 +1,279 @@
+@charset "UTF-8";
+/* 清除内外边距 */
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote,
+dl, dt, dd, ul, ol, li,
+pre,
+fieldset, button, input, textarea,
+th, td {
+  margin: 0;
+  padding: 0; }
+
+/* 设置默认字体 */
+body,
+button, input, select, textarea {
+  /*font: 12px/1 Tahoma, Helvetica, Arial, "宋体", sans-serif; */
+  font: 12px/24px Verdana, ​Arial, ​Vrinda, ​Tahoma;
+  color: #666; }
+
+h1 {
+  font-size: 18px; }
+
+h2 {
+  font-size: 16px; }
+
+h3 {
+  font-size: 14px; }
+
+h4, h5, h6 {
+  font-size: 100%; }
+
+address, cite, dfn, em, var {
+  font-style: normal; }
+
+code, kbd, pre, samp, tt {
+  font-family: "Courier New", Courier, monospace; }
+
+small {
+  font-size: 12px; }
+
+/* 重置列表元素 */
+ul, ol {
+  list-style: none; }
+
+/* 重置文本格式元素 */
+a {
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: none; }
+
+abbr[title], acronym[title] {
+  border-bottom: 1px dotted;
+  cursor: help; }
+
+q:before, q:after {
+  content: ""; }
+
+/* 重置表单元素 */
+fieldset, img {
+  border: none; }
+
+/* 注：optgroup 无法扶正 */
+button, input, select, textarea {
+  font-size: 100%; }
+
+/* 重置表格元素 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* 重置 hr */
+hr {
+  border: none;
+  height: 1px; }
+
+.hide {
+  display: none; }
+
+body {
+  background-color: #F9F9F9; }
+  body a {
+    color: #666; }
+  body a:hover {
+    color: #0099cc; }
+
+.header_content {
+  margin: 0 auto;
+  padding: 0px;
+  width: 100%;
+  overflow: hidden; }
+  .header_content .logo {
+    height: 30px;
+    width: 30%;
+    float: left;
+    color: #CC3300;
+    padding: 5px 0 0 14px; }
+    .header_content .logo .nav_list {
+      margin: 0; }
+      .header_content .logo .nav_list a {
+        display: inline;
+        color: #0099cc; }
+      .header_content .logo .nav_list li {
+        display: inline; }
+
+#left_content {
+  clear: both;
+  width: 199px;
+  overflow: hidden;
+  float: left;
+  position: relative; }
+  #left_content #user_info {
+    background-image: url(../images/manage_r2_c1.jpg);
+    background-repeat: no-repeat;
+    height: 55px;
+    padding: 10px 0 0 55px; }
+  #left_content #user_info a {
+    color: #0099cc; }
+  #left_content #main_nav {
+    width: 199px;
+    position: absolute;
+    left: 0;
+    top: 66px;
+    bottom: 0;
+    overflow: hidden;
+    background-image: url(../images/left_nav_bg.jpg);
+    background-repeat: repeat-y; }
+    #left_content #main_nav .list_item {
+      display: none; }
+    #left_content #main_nav .active {
+      display: block; }
+    #left_content #main_nav #left_main_nav {
+      float: left;
+      width: 25px;
+      height: auto;
+      overflow: hidden;
+      line-height: 13px;
+      color: #0099cc; }
+      #left_content #main_nav #left_main_nav li {
+        height: 69px;
+        width: 12px;
+        text-align: center;
+        padding: 7px 6px 0 7px; }
+      #left_content #main_nav #left_main_nav .left_back {
+        background-image: url(../images/manage_r7_c2.jpg);
+        background-repeat: no-repeat;
+        cursor: pointer; }
+      #left_content #main_nav #left_main_nav .current {
+        background-image: url(../images/manage_r6_c2.jpg);
+        background-repeat: no-repeat;
+        color: #333333; }
+      #left_content #main_nav #left_main_nav a {
+        color: #0099cc; }
+    #left_content #main_nav #right_main_nav {
+      width: 173px;
+      position: absolute;
+      bottom: 0px;
+      left: 25px;
+      top: 0;
+      overflow: auto;
+      border-top-width: 1px;
+      border-bottom-width: 1px;
+      border-top-style: solid;
+      border-bottom-style: solid;
+      border-top-color: #B4C9C6;
+      border-bottom-color: #B4C9C6;
+      float: right;
+      background-color: #FFFFFF;
+      border-right-width: 1px;
+      border-right-style: solid;
+      border-right-color: #B4C9C6;
+      text-align: left; }
+      #left_content #main_nav #right_main_nav .list_title {
+        background-image: url(../images/list_title.gif);
+        background-repeat: no-repeat;
+        margin: 0 auto 8px;
+        clear: both; }
+        #left_content #main_nav #right_main_nav .list_title span {
+          height: 22px;
+          width: 140px;
+          padding-left: 30px;
+          font-weight: bold;
+          color: #0099CC;
+          margin-top: 9px;
+          cursor: pointer; }
+        #left_content #main_nav #right_main_nav .list_title .list_detail {
+          margin: 0 auto; }
+          #left_content #main_nav #right_main_nav .list_title .list_detail li {
+            list-style-image: url(../images/direct_blue.gif);
+            list-style-position: inside;
+            padding: 0 0 0 4px; }
+      #left_content #main_nav #right_main_nav .list_title_onclick {
+        background-image: url(../images/list_title_onclick.gif);
+        background-repeat: no-repeat;
+        margin: 0 auto;
+        clear: both;
+        height: 22px;
+        width: 140px;
+        padding-left: 30px;
+        font-weight: bold;
+        color: #0099CC;
+        margin-top: 9px;
+        cursor: pointer; }
+
+#right_content {
+  position: absolute;
+  left: 197px;
+  right: 0;
+  top: 0px;
+  bottom: 0;
+  margin-left: 8px; }
+  #right_content #nav {
+    width: 99%;
+    height: auto;
+    overflow: hidden;
+    clear: both;
+    background-image: url(../images/nav_bg.jpg); }
+    #right_content #nav ul {
+      float: left;
+      margin: 0;
+      list-style: none;
+      padding: 0; }
+      #right_content #nav ul li {
+        float: left;
+        margin: 0;
+        padding: 2px 35px 0 30px;
+        line-height: 24px;
+        font-weight: bold;
+        background: url(../images/manage_r2_c14.jpg) no-repeat;
+        cursor: pointer; }
+        #right_content #nav ul li .sub_message {
+          display: none; }
+      #right_content #nav ul .active {
+        background: url(../images/manage_r2_c13.jpg) no-repeat;
+        color: #0099CC;
+        cursor: default; }
+    #right_content #nav .right_nav {
+      float: right;
+      overflow: hidden;
+      padding: 0 0 0 0;
+      text-align: right; }
+      #right_content #nav .right_nav a {
+        margin-left: 8px;
+        white-space: nowrap;
+        color: #0099cc; }
+  #right_content #sub_info {
+    width: 99%;
+    clear: both;
+    background-image: url(../images/manage_r3_c11.jpg);
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-color: #B4C9C6;
+    border-bottom-color: #B4C9C6;
+    border-left-color: #B4C9C6;
+    height: 26px;
+    background-repeat: repeat-x;
+    padding: 5px 0 0 0; }
+  #right_content #man_zone {
+    clear: both;
+    position: relative;
+    width: 99%;
+    border: 1px solid #B4C9C6;
+    margin: 6px 0;
+    background-color: #FFFFFF;
+    padding: 5px 0 5px 0;
+    overflow: hidden; }
+    #right_content #man_zone iframe {
+      width: 98%;
+      height: 98%;
+      margin: 1% auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0; }
+
+/*# sourceMappingURL=index.css.map */
