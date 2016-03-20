@@ -55,15 +55,12 @@ class CompanyController extends Controller
     public function getIndex()
     {
         $companies = Company::all();
-        $tmpRooms = Room::where('company_id', '<>', 0)
-            ->select('company_id', 'building', 'room_number')
-            ->get();
-        $rooms = [];
-        foreach ($tmpRooms as $tmpRoom) {
-            $rooms[$tmpRoom->company_id][] = $tmpRoom->building . '-' . $tmpRoom->room_number;
+        $count['company'] = count($companies);
+        $count['room'] = 0;
+        foreach ($companies as $company) {
+            $count['room'] += count($company->rooms);
         }
-
-        return view('company.index', ['companies'=>$companies]);
+        return view('company.index', ['companies'=>$companies, 'count'=>$count]);
     }
 
     /**

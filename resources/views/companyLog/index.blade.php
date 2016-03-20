@@ -16,8 +16,7 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        公司名：
-                        <input type="text" class="form-control">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control"  placeholder="公司名称">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -91,7 +90,7 @@
     </div>
 @endsection
 @section('bottom')
-    <p>haha </p>
+    <p>共有 {{ count($companyLogs) }} 条记录</p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>

@@ -39,7 +39,14 @@ class RoomController extends Controller
     public function getIndex()
     {
         $rooms = Room::all();
-        return view('room.index', ['rooms' => $rooms]);
+        $count['all'] = count($rooms);
+        $count['empty'] = 0;
+        foreach ($rooms as $room) {
+            if ($room->company_id == 0) {
+                $count['empty']++;
+            }
+        }
+        return view('room.index', ['rooms' => $rooms, 'count'=>$count]);
     }
 
     /**

@@ -16,10 +16,9 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        房间号：
-                        <input type="text" class="form-control">&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="status" />空房间</label>&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="status" />正在使用的房间</label>&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="房间号">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="月份，格式为：2016-3">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -108,7 +107,8 @@
     </div>
 @endsection
 @section('bottom')
-    <p>haha </p>
+    <p>共有 {{ count($utilities) }} 条记录</p>
+    <p><span style="color:red;font-weight: bold">TODO</span> 费用统计。。。。。。</p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>

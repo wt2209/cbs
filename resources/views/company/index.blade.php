@@ -19,8 +19,8 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        公司名称：
-                        <input type="text" class="form-control">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control"  placeholder="负责人/联系人">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -155,8 +155,8 @@
 
 @endsection
 @section('bottom')
-    <p>共有10个公司</p>
-    <p>共占用100个房间</p>
+    <p>共有 {{ $count['company'] }} 个公司</p>
+    <p>共占用 {{ $count['room'] }} 个房间</p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>

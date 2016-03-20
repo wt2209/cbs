@@ -24,7 +24,7 @@
                         抄表人：
                         <input type="text" id="recorder" class="form-control input-sm">&nbsp;&nbsp;&nbsp;
                         抄表时间：
-                        <input type="text" id="record_time" class="form-control input-sm">&nbsp;&nbsp;&nbsp;
+                        <input type="text" id="record_time" class="form-control input-sm" placeholder="格式：2015-8-20">&nbsp;&nbsp;&nbsp;
                     </div>
                 </form>
             </div>

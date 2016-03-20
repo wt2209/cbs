@@ -16,10 +16,7 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        房间号：
-                        <input type="text" class="form-control">&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="status" />空房间</label>&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="status" />正在使用的房间</label>&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="房间号">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -103,7 +100,8 @@
     </div>
 @endsection
 @section('bottom')
-    <p>haha </p>
+    <p>共有 {{ $count['all'] }} 个房间</p>
+    <p>剩余 {{ $count['empty'] }} 个空房间</p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
