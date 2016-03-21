@@ -19,6 +19,8 @@
     @yield('bottom')
 </div>
 
+@yield('modal')
+
 @yield('js')
 <script>
     $('a').focus(function(){

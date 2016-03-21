@@ -57,15 +57,16 @@
                     <td>{{ $base->u_base_remark }}</td>
                     <td>
                         <a href="{{ url('utility/edit-base/'.$base->u_base_id) }}" class="btn btn-success btn-xs">修改</a>
-                        <a href="javascript:;" room_id="" class="btn btn-danger btn-xs">删除</a>
+                        <button delete_id="{{ $base->u_base_id }}"  class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>
                 </tr>
             @endforeach
         </table>
     </div>
-
+@endsection
+@section('modal')
     <!-- delete modal -->
-    <div id="modal" class="modal bs-example-modal-sm">
+    <div id="delete-modal" class="modal bs-example-modal-sm fade">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -78,7 +79,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="modal-confirm" type="button" class="btn btn-primary">确认</button>
+                    <button id="delete-confirm" type="button" class="btn btn-primary">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
@@ -107,6 +108,10 @@
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
+        //模态框删除
+        ajaxDelete('{{ url('utility/base-delete/') }}');
+
+        //表单验证
         var s = true;
         var validate = $("#calculate").validate({
             debug: true, //调试模式取消submit的默认提交功能

@@ -76,17 +76,46 @@
                     </td>
                     <td>{{ $utility->utility_remark }}</td>
                     <td>
-                        <a href="{{ url('utility/charge/'.$utility->utility_id) }}" class="btn btn-success btn-xs">缴费</a>
+                        @if ($utility->is_charged)
+                            <button class="btn btn-success btn-xs charge-button" disabled="disabled" utility_id="{{ $utility->utility_id }}">缴费</button>
+                        @else
+                            <button class="btn btn-success btn-xs charge-button" utility_id="{{ $utility->utility_id }}">缴费</button>
+                        @endif
                         <a href="{{ url('utility/edit/'.$utility->utility_id) }}" class="btn btn-primary btn-xs">修改</a>
-                        <a href="javascript:;" room_id="" class="btn btn-danger btn-xs">删除</a>
+                        <button delete_id="{{ $utility->utility_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>
                 </tr>
             @endforeach
         </table>
     </div>
-
+@endsection
+@section('modal')
+    <!-- charge modal -->
+    <div id="charge-modal" class="modal bs-example-modal-sm fade">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">缴费确认</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        确认要缴费吗？
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form id="form">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="hidden" name="year">
+                    </form>
+                    <button id="charge-confirm" type="button" class="btn btn-primary">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- delete modal -->
-    <div id="modal" class="modal bs-example-modal-sm">
+    <div id="delete-modal" class="modal bs-example-modal-sm fade">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -99,7 +128,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="modal-confirm" type="button" class="btn btn-primary">确认</button>
+                    <button id="delete-confirm" type="button" class="btn btn-primary">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
@@ -113,5 +142,11 @@
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
+    <script>
+        //缴费
+        ajaxCharge('{{ url('utility/charge-single-room/') }}');
+        //删除
+        ajaxDelete('{{ url('utility/delete/') }}');
 
+    </script>
 @endsection

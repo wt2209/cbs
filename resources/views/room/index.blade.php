@@ -55,7 +55,7 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" room_id="{{ $room->room_id }}" class="btn btn-danger btn-xs">删除</a>
+                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
                         </td>
                     </tr>
                 @else
@@ -70,16 +70,17 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" room_id="{{ $room->room_id }}" class="btn btn-danger btn-xs">删除</a>
+                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
                         </td>
                     </tr>
                 @endif
             @endforeach
         </table>
     </div>
-
+@endsection
+@section('modal')
     <!-- delete modal -->
-    <div id="modal" class="modal bs-example-modal-sm">
+    <div id="delete-modal" class="modal fade bs-example-modal-sm">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -92,7 +93,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="modal-confirm" type="button" class="btn btn-primary">确认</button>
+                    <button id="delete-confirm" type="button" class="btn btn-primary">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
@@ -108,24 +109,7 @@
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script>
         //删除模态框
-{{--        //{{ url('room/del/'.$room->room_id) }}--}}
-        var roomId = 0;
-        $('.btn-danger').click(function(){
-            $('#modal').modal('show');
-            roomId = $(this).attr('room_id');
-        })
-        $('#modal-confirm').click(function(){
-            $('#modal').modal('hide');
-            maskShow();
-            $.get('{{ url('room/remove/') }}', 'room_id=' + roomId, function(e){
-                maskHide();
-                popdown({'message':e.message, 'status': e.status, 'callback':function(){
-                    if (e.status) {
-                        location.reload(true);
-                    }
-                }});
-            }, 'json');
-        })
+        ajaxDelete('{{ url('room/remove/') }}');
 
     </script>
 @endsection

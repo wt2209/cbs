@@ -76,7 +76,7 @@ class RoomController extends Controller
     public function getRemove(Request $request)
     {
         //验证房间id
-        $roomId = (int)$request->room_id;
+        $roomId = (int)$request->delete_id;
         if (!$roomId) {
             exit();
         }

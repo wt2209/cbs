@@ -51,6 +51,11 @@ class UtilityController extends Controller{
         $roomToId = $this->setRoomToId();
         $idToRoom = array_flip($roomToId);
         foreach ($bases as $k => $base) {
+            //房间已被删除，底数成为“野底数”
+            if (!isset($idToRoom[$base['room_id']])) {
+                unset($bases[$k]);
+                continue;
+            }
             $bases[$k]['room'] = $idToRoom[$base['room_id']];
         }
         return view('utility.base', ['bases'=>$bases]);
@@ -182,6 +187,23 @@ class UtilityController extends Controller{
     }
 
     /**
+     * 单个房间缴费
+     * @param $utilityId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getChargeSingleRoom(Request $request)
+    {
+        $utilityId = intval($request->utility_id);
+        if (!$utilityId) {
+            return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
+        }
+        if (UtilityController::chargeStore([$utilityId])) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"错误：请重试！", 'status'=>0]);
+    }
+
+    /**
      * 更新水电底数
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -205,13 +227,53 @@ class UtilityController extends Controller{
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function getDelete(Request $request)
     {
-        //
+        $utilityId = intval($request->delete_id);
+        if (!$utilityId) {
+            return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
+        }
+        if (Utility::destroy($utilityId)) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"错误：请重试！", 'status'=>0]);
+    }
+
+    /**
+     * 删除水电底数
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBaseDelete(Request $request)
+    {
+        $utilityBaseId = intval($request->delete_id);
+        if (!$utilityBaseId) {
+            return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
+        }
+        if (UtilityBase::destroy($utilityBaseId)) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"错误：请重试！", 'status'=>0]);
+    }
+
+    /**
+     * 缴费存储
+     * @param $utilityIdArray
+     * @param null $dateTime
+     * @return bool
+     */
+    public static function chargeStore($utilityIdArray, $dateTime = NULL)
+    {
+        $dateTime = $dateTime ? date("Y-m-d H:i:s", strtotime($dateTime)) : date("Y-m-d H:i:s");
+        return DB::table('utility')
+            ->whereIn('utility_id', $utilityIdArray)
+            ->update([
+                'is_charged'=>1,
+                'charge_time'=>$dateTime
+            ]);
     }
 
     /**

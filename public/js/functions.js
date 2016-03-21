@@ -32,3 +32,45 @@ function maskShow() {
 function maskHide() {
     $("#mask").remove();
 }
+
+
+function ajaxDelete(url) {
+    var deleteId = 0;
+    $('.delete-button').click(function(){
+        $('#delete-modal').modal('show');
+        deleteId = $(this).attr('delete_id');
+    });
+    $('#delete-confirm').click(function(){
+        $('#delete-modal').modal('hide');
+        maskShow();
+        $.get(url, 'delete_id=' + deleteId, function(e){
+            maskHide();
+            popdown({'message':e.message, 'status': e.status, 'callback':function(){
+                if (e.status) {
+                    location.reload(true);
+                }
+            }});
+        }, 'json');
+    })
+}
+
+function ajaxCharge(url) {
+    var utilityId = 0;
+    //缴费模态框
+    $('.charge-button').click(function(){
+        $('#charge-modal').modal('show');
+        utilityId = $(this).attr('utility_id');
+    });
+    $('#charge-confirm').click(function(){
+        $('#charge-modal').modal('hide');
+        maskShow();
+        $.get(url, 'utility_id=' + utilityId, function(e){
+            maskHide();
+            popdown({'message':e.message, 'status': e.status, 'callback':function(){
+                if (e.status) {
+                    location.reload(true);
+                }
+            }});
+        }, 'json');
+    })
+}
