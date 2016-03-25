@@ -47,7 +47,7 @@
                 <span class="company-description">{{ $company->company_description }}</span>
                 <p class="operation">
                     <a href="javascript:;" class="btn btn-success btn-xs">房租</a>
-                    <a href="javascript:;" class="btn btn-warning btn-xs">水电费</a>
+                    <a href="{{ url('company/company-utility/'.$company->company_id) }}" class="btn btn-warning btn-xs">水电费</a>
                     <a href="javascript:;" class="btn btn-danger btn-xs">处罚</a>
                 </p>
             </div>

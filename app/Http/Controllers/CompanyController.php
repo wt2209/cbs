@@ -145,6 +145,73 @@ class CompanyController extends Controller
     }
 
     /**
+     * 显示公司尚未缴费的房间明细
+     * @param $companyId
+     * @return \Illuminate\View\View
+     */
+    public function getCompanyUtility($companyId)
+    {
+        $this->validateCompanyId($companyId);
+        $utilities = DB::table('utility')
+            ->join('company', 'company.company_id', '=', 'utility.company_id')
+            ->join('room', 'room.room_id', '=', 'utility.room_id')
+            ->where('utility.company_id', $companyId)
+            ->where('is_charged', 0)
+            ->get();
+
+        $companyName = DB::table('utility')
+            ->join('company', 'company.company_id', '=', 'utility.company_id')
+            ->where('utility.company_id', $companyId)
+            ->value('company_name');
+        $count = [];
+        $dateArr = [];
+
+        if (count($utilities) > 0) {
+            $count['water_money'] = $count['electric_money'] = 0;
+            foreach ($utilities as $utility) {
+                $dateArr[] = $utility->year . '-' . $utility->month;
+                $count['water_money'] += $utility->water_money;
+                $count['electric_money'] += $utility->electric_money;
+            }
+            $dateArr = array_unique($dateArr);
+        }
+        return view(
+            'company.charge',
+            [
+                'utilities'=>$utilities,
+                'date'=>implode('、', $dateArr),
+                'count'=>$count,
+                'company_id'=>$companyId,
+                'company_name'=>$companyName
+            ]
+        );
+    }
+
+    /**
+     * 公司所属房间批量缴费
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postCompanyUtilityCharge(Request $request)
+    {
+        $companyId = intval($request->company_id);
+        if (!$companyId) {
+            return response()->json(['message'=>'错误：参数错误！', 'status'=>0]);
+        }
+        $utilityIds = DB::table('utility')
+            ->join('company', 'company.company_id', '=', 'utility.company_id')
+            ->join('room', 'room.room_id', '=', 'utility.room_id')
+            ->where('utility.company_id', $companyId)
+            ->where('is_charged', 0)
+            ->lists('utility_id');
+
+        if (UtilityController::chargeStore($utilityIds)) {
+            return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        }
+        return response()->json(['message'=>'错误：请重试...', 'status'=>0]);
+    }
+
+    /**
      * 调整房间
      * @param $companyId
      * @return \Illuminate\View\View

@@ -54,7 +54,7 @@ class UtilityController extends Controller{
         $count = $this->setBaseCount();
         $bases = DB::table('utility_base')
             ->join('room', 'utility_base.room_id', '=', 'room.room_id')
-            ->paginate(20);
+            ->paginate(3);
         return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
     }
 
