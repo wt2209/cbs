@@ -1,2 +1,2 @@
 # laravel
-The department manage system
+This is a personal project with lots of bugs and mistakes.
