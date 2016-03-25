@@ -76,6 +76,7 @@
                 @endif
             @endforeach
         </table>
+        {!! $rooms->render() !!}
     </div>
 @endsection
 @section('modal')

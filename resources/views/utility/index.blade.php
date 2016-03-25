@@ -87,6 +87,7 @@
                 </tr>
             @endforeach
         </table>
+        {!! $utilities->render() !!}
     </div>
 @endsection
 @section('modal')
@@ -136,8 +137,17 @@
     </div>
 @endsection
 @section('bottom')
-    <p>共有 {{ count($utilities) }} 条记录</p>
-    <p><span style="color:red;font-weight: bold">TODO</span> 费用统计。。。。。。</p>
+    <p>共有 {{ $count['total_number'] }} 条记录</p>
+    <p>
+        已缴费用共计 {{ $count['is_charged']['water_money'] + $count['is_charged']['electric_money'] }} 元，
+        其中电费 {{ $count['is_charged']['electric_money'] }} 元，
+        水费 {{ $count['is_charged']['water_money'] }} 元。
+    </p>
+    <p>
+        尚未缴费用共计 {{ $count['no_charged']['water_money'] + $count['no_charged']['electric_money'] }} 元，
+        其中电费 {{ $count['no_charged']['electric_money'] }} 元，
+        水费 {{ $count['no_charged']['water_money'] }} 元。
+    </p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>

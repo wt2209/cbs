@@ -25,11 +25,14 @@ class UtilityController extends Controller{
      */
     public function getIndex()
     {
+        //TODO 分页中每一页的数量设置成一个配置项
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
             ->join('company', 'company.company_id', '=', 'room.company_id')
-            ->get();
-        return view('utility.index', ['utilities'=>$utilities]);
+            ->paginate(20);
+
+        $count = $this->setUtilityCount();
+        return view('utility.index', ['utilities'=>$utilities, 'count'=>$count]);
     }
 
     /**
@@ -47,18 +50,12 @@ class UtilityController extends Controller{
      */
     public function getBase()
     {
-        $bases = UtilityBase::all();
-        $roomToId = $this->setRoomToId();
-        $idToRoom = array_flip($roomToId);
-        foreach ($bases as $k => $base) {
-            //房间已被删除，底数成为“野底数”
-            if (!isset($idToRoom[$base['room_id']])) {
-                unset($bases[$k]);
-                continue;
-            }
-            $bases[$k]['room'] = $idToRoom[$base['room_id']];
-        }
-        return view('utility.base', ['bases'=>$bases]);
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->setBaseCount();
+        $bases = DB::table('utility_base')
+            ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+            ->paginate(20);
+        return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
     }
 
     /**
@@ -365,5 +362,67 @@ class UtilityController extends Controller{
             }
         }
         return $items;
+    }
+
+    /**
+     * 统计水、电各项数据
+     * @param null $where 必须满足laravel要求的where方法的参数
+     * @return array
+     */
+    private function setUtilityCount($where = NULL)
+    {
+        if ($where == NULL) {
+            $utilities = DB::table('utility')
+                ->join('room', 'utility.room_id', '=', 'room.room_id')
+                ->join('company', 'company.company_id', '=', 'room.company_id')
+                ->get();
+        } else {
+            $utilities = DB::table('utility')
+                ->join('room', 'utility.room_id', '=', 'room.room_id')
+                ->join('company', 'company.company_id', '=', 'room.company_id')
+                ->where($where)
+                ->get();
+        }
+
+        $count = [
+            'total_number'=>count($utilities),
+            'is_charged'=>[
+                'water_money'=>0,
+                'electric_money'=>0
+            ],
+            'no_charged'=>[
+                'water_money'=>0,
+                'electric_money'=>0
+            ]
+        ];
+        foreach ($utilities as $utility) {
+            if ($utility->is_charged == 1) {
+                $count['is_charged']['water_money'] += $utility->water_money;
+                $count['is_charged']['electric_money'] += $utility->electric_money;
+            } elseif ($utility->is_charged == 0) {
+                $count['no_charged']['water_money'] += $utility->water_money;
+                $count['no_charged']['electric_money'] += $utility->electric_money;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * 统计水电底数总数
+     * @param null $where 必须满足laravel要求的where方法的参数
+     * @return int
+     */
+    private function setBaseCount($where = NULL)
+    {
+        if ($where) {
+            return DB::table('utility_base')
+                ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+                ->where($where)
+                ->count();
+        } else {
+            return DB::table('utility_base')
+                ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+                ->count();
+        }
     }
 }

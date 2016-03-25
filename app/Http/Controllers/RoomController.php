@@ -38,15 +38,9 @@ class RoomController extends Controller
      **/
     public function getIndex()
     {
-        $rooms = Room::all();
-        $count['all'] = count($rooms);
-        $count['empty'] = 0;
-        foreach ($rooms as $room) {
-            if ($room->company_id == 0) {
-                $count['empty']++;
-            }
-        }
-        return view('room.index', ['rooms' => $rooms, 'count'=>$count]);
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->setRoomCount();
+        return view('room.index', ['rooms' => Room::paginate(20), 'count'=>$count]);
     }
 
     /**
@@ -138,5 +132,27 @@ class RoomController extends Controller
         } else {
             exit(json_encode(['message'=>'失败：数据添加失败，请重试...', 'status'=>0]));
         }
+    }
+
+    /**
+     * 统计房间总数及空房间数
+     * @param null $where 必须满足laravel中where参数的要求
+     * @return array
+     */
+    private function setRoomCount($where = NULL)
+    {
+        if ($where) {
+            $rooms = Room::where($where)->get();
+        } else {
+            $rooms = Room::get();
+        }
+        $count['all'] = count($rooms);
+        $count['empty'] = 0;
+        foreach ($rooms as $room) {
+            if ($room->company_id == 0) {
+                $count['empty']++;
+            }
+        }
+        return $count;
     }
 }

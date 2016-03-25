@@ -48,7 +48,7 @@
 
             @foreach($bases as $base)
                 <tr>
-                    <td>{{ $base->room }}</td>
+                    <td>{{ $base->building }}-{{ $base->room_number }}</td>
                     <td>{{ $base->year }}-{{ $base->month }} </td>
                     <td>{{ $base->electric_base }}</td>
                     <td>{{ $base->water_base }}</td>
@@ -62,6 +62,7 @@
                 </tr>
             @endforeach
         </table>
+        {!! $bases->render() !!}
     </div>
 @endsection
 @section('modal')
@@ -87,7 +88,7 @@
     </div>
 @endsection
 @section('bottom')
-    <p>共有 {{ count($bases) }} 条记录</p>
+    <p>共有 {{ $count }} 条记录</p>
     <div class="container-fluid">
         <div class="navbar-header">
             <form id="calculate" class="navbar-form navbar-left" role="search">
