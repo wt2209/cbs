@@ -2,19 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Model\CompanyLog;
 use App\Model\Company;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyLogController extends Controller
 {
+    /**
+     * 首页
+     * @return \Illuminate\View\View
+     */
     public function getIndex()
     {
-        $companyLogs = CompanyLog::all();
+        //TODO 分页中每一页的数量设置成一个配置项
+        $companyLogs = DB::table('company_log')->paginate(20);
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }
+    public function getSearch(Request $request)
+    {
+        $companyName = trim(strip_tags(htmlspecialchars($request->company_name)));
+        $companyLogs = DB::table('company_log')->where('company_name', 'like', '%' . $companyName . '%')
+            ->paginate(1);
+        return view('companyLog/index', ['companyLogs'=>$companyLogs]);
+    }
+
     /**
      * * 记录房间操作的历史日志
      * @param $type 操作类型，1|入住 2|调整房间 3|退房 4|删除
@@ -56,5 +71,22 @@ class CompanyLogController extends Controller
         } else {
             return false;
         }
+    }
+
+    /**
+     * 删除操作记录
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDelete(Request $request)
+    {
+        $deleteId = intval($request->delete_id);
+        if (!$deleteId) {
+            return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
+        }
+        if (CompanyLog::destroy($deleteId)) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"错误：请重试！", 'status'=>0]);
     }
 }

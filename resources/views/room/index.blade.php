@@ -8,15 +8,21 @@
         <li role="presentation" class="active"><a href="#">房间明细</a></li>
     </ul>
     <div id="return-btn">
-        <a href="" class="refresh"></a>
+        <a href="{{ url('room/index') }}" class="refresh"></a>
     </div>
     <nav class="navbar navbar-default navbar-small">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left" role="search"  method="get" action="{{ url('room/search') }}">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="房间号">&nbsp;&nbsp;&nbsp;
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="text" class="form-control"  value="{{ $_GET['room_name'] or '' }}" name="room_name" placeholder="房间号">&nbsp;或者
+                        <select name="room_type" class="form-control">
+                            <option value="0">全部房间</option>
+                            <option value="1" @if(isset($_GET['room_type'])&&$_GET['room_type'] == 1) selected=""@endif>正在使用</option>
+                            <option value="2" @if(isset($_GET['room_type'])&&$_GET['room_type'] == 2) selected=""@endif>空房间</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -76,7 +82,7 @@
                 @endif
             @endforeach
         </table>
-        {!! $rooms->render() !!}
+        {!! $rooms->appends(['room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '', 'room_type'=>isset($_GET['room_type']) ? $_GET['room_type'] :0])->render() !!}
     </div>
 @endsection
 @section('modal')

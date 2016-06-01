@@ -64,6 +64,34 @@ class CompanyController extends Controller
     }
 
     /**
+     * 搜索 只能同时搜索公司名或者人名
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function getSearch (Request $request)
+    {
+        $companyName = trim(strip_tags(htmlspecialchars($request->company_name)));
+        $personName = trim(strip_tags(htmlspecialchars($request->person_name)));
+
+        $company = new Company();
+        if (!empty($companyName)) {
+            $companies = $company->where('company_name', 'like', '%' . $companyName . '%')->get();
+        } elseif (!empty($personName)) {
+            $companies = $company->where("linkman", 'like', '%' . $personName . '%')
+                ->orWhere('manager', 'like', '%' . $personName . '%')
+                ->get();
+        } else {
+            $companies = Company::all();
+        }
+        $count['company'] = count($companies);
+        $count['room'] = 0;
+        foreach ($companies as $company) {
+            $count['room'] += count($company->rooms);
+        }
+        return view('company.index', ['companies'=>$companies, 'count'=>$count]);
+    }
+
+    /**
      * 添加公司
      * @return \Illuminate\View\View
      */
@@ -307,16 +335,18 @@ class CompanyController extends Controller
             $postRooms = $request->room_select;
         }
 
-        foreach ($postRooms as $postRoom) {
-            //过滤空数据
-            $postRoom = trim($postRoom);
-            if (empty($postRoom)) {
-                continue;
-            }
+        if (!empty($postRooms)) {
+            foreach ($postRooms as $postRoom) {
+                //过滤空数据
+                $postRoom = trim($postRoom);
+                if (empty($postRoom)) {
+                    continue;
+                }
 
-            if (isset($roomToId[$postRoom])) {
-                $this->newRooms[] = $postRoom;
-                $data[] = $roomToId[$postRoom];
+                if (isset($roomToId[$postRoom])) {
+                    $this->newRooms[] = $postRoom;
+                    $data[] = $roomToId[$postRoom];
+                }
             }
         }
 

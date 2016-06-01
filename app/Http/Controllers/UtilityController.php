@@ -139,7 +139,7 @@ class UtilityController extends Controller{
 
     /**
      * 编辑水电费
-     * @param  int  $id
+     * @param  int  $UtilityId
      * @return Response
      */
     public function getEdit($UtilityId)
@@ -164,7 +164,6 @@ class UtilityController extends Controller{
     /**
      *  更新水电费
      * @param  Request  $request
-     * @param  int  $id
      * @return Response
      */
     public function postUpdate(Request $request)
@@ -185,7 +184,7 @@ class UtilityController extends Controller{
 
     /**
      * 单个房间缴费
-     * @param $utilityId
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getChargeSingleRoom(Request $request)

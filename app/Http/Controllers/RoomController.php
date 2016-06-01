@@ -43,6 +43,31 @@ class RoomController extends Controller
         return view('room.index', ['rooms' => Room::paginate(20), 'count'=>$count]);
     }
 
+    public function getSearch(Request $request)
+    {
+        $roomName = trim(strip_tags(htmlspecialchars($request->room_name)));
+        $roomType = intval($request->room_type);
+
+        if (!empty($roomName)) {
+            $tmpArr = explode('-', $roomName);
+            $where = "building = $tmpArr[0] and room_number = $tmpArr[1]";
+        } elseif ($roomType === 1) {
+            $where = "company_id != 0";
+        } elseif ($roomType === 2) { //空房间。company_id=0
+            $where = "company_id = 0";
+        } else {
+            $where = NULL;
+        }
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->setRoomCount($where);
+        if ($where) {
+            $rooms =  Room::whereRaw($where)->paginate(1);
+        } else {
+            $rooms =  Room::paginate(1);
+        }
+        return view('room.index', ['rooms' => $rooms, 'count'=>$count]);
+    }
+
     /**
      * 添加房间
      * @return \Illuminate\View\View
@@ -142,7 +167,7 @@ class RoomController extends Controller
     private function setRoomCount($where = NULL)
     {
         if ($where) {
-            $rooms = Room::where($where)->get();
+            $rooms = Room::whereRaw($where)->get();
         } else {
             $rooms = Room::get();
         }

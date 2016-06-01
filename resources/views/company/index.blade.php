@@ -11,16 +11,17 @@
         <li role="presentation" class="active"><a href="#">承包商公司明细</a></li>
     </ul>
     <div id="return-btn">
-        <a href="" class="refresh"></a>
+        <a href="{{ url('company/index') }}" class="refresh"></a>
     </div>
     <nav class="navbar navbar-default navbar-small">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('company/search') }}">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;&nbsp;&nbsp;
-                        <input type="text" class="form-control"  placeholder="负责人/联系人">&nbsp;&nbsp;&nbsp;
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name" placeholder="公司名称">&nbsp;或者
+                        <input type="text" class="form-control" value="{{ $_GET['person_name'] or '' }}" name="person_name"  placeholder="负责人/联系人">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -124,8 +125,8 @@
                     <div class="func">
                         <a href="{{ url('company/change-rooms/'.$company->company_id) }}" class="btn btn-success btn-xs">调整房间</a>
                         <a href="{{ url('company/edit/'.$company->company_id) }}" class="btn btn-success btn-xs">修改</a>
-                        <a href="{{ url('company/quit/'.$company->company_id) }}" class="btn btn-warning btn-xs">退租</a>
-                        <a href="{{ url('company/del/'.$company->company_id) }}" class="btn btn-danger btn-xs">删除</a>
+                        <a href="{{ url('company/.../'.$company->company_id) }}" class="btn btn-warning btn-xs">巡查状态</a>
+                        <a href="{{ url('company/quit/'.$company->company_id) }}" class="btn btn-danger btn-xs">退租</a>
                     </div>
                 </div>
             </div>

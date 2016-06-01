@@ -8,15 +8,16 @@
         <li role="presentation" class="active"><a href="#">公司房间变动记录</a></li>
     </ul>
     <div id="return-btn">
-        <a href="" class="refresh"></a>
+        <a href="{{ url('company-log/index') }}" class="refresh"></a>
     </div>
     <nav class="navbar navbar-default navbar-small">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('company-log/search') }}">
                     <div class="form-group">
-                        <input type="text" class="form-control"  placeholder="公司名称">&nbsp;&nbsp;&nbsp;
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name"  placeholder="公司名称">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -61,15 +62,17 @@
                     <td>{{$companyLog->old_rooms}}</td>
                     <td>{{$companyLog->new_rooms}}</td>
                     <td>
-                        <a href="" class="btn btn-danger btn-xs">删除</a>
+                        <button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>
                 </tr>
             @endforeach
         </table>
+        {!! $companyLogs->appends(['company_name' => isset($_GET['company_name']) ? $_GET['company_name'] : ''])->render() !!}
     </div>
-
-    <!-- delete modal -->
-    <div id="modal" class="modal bs-example-modal-sm">
+@endsection
+@section('modal')
+        <!-- delete modal -->
+    <div id="delete-modal" class="modal bs-example-modal-sm fade">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -82,7 +85,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="modal-confirm" type="button" class="btn btn-primary">确认</button>
+                    <button id="delete-confirm" type="button" class="btn btn-primary">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
@@ -96,25 +99,6 @@
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script>
-        //删除模态框
-        {{--        //{{ url('room/del/'.$room->room_id) }}--}}
-        var roomId = 0;
-        $('.btn-danger').click(function(){
-            $('#modal').modal('show');
-            roomId = $(this).attr('room_id');
-        })
-        $('#modal-confirm').click(function(){
-            $('#modal').modal('hide');
-            maskShow();
-            $.get('{{ url('room/remove/') }}', 'room_id=' + roomId, function(e){
-                maskHide();
-                popdown({'message':e.message, 'status': e.status, 'callback':function(){
-                    if (e.status) {
-                        location.reload(true);
-                    }
-                }});
-            }, 'json');
-        })
-
+        ajaxDelete('{{ url('company-log/delete/') }}');
     </script>
 @endsection

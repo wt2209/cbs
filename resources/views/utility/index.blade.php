@@ -16,9 +16,14 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="房间号">&nbsp;&nbsp;&nbsp;
-                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;&nbsp;&nbsp;
-                        <input type="text" class="form-control" placeholder="月份，格式为：2016-3">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" placeholder="房间号">&nbsp;或
+                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;，
+                        <input type="text" class="form-control" placeholder="月份，格式为：2016-3">&nbsp;
+                        <select name="room_type" class="form-control">
+                            <option value="0">全部</option>
+                            <option value="1" @if(isset($_GET['charge_type'])&&$_GET['charge_type'] == 1) selected=""@endif>已缴费</option>
+                            <option value="2" @if(isset($_GET['charge_type'])&&$_GET['charge_type'] == 2) selected=""@endif>未缴费</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
