@@ -32,3 +32,6 @@ Route::controller('company-log', 'CompanyLogController');
 
 //水电费处理
 Route::controller('utility','UtilityController');
+
+//罚款控制器
+Route::controller('punish','PunishController');

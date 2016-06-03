@@ -12,6 +12,7 @@ return array(
     'CreateFireguidersTable' => $baseDir . '/database/migrations/2015_07_25_151104_create_fireguiders_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
     'CreatePersonTable' => $baseDir . '/database/migrations/2015_07_25_151028_create_person_table.php',
+    'CreatePunishTable' => $baseDir . '/database/migrations/2016_06_03_220920_create_punish_table.php',
     'CreateRoomsTable' => $baseDir . '/database/migrations/2015_07_25_135706_create_rooms_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2014_10_12_000000_create_users_table.php',
     'CreateUtilityBaseTable' => $baseDir . '/database/migrations/2016_03_15_182554_create_utility_base_table.php',

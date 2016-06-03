@@ -52,6 +52,19 @@ return [
         ],
         'company_remark'=>[
             'between'=>'失败：备注不得多于255个字符！'
+        ],
+
+        //处罚相关
+        'money'=>[
+            'required'=>'失败：金额必须填写！',
+            'numeric'=>'失败：请填写正确的数额！'
+        ],
+        'reason'=>[
+            'required'=>'失败：原因必须填写！',
+            'between'=>'失败：原因不得多于255个字符！'
+        ],
+        'punish_remark'=>[
+            'between'=>'失败：备注不得多于255个字符！'
         ]
     ],
 

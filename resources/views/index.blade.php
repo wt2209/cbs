@@ -38,6 +38,7 @@
                     <li class="left_back">承包商公司</li>
                     <li class="left_back">房间管理</li>
                     <li class="left_back">水电费管理</li>
+                    <li class="left_back">罚单管理</li>
                 </ul>
             </div>
             <div id="right_main_nav">
@@ -77,6 +78,17 @@
                         </li>
                         <li>
                             <a href="{{ url('utility/add') }}" target="iframe">录入底数</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="list_title">
+                    <span>罚单管理</span>
+                    <ul class="list_detail">
+                        <li>
+                            <a href="{{ url('punish/charged-list') }}" target="iframe">未缴费</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('punish/uncharged-list') }}" target="iframe">已缴费</a>
                         </li>
                     </ul>
                 </div>
