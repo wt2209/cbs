@@ -8,7 +8,6 @@ use App\Model\Utility;
 use App\Model\Room;
 use App\Model\UtilityBase;
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -36,6 +35,58 @@ class UtilityController extends Controller{
     }
 
     /**
+     * 搜索水电费
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function getSearch(Request$request)
+    {
+        $roomName = trim(strip_tags(htmlspecialchars($request->room_name)));
+        $companyName = trim(strip_tags(htmlspecialchars($request->company_name)));
+        $yearMonth = trim(strip_tags(htmlspecialchars($request->year_month)));
+        $chargeType = intval($request->charge_type);
+
+        $whereArr = [];
+        if (empty($roomName)) { //房间号空
+            if (!empty($companyName)) { //公司名不空：不用处理房间号，只用处理公司名
+                $whereArr[] = "cbs_company.company_name like '%{$companyName}%'";
+            }
+        } else { //房间号不空，不用处理公司名
+            $tmpRoom = explode('-', $roomName);
+            if (count($tmpRoom) === 2) {//房间格式不对，给一个不能查出结果的条件
+                $whereArr[] = 'cbs_room.building = ' . $tmpRoom[0] . ' and cbs_room.room_number = ' . $tmpRoom[1];
+            }
+        }
+        if (!empty($yearMonth)) {
+            $tmp = explode('-', $yearMonth);
+            $year = isset($tmp[0]) ? intval($tmp[0]) : 0;
+            $month = isset($tmp[1]) ? intval($tmp[1]) : 0;
+            $whereArr[] = "year = {$year} and month = {$month}";
+        }
+
+        if ($chargeType === 1) {//已缴费
+            $whereArr[] = "is_charged = 1";
+        }
+        if ($chargeType === 2) {//未交费
+            $whereArr[] = "is_charged = 0";
+        }
+
+        $where = implode(' and ', $whereArr);
+        if (!$where) { //条件为空，显示所有结果
+            $where = 'utility_id != 0';
+        }
+        //TODO 分页
+        $utilities = DB::table('utility')
+            ->join('room', 'utility.room_id', '=', 'room.room_id')
+            ->join('company', 'company.company_id', '=', 'room.company_id')
+            ->whereRaw($where)
+            ->paginate(1);
+
+        $count = $this->setUtilityCount($where);
+        return view('utility.index', ['utilities'=>$utilities, 'count'=>$count]);
+    }
+
+    /**
      * 录入底数
      * @return \Illuminate\View\View
      */
@@ -54,6 +105,38 @@ class UtilityController extends Controller{
         $count = $this->setBaseCount();
         $bases = DB::table('utility_base')
             ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+            ->paginate(3);
+        return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
+    }
+
+    public function getBaseSearch(Request $request)
+    {
+        $roomName = trim(strip_tags(htmlspecialchars($request->room_name)));
+        $yearMonth = trim(strip_tags(htmlspecialchars($request->year_month)));
+
+        $whereArr = [];
+        if (!empty($roomName)) { //房间号不空，不用处理公司名
+            $tmpRoom = explode('-', $roomName);
+            if (count($tmpRoom) === 2) {//房间格式不对，给一个不能查出结果的条件
+                $whereArr[] = 'cbs_room.building = ' . $tmpRoom[0] . ' and cbs_room.room_number = ' . $tmpRoom[1];
+            }
+        }
+        if (!empty($yearMonth)) {
+            $tmp = explode('-', $yearMonth);
+            $year = isset($tmp[0]) ? intval($tmp[0]) : 0;
+            $month = isset($tmp[1]) ? intval($tmp[1]) : 0;
+            $whereArr[] = "year = {$year} and month = {$month}";
+        }
+
+        $where = implode(' and ', $whereArr);
+        if (!$where) { //条件为空，显示所有结果
+            $where = 'u_base_id != 0';
+        }
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->setBaseCount();
+        $bases = DB::table('utility_base')
+            ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+            ->whereRaw($where)
             ->paginate(3);
         return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
     }
@@ -379,7 +462,7 @@ class UtilityController extends Controller{
             $utilities = DB::table('utility')
                 ->join('room', 'utility.room_id', '=', 'room.room_id')
                 ->join('company', 'company.company_id', '=', 'room.company_id')
-                ->where($where)
+                ->whereRaw($where)
                 ->get();
         }
 
@@ -416,7 +499,7 @@ class UtilityController extends Controller{
         if ($where) {
             return DB::table('utility_base')
                 ->join('room', 'utility_base.room_id', '=', 'room.room_id')
-                ->where($where)
+                ->whereRaw($where)
                 ->count();
         } else {
             return DB::table('utility_base')

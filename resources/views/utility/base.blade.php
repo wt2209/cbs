@@ -14,10 +14,11 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('utility/base-search') }}">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="房间号">&nbsp;&nbsp;&nbsp;
-                        <input type="text" class="form-control" placeholder="月份，格式为：2016-3">&nbsp;&nbsp;&nbsp;
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="text" class="form-control" value="{{ $_GET['room_name'] or '' }}" name="room_name" placeholder="房间号">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" value="{{ $_GET['year_month'] or '' }}" name="year_month" placeholder="月份，格式为：2016-3">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -62,7 +63,10 @@
                 </tr>
             @endforeach
         </table>
-        {!! $bases->render() !!}
+        {!! $bases->appends([
+                'room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '',
+                'year_month'=>isset($_GET['year_month']) ? $_GET['year_month'] : '',
+            ])->render() !!}
     </div>
 @endsection
 @section('modal')

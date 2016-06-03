@@ -14,12 +14,13 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search">
+                <form class="navbar-form navbar-left" role="search"  method="get" action="{{ url('utility/search') }}">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="房间号">&nbsp;或
-                        <input type="text" class="form-control" placeholder="公司名称">&nbsp;，
-                        <input type="text" class="form-control" placeholder="月份，格式为：2016-3">&nbsp;
-                        <select name="room_type" class="form-control">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="text" class="form-control" value="{{ $_GET['room_name'] or '' }}" name="room_name"  placeholder="房间号">&nbsp;或
+                        <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name"  placeholder="公司名称">&nbsp;，
+                        <input type="text" class="form-control" value="{{ $_GET['year_month'] or '' }}" name="year_month" placeholder="月份，格式为：2016-3">&nbsp;
+                        <select name="charge_type" class="form-control">
                             <option value="0">全部</option>
                             <option value="1" @if(isset($_GET['charge_type'])&&$_GET['charge_type'] == 1) selected=""@endif>已缴费</option>
                             <option value="2" @if(isset($_GET['charge_type'])&&$_GET['charge_type'] == 2) selected=""@endif>未缴费</option>
@@ -92,7 +93,12 @@
                 </tr>
             @endforeach
         </table>
-        {!! $utilities->render() !!}
+        {!! $utilities->appends([
+                'room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '',
+                'company_name'=>isset($_GET['company_name']) ? $_GET['company_name'] :0,
+                'year_month'=>isset($_GET['year_month']) ? $_GET['year_month'] : '',
+                'charge_type'=>isset($_GET['charge_type']) ? $_GET['charge_type'] :0
+            ])->render() !!}
     </div>
 @endsection
 @section('modal')

@@ -82,7 +82,10 @@
                 @endif
             @endforeach
         </table>
-        {!! $rooms->appends(['room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '', 'room_type'=>isset($_GET['room_type']) ? $_GET['room_type'] :0])->render() !!}
+        {!! $rooms->appends([
+                'room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '',
+                'room_type'=>isset($_GET['room_type']) ? $_GET['room_type'] :0
+            ])->render() !!}
     </div>
 @endsection
 @section('modal')
