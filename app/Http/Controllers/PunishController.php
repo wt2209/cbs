@@ -74,7 +74,6 @@ class PunishController extends Controller
                                     date('Y-m-d H:i:s', strtotime($request->created_at)) :
                                     date('Y-m-d H:i:s');
 
-
         //开启事务
         DB::beginTransaction();
         if ($punish->save()) {
