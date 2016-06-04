@@ -272,7 +272,7 @@ class UtilityController extends Controller{
      */
     public function getChargeSingleRoom(Request $request)
     {
-        $utilityId = intval($request->utility_id);
+        $utilityId = intval($request->charge_id);
         if (!$utilityId) {
             return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
         }

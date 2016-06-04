@@ -55,16 +55,16 @@ function ajaxDelete(url) {
 }
 
 function ajaxCharge(url) {
-    var utilityId = 0;
+    var chargeId = 0;
     //缴费模态框
     $('.charge-button').click(function(){
         $('#charge-modal').modal('show');
-        utilityId = $(this).attr('utility_id');
+        chargeId = $(this).attr('charge_id');
     });
     $('#charge-confirm').click(function(){
         $('#charge-modal').modal('hide');
         maskShow();
-        $.get(url, 'utility_id=' + utilityId, function(e){
+        $.get(url, 'charge_id=' + chargeId, function(e){
             maskHide();
             popdown({'message':e.message, 'status': e.status, 'callback':function(){
                 if (e.status) {

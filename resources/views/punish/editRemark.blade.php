@@ -1,64 +1,55 @@
 @extends('header')
-@section('title', '开具罚单')
+
+@section('title', '修改备注')
+
+
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/punish/create.css') }}"/>
+    <link rel="stylesheet" href="{{ url('/css/company/edit.css') }}"/>
+
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">开具罚单</a></li>
+        <li role="presentation" class="active"><a href="#">修改备注</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('punish/uncharged-list') }}"><< 返回未缴费列表页</a>
         <a href="" class="refresh"></a>
     </div>
-    <nav class="navbar navbar-default navbar-small">
-        <div class="warning-message">
-            <span style="color:red">请注意：</span>一旦开具，罚单将不能修改，且必须注明原因后才能撤销！
-        </div>
-    </nav>
 @endsection
 @section('content')
     <div class="table-responsive">
         <form id="form">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+            <input type="hidden" name="punish_id" value="{{ $punish->punish_id }}">
             <table class="table table-hover table-condensed">
                 <tr class="no-border">
                     <th width="10%">公司名称</th>
                     <td width="20%">
-                        {{ $company->company_name }}
-                        <input type="hidden" name="company_id" value="{{ $company->company_id }}">
+                        {{ $punish->company->company_name }}
                     </td>
                     <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>罚款金额</th>
-                    <td>
-                        <input type="text" class="form-control input-sm" name="money"/>
+                    <th width="10%">罚款原因</th>
+                    <td width="20%">
+                        {{ $punish->reason }}
                     </td>
-                    <td></td>
+                    <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>处罚原因</th>
-                    <td colspan="2" width="30%">
-                        <textarea name="reason" class="form-control" cols="30" rows="3"></textarea>
+                    <th width="10%">金额</th>
+                    <td width="20%">
+                        {{ $punish->money }}
                     </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th>开单时间</th>
-                    <td>
-                        <input type="text" class="form-control input-sm" name="created_at"
-                               placeholder="例如：2016-6-1"/>
-                    </td>
-                    <td></td>
+                    <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
                     <th>备注</th>
                     <td colspan="2" width="30%">
-                        <textarea name="punish_remark" class="form-control" cols="30" rows="3"></textarea>
+                        <textarea name="punish_remark" class="form-control" cols="30" rows="3">{{ $punish->punish_remark }}</textarea>
                     </td>
                     <td></td>
                 </tr>
@@ -69,11 +60,13 @@
         </form>
     </div>
 @endsection
+
 @section('js')
     {{-- 加载气泡效果js --}}
     <script src="{{ url('/js/functions.js') }}"></script>
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
+        /*表单验证*/
         var s = true;
         var validate = $("#form").validate({
             debug: true, //调试模式取消submit的默认提交功能
@@ -81,16 +74,16 @@
             focusInvalid: false, //当为false时，验证无效时，没有焦点响应
             onkeyup: false,
             submitHandler: function(){   //表单提交句柄,为一回调函数，带一个参数：form
+                var s = true;
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('punish/store') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('punish/update-remark') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             if (e.status) {
-                                $('#form')[0].reset();
                                 /*返回并刷新原页面*/
-                                location.href = '{{ url("company/index") }}';
+                                location.href = document.referrer;
                             }
                         }});
                         s = true;
@@ -99,35 +92,21 @@
                 return false;
             },
             rules:{
-                money:{
+                punish_id:{
                     required:true,
                     number:true
-                },
-                reason:{
-                    required:true,
-                    maxlength:255
-                },
-                created_at:{
-                    date:true
                 },
                 punish_remark:{
                     maxlength:255
                 }
             },
             messages:{
-                money:{
-                    required:"金额必须填写！",
-                    number:"请填写正确的数额！"
-                },
-                reason:{
-                    required:"原因必须填写！",
-                    maxlength:"原因不得多于255个字符！"
-                },
-                created_at:{
-                    date:"请填写正确的日期格式，或者不填！"
+                punish_id:{
+                    required:"非法!",
+                    number:"非法！"
                 },
                 punish_remark:{
-                    maxlength:"备注不得多于255个字符！"
+                    maxlength:"备注不能超过255个字符！"
                 }
             }
         });

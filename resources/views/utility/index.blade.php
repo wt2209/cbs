@@ -83,9 +83,9 @@
                     <td>{{ $utility->utility_remark }}</td>
                     <td>
                         @if ($utility->is_charged)
-                            <button class="btn btn-success btn-xs charge-button" disabled="disabled" utility_id="{{ $utility->utility_id }}">缴费</button>
+                            <button class="btn btn-success btn-xs charge-button" disabled="disabled">缴费</button>
                         @else
-                            <button class="btn btn-success btn-xs charge-button" utility_id="{{ $utility->utility_id }}">缴费</button>
+                            <button class="btn btn-success btn-xs charge-button" charge_id="{{ $utility->utility_id }}">缴费</button>
                         @endif
                         <a href="{{ url('utility/edit/'.$utility->utility_id) }}" class="btn btn-primary btn-xs">修改</a>
                         <button delete_id="{{ $utility->utility_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
@@ -116,10 +116,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <form id="form">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-                        <input type="hidden" name="year">
-                    </form>
                     <button id="charge-confirm" type="button" class="btn btn-primary">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>

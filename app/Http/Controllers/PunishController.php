@@ -13,24 +13,45 @@ use App\Http\Controllers\Controller;
 class PunishController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
+     * 已缴费列表
+     * @return \Illuminate\View\View
      */
     public function getChargedList()
     {
         return 'charged';
     }
 
-
+    /**
+     * 未缴费列表
+     * @return \Illuminate\View\View
+     */
     public function getUnchargedList()
     {
-        return 'uncharged';
+        //TODO 需要处理user_id 和cancel_user_id
+        //TODO 分页
+        $unchargedLists = Punish::where('is_charged', 0)
+            ->paginate(2);
+        $count = $this->setUnchargedCount();
+        return view('punish.uncharged', ['unchargedLists'=>$unchargedLists, 'count'=>$count]);
+    }
+
+
+    public function getCharge(Request $request)
+    {
+        $punishId = intval($request->charge_id);
+        if (!$punishId) {
+            return response()->json(['message'=>"错误：请正确操作！", 'status'=>0]);
+        }
+
+        if ($this->chargeStore($punishId)) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"错误：请重试！", 'status'=>0]);
     }
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
+     * 开罚单
+     * @param $companyId
+     * @return \Illuminate\View\View
      */
     public function getCreate($companyId)
     {
@@ -42,8 +63,7 @@ class PunishController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
+     *存储罚单
      * @param  Request  $request
      * @return Response
      */
@@ -61,7 +81,6 @@ class PunishController extends Controller
         if ($validator->fails()) {
             return response()->json(['message'=>$validator->errors()->first(), 'status'=>0]);
         }
-
 
         $punish = new Punish();
         $punish->company_id = $request->company_id;
@@ -86,48 +105,77 @@ class PunishController extends Controller
         }
     }
 
+
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
+     * 修改备注
+     * @param $punishId
+     * @return \Illuminate\View\View
      */
-    public function show($id)
+    public function getEditRemark($punishId)
     {
-        //
+        if (!intval($punishId)) {
+            exit('非法请求！');
+        }
+        $punish = Punish::find(intval($punishId));
+        return view('punish.editRemark', ['punish'=>$punish]);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
+     * 存储备注
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function edit($id)
+    public function postUpdateRemark(Request $request)
     {
-        //
+        $punishId = intval($request->punish_id);
+        $remark = trim(htmlspecialchars(strip_tags($request->punish_remark)));
+        if ($punishId) {
+            DB::table('punish')->where('punish_id', $punishId)
+                ->update(['punish_remark' => $remark]);
+            return response()->json(['message'=>"操作成功！",'status'=>1]);
+        }
+        return response()->json(['message'=>"失败：请重试！",'status'=>0]);
+    }
+
+
+    public function getCancel($punishId)
+    {
+        return view('punish.cancel');
+    }
+
+
+    /**
+     * 计算未缴费的统计信息
+     * @param null $where
+     * @return array
+     */
+    private function setUnchargedCount($where = NULL)
+    {
+        $whereArr[] = 'is_charged = 0';
+        if ($where) {
+            $whereArr[] = $where;
+        }
+        $whereStr = implode(' and ', $whereArr);
+
+        $count['totalNumber'] = DB::table('punish')->whereRaw($whereStr)
+                                    ->count();
+        $count['totalMoney'] = DB::table('punish')->whereRaw($whereStr)
+                                    ->sum('money');
+        return $count;
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return Response
+     * 存储缴费记录
+     * @param $punishId
+     * @return mixed
      */
-    public function update(Request $request, $id)
+    private function chargeStore($punishId)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
+        return DB::table('punish')
+            ->where('punish_id', $punishId)
+            ->update([
+                'is_charged'=>1,
+                'charged_at'=>date('Y-m-d H:i:s')
+            ]);
     }
 }

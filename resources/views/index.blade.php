@@ -85,10 +85,10 @@
                     <span>罚单管理</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="{{ url('punish/charged-list') }}" target="iframe">未缴费</a>
+                            <a href="{{ url('punish/uncharged-list') }}" target="iframe">未缴费</a>
                         </li>
                         <li>
-                            <a href="{{ url('punish/uncharged-list') }}" target="iframe">已缴费</a>
+                            <a href="{{ url('punish/charged-list') }}" target="iframe">已缴费</a>
                         </li>
                     </ul>
                 </div>
