@@ -7,7 +7,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">修改水电费</a></li>
+        <li role="presentation" class="active"><a href="">修改水电费</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('utility/index') }}"><< 返回列表页</a>

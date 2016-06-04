@@ -18,11 +18,11 @@
         <div class="text_right">
             <ul class="nav_return">
                 <li><img src="{{ asset('/images/return.gif') }}" width="13" height="21" />&nbsp;返回 [
-                    <a href="#">待定1</a>|
-                    <a href="#">待定2</a> ]
+                    <a href="">待定1</a>|
+                    <a href="">待定2</a> ]
                 </li>
-                <li> [<a href="#">待定3</a>]</li>
-                <li> [<a href="#">退出</a>]&nbsp;&nbsp;</li>
+                <li> [<a href="">待定3</a>]</li>
+                <li> [<a href="">退出</a>]&nbsp;&nbsp;</li>
             </ul>
         </div>
     </div>
@@ -30,7 +30,7 @@
 {{--头部区域结束--}}
 {{--左侧区域--}}
 <div id="left_content">
-    <div id="user_info">欢迎您，<strong>wt2209</strong><br />[<a href="#">系统管理员</a>，<a href="#">退出</a>]</div>
+    <div id="user_info">欢迎您，<strong>wt2209</strong><br />[<a href="">系统管理员</a>，<a href="">退出</a>]</div>
     <div id="main_nav">
         <div class="list_item active">
             <div id="left_main_nav">
@@ -90,31 +90,8 @@
                         <li>
                             <a href="{{ url('punish/charged-list') }}" target="iframe">已缴费</a>
                         </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="list_item">
-            <div id="left_main_nav">
-                <ul>
-                    <li class="left_back">退出系统</li>
-                    <li class="left_back">退出系统2</li>
-                </ul>
-            </div>
-            <div id="right_main_nav">
-                <div class="list_title">
-                    <span>退出系统1</span>
-                    <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="list_title">
-                    <span>退出系统2</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="#" target="iframe">点击退出登录2</a>
+                            <a href="{{ url('punish/canceled-list') }}" target="iframe">已撤销</a>
                         </li>
                     </ul>
                 </div>
@@ -132,7 +109,7 @@
                     <span>退出系统1</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录</a>
+                            <a href="" target="iframe">点击退出登录</a>
                         </li>
                     </ul>
                 </div>
@@ -140,7 +117,7 @@
                     <span>退出系统2</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录2</a>
+                            <a href="" target="iframe">点击退出登录2</a>
                         </li>
                     </ul>
                 </div>
@@ -158,7 +135,7 @@
                     <span>退出系统1</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录</a>
+                            <a href="" target="iframe">点击退出登录</a>
                         </li>
                     </ul>
                 </div>
@@ -166,7 +143,7 @@
                     <span>退出系统2</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录2</a>
+                            <a href="" target="iframe">点击退出登录2</a>
                         </li>
                     </ul>
                 </div>
@@ -184,7 +161,7 @@
                     <span>退出系统1</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录</a>
+                            <a href="" target="iframe">点击退出登录</a>
                         </li>
                     </ul>
                 </div>
@@ -192,7 +169,33 @@
                     <span>退出系统2</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="#" target="iframe">点击退出登录2</a>
+                            <a href="" target="iframe">点击退出登录2</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="list_item">
+            <div id="left_main_nav">
+                <ul>
+                    <li class="left_back">退出系统</li>
+                    <li class="left_back">退出系统2</li>
+                </ul>
+            </div>
+            <div id="right_main_nav">
+                <div class="list_title">
+                    <span>退出系统1</span>
+                    <ul class="list_detail">
+                        <li>
+                            <a href="" target="iframe">点击退出登录</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="list_title">
+                    <span>退出系统2</span>
+                    <ul class="list_detail">
+                        <li>
+                            <a href="" target="iframe">点击退出登录2</a>
                         </li>
                     </ul>
                 </div>
@@ -212,7 +215,7 @@
     <div id="nav">
         <ul>
             <li class="man_nav active">
-                管理首页
+                基础管理
                 <p class="sub_message">
                     欢迎使用承包商公寓管理系统!!
                 </p>
@@ -244,10 +247,10 @@
         </ul>
         <div class="right_nav">
             <a href=""><img src="{{ asset('/images/return.gif') }}" width="13" height="21" />&nbsp;返回</a>
-            <a href="#">[待定1]</a>
-            <a href="#">[待定2]</a>
-            <a href="#">[待定3]</a>
-            <a href="#">[退出]</a>
+            <a href="">[待定1]</a>
+            <a href="">[待定2]</a>
+            <a href="">[待定3]</a>
+            <a href="">[退出]</a>
         </div>
     </div>
     <div id="sub_info">

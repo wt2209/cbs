@@ -5,7 +5,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">水电费底数</a></li>
+        <li role="presentation" class="active"><a href="">水电费底数</a></li>
     </ul>
     <div id="return-btn">
         <a href="" class="refresh"></a>
@@ -54,7 +54,7 @@
                     <td>{{ $base->electric_base }}</td>
                     <td>{{ $base->water_base }}</td>
                     <td>{{ $base->recorder }}</td>
-                    <td>{{ $base->record_time }}</td>
+                    <td>{{ substr($base->record_time, 0, 10) }}</td>
                     <td>{{ $base->u_base_remark }}</td>
                     <td>
                         <a href="{{ url('utility/edit-base/'.$base->u_base_id) }}" class="btn btn-success btn-xs">修改</a>

@@ -4,12 +4,11 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/company/edit.css') }}"/>
-
+    <link rel="stylesheet" href="{{ url('/css/common.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">修改备注</a></li>
+        <li role="presentation" class="active"><a href="">修改备注</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('punish/uncharged-list') }}"><< 返回未缴费列表页</a>

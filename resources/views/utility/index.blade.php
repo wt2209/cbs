@@ -5,7 +5,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">水电费明细</a></li>
+        <li role="presentation" class="active"><a href="">水电费明细</a></li>
     </ul>
     <div id="return-btn">
         <a href="" class="refresh"></a>
@@ -77,18 +77,20 @@
                     </td>
                     <td>
                         @if($utility->is_charged)
-                            {{ $utility->charge_time }}
+                            {{ substr($utility->charge_time, 0, 10) }}
                         @endif
                     </td>
                     <td>{{ $utility->utility_remark }}</td>
                     <td>
                         @if ($utility->is_charged)
-                            <button class="btn btn-success btn-xs charge-button" disabled="disabled">缴费</button>
+                            <button class="btn btn-success btn-xs" disabled="disabled">缴费</button>
+                            <button class="btn btn-primary btn-xs" disabled="disabled">修改</button>
+                            <button class="btn btn-danger btn-xs" disabled="disabled">删除</button>
                         @else
                             <button class="btn btn-success btn-xs charge-button" charge_id="{{ $utility->utility_id }}">缴费</button>
+                            <a href="{{ url('utility/edit/'.$utility->utility_id) }}" class="btn btn-primary btn-xs">修改</a>
+                            <button delete_id="{{ $utility->utility_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                         @endif
-                        <a href="{{ url('utility/edit/'.$utility->utility_id) }}" class="btn btn-primary btn-xs">修改</a>
-                        <button delete_id="{{ $utility->utility_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>
                 </tr>
             @endforeach

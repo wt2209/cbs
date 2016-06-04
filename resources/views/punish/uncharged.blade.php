@@ -5,7 +5,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">未缴费罚款</a></li>
+        <li role="presentation" class="active"><a href="">未缴费罚款</a></li>
     </ul>
     <div id="return-btn">
         <a href="" class="refresh"></a>
@@ -48,7 +48,7 @@
                     <td>{{ $unchargedList->reason }}</td>
                     <td>{{ $unchargedList->money }}</td>
                     <td>{{ $unchargedList->user_id }}</td>
-                    <td>{{ $unchargedList->created_at }}</td>
+                    <td>{{ substr($unchargedList->created_at, 0, 10) }}</td>
                     <td>{{ $unchargedList->punish_remark }}</td>
                     <td>
                         <button class="btn btn-success btn-xs charge-button" charge_id="{{ $unchargedList->punish_id }}">缴费</button>

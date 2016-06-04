@@ -27,7 +27,7 @@ class UtilityController extends Controller{
         //TODO 分页中每一页的数量设置成一个配置项
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
-            ->join('company', 'company.company_id', '=', 'room.company_id')
+            ->join('company', 'company.company_id', '=', 'utility.company_id')
             ->paginate(20);
 
         $count = $this->setUtilityCount();
@@ -78,7 +78,7 @@ class UtilityController extends Controller{
         //TODO 分页
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
-            ->join('company', 'company.company_id', '=', 'room.company_id')
+            ->join('company', 'company.company_id', '=', 'utility.company_id')
             ->whereRaw($where)
             ->paginate(1);
 
@@ -205,7 +205,7 @@ class UtilityController extends Controller{
         $insert = $this->setInsertData($year, $month);
 
         DB::beginTransaction();
-        //如果有以前录入的重复的数据，则删除
+        //如果有以前计算的重复的数据，则删除
         DB::table('utility')
                 ->where('year', $year)
                 ->where('month', $month)
@@ -419,6 +419,7 @@ class UtilityController extends Controller{
             $preMonth = $month - 1;
         }
         //相关的两个月的水电底数
+        //不计算空房间的水电费
         $utilityBases = DB::table('utility_base')
             ->leftJoin('room', 'utility_base.room_id', '=', 'room.room_id')
             ->where('room.company_id', '!=', 0)

@@ -77,7 +77,7 @@
                     </p>
                 </div>
                 <div class="down">
-                    <p><strong>入住时间：</strong><span>{{$company->created_at}}</span></p>
+                    <p><strong>入住时间：</strong><span>{{substr($company->created_at, 0, 10)}}</span></p>
                     <strong>所居住房间：</strong>
                     {{--<p class="all-rooms">
                         @if (isset($rooms[$company->company_id]))

@@ -9,7 +9,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">修改公司</a></li>
+        <li role="presentation" class="active"><a href="">修改公司</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('company/index') }}"><< 返回列表页</a>
@@ -33,7 +33,7 @@
                 <tr>
                     <th>描述</th>
                     <td colspan="2" >
-                        <textarea name="company_description" value="{{ $company->company_description }}" class="form-control" cols="30" rows="3"></textarea>
+                        <textarea name="company_description" class="form-control" cols="30" rows="3">{{ $company->company_description }}</textarea>
                     </td>
                     <td></td>
                 </tr>
@@ -145,11 +145,12 @@
                     maskShow();
                     $.post('{{ url('company/store') }}', $('#form').serialize(), function(e){
                         maskHide();
-                        popdown({'message':e.message, 'status': e.status});
-                        if (e.status) {
-                            /*返回并刷新原页面*/
-                            location.href = document.referrer;
-                        }
+                        popdown({'message':e.message, 'status': e.status, 'callback':function(){
+                            if (e.status) {
+                                /*返回并刷新原页面*/
+                                location.href = "{{ url('company/index') }}";
+                            }
+                        }});
                         s = true;
                     }, 'json');
                 }

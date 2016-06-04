@@ -8,7 +8,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small nav-fixed">
-        <li role="presentation" class="active"><a href="#">公司缴费</a></li>
+        <li role="presentation" class="active"><a href="">公司缴费</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('company/index') }}"><< 返回列表页</a>

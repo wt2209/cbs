@@ -5,7 +5,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">开具罚单</a></li>
+        <li role="presentation" class="active"><a href="">开具罚单</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('punish/uncharged-list') }}"><< 返回未缴费列表页</a>

@@ -18,7 +18,13 @@ class PunishController extends Controller
      */
     public function getChargedList()
     {
-        return 'charged';
+        //TODO 需要处理user_id 和cancel_user_id
+        //TODO 分页
+        $chargedLists = Punish::where('is_charged', 1)
+            ->where('is_canceled', 0)
+            ->paginate(2);
+        $count = $this->setCountMessage('charged');
+        return view('punish.charged', ['chargedLists'=>$chargedLists, 'count'=>$count]);
     }
 
     /**
@@ -30,12 +36,45 @@ class PunishController extends Controller
         //TODO 需要处理user_id 和cancel_user_id
         //TODO 分页
         $unchargedLists = Punish::where('is_charged', 0)
+            ->where('is_canceled', 0)
             ->paginate(2);
-        $count = $this->setUnchargedCount();
+        $count = $this->setCountMessage('uncharged');
         return view('punish.uncharged', ['unchargedLists'=>$unchargedLists, 'count'=>$count]);
     }
 
+    /**
+     * 撤销列表
+     * @return \Illuminate\View\View
+     */
+    public function getCanceledList()
+    {
+        //TODO 需要处理user_id 和cancel_user_id
+        //TODO 分页
+        $canceledLists = Punish::where('is_canceled', 1)
+            ->paginate(2);
+        $count = $this->setCountMessage('canceled');
+        return view('punish.canceled', ['canceledLists'=>$canceledLists, 'count'=>$count]);
+    }
 
+
+    public function getChargedSearch(Request $request)
+    {
+
+    }
+    public function getUnchargedSearch(Request $request)
+    {
+
+    }
+    public function getCancelSearch(Request $request)
+    {
+
+    }
+
+    /**
+     * 缴费
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getCharge(Request $request)
     {
         $punishId = intval($request->charge_id);
@@ -63,9 +102,9 @@ class PunishController extends Controller
     }
 
     /**
-     *存储罚单
+     * 存储罚单
      * @param  Request  $request
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function postStore(Request $request)
     {
@@ -137,31 +176,52 @@ class PunishController extends Controller
         return response()->json(['message'=>"失败：请重试！",'status'=>0]);
     }
 
-
+    /**
+     * 撤销罚单
+     * @param $punishId
+     * @return \Illuminate\View\View
+     */
     public function getCancel($punishId)
     {
-        return view('punish.cancel');
+        if (!intval($punishId)) {
+            exit('非法请求！');
+        }
+        $punish = Punish::find(intval($punishId));
+        return view('punish.cancel',['punish'=>$punish]);
     }
 
-
     /**
-     * 计算未缴费的统计信息
-     * @param null $where
-     * @return array
+     * 存储撤销相关的数据
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    private function setUnchargedCount($where = NULL)
+    public function postUpdateCancel(Request $request)
     {
-        $whereArr[] = 'is_charged = 0';
-        if ($where) {
-            $whereArr[] = $where;
-        }
-        $whereStr = implode(' and ', $whereArr);
+        $punishId = intval($request->punish_id);
+        $cancelReason = trim(htmlspecialchars(strip_tags($request->cancel_reason)));
+        //TODO cancel_user_id
+        $cancelUserId = 0;
 
-        $count['totalNumber'] = DB::table('punish')->whereRaw($whereStr)
-                                    ->count();
-        $count['totalMoney'] = DB::table('punish')->whereRaw($whereStr)
-                                    ->sum('money');
-        return $count;
+        //必须有撤销原因
+        if (empty($cancelReason)) {
+            return response()->json(['message'=>"失败：请填写撤销原因！", 'status'=>0]);
+        }
+        //已缴费的项目不能撤销
+        $punish = DB::table('punish')->find($punishId);
+        if (intval($punish->is_charged) === 1 ) {
+            return response()->json(['message'=>"失败：已缴费罚单不能撤销！", 'status'=>0]);
+        }
+
+        if (DB::table('punish')->where('punish_id', $punishId)
+                ->update([
+                    'cancel_user_id'    =>  $cancelUserId,
+                    'cancel_reason'     =>  $cancelReason,
+                    'is_canceled'       =>  1,
+                    'cancel_at'         =>  date('Y-m-d H:i:s')
+            ])) {
+            return response()->json(['message'=>"操作成功！", 'status'=>1]);
+        }
+        return response()->json(['message'=>"失败：内部错误，请重试！", 'status'=>0]);
     }
 
     /**
@@ -177,5 +237,39 @@ class PunishController extends Controller
                 'is_charged'=>1,
                 'charged_at'=>date('Y-m-d H:i:s')
             ]);
+    }
+
+    /**
+     * 计算统计信息
+     * @param null $where
+     * @return array
+     */
+    private function setCountMessage($type, $where = NULL)
+    {
+        $whereArr = [];
+        switch ($type) {
+            case 'charged':
+                $whereArr[] = 'is_charged = 1';
+                $whereArr[] = 'is_canceled = 0';//未被撤销的
+                break;
+            case 'uncharged':
+                $whereArr[] = 'is_charged = 0';
+                $whereArr[] = 'is_canceled = 0';//未被撤销的
+                break;
+            case 'canceled':
+                $whereArr[] = 'is_canceled = 1';//被撤销的
+                break;
+        }
+
+        if ($where) {
+            $whereArr[] = $where;
+        }
+        $whereStr = implode(' and ', $whereArr);
+
+        $count['totalNumber'] = DB::table('punish')->whereRaw($whereStr)
+            ->count();
+        $count['totalMoney'] = DB::table('punish')->whereRaw($whereStr)
+            ->sum('money');
+        return $count;
     }
 }

@@ -139,7 +139,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     <head>
     </head>
     <body>
-        <nav><a href="#"><a href="#"></nav>
+        <nav><a href=""><a href=""></nav>
     </body>
 </html>
 EOF
@@ -189,7 +189,7 @@ EOF
     <head>
     </head>
     <body>
-        <nav><a href="#"><a href="#"></nav>
+        <nav><a href=""><a href=""></nav>
     </body>
 </html>
 EOF

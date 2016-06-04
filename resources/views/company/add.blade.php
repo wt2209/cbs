@@ -9,7 +9,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">新公司入住</a></li>
+        <li role="presentation" class="active"><a href="">新公司入住</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('company/index') }}"><< 返回列表页</a>

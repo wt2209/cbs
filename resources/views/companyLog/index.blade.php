@@ -5,7 +5,7 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="#">公司房间变动记录</a></li>
+        <li role="presentation" class="active"><a href="">公司房间变动记录</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('company-log/index') }}" class="refresh"></a>
