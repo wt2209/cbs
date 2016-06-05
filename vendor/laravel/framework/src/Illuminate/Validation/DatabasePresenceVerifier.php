@@ -46,7 +46,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
     {
         $query = $this->table($collection)->where($column, '=', $value);
 
-        if (!is_null($excludeId) && $excludeId != 'NULL') {
+        if (! is_null($excludeId) && $excludeId != 'NULL') {
             $query->where($idColumn ?: 'id', '<>', $excludeId);
         }
 
@@ -104,7 +104,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      */
     protected function table($table)
     {
-        return $this->db->connection($this->connection)->table($table);
+        return $this->db->connection($this->connection)->table($table)->useWritePdo();
     }
 
     /**

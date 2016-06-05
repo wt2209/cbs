@@ -57,14 +57,14 @@ class BelongsToMany extends Relation
     /**
      * The custom pivot table column for the created_at timestamp.
      *
-     * @var array
+     * @var string
      */
     protected $pivotCreatedAt;
 
     /**
      * The custom pivot table column for the updated_at timestamp.
      *
-     * @var array
+     * @var string
      */
     protected $pivotUpdatedAt;
 
@@ -151,7 +151,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (!is_null($model = $this->first($columns))) {
+        if (! is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -193,13 +193,14 @@ class BelongsToMany extends Relation
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 
-        $paginator = $this->query->paginate($perPage, $columns, $pageName);
+        $paginator = $this->query->paginate($perPage, $columns, $pageName, $page);
 
         $this->hydratePivotRelation($paginator->items());
 
@@ -211,13 +212,14 @@ class BelongsToMany extends Relation
      *
      * @param  int  $perPage
      * @param  array  $columns
+     * @param  string  $pageName
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'])
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 
-        $paginator = $this->query->simplePaginate($perPage, $columns);
+        $paginator = $this->query->simplePaginate($perPage, $columns, $pageName);
 
         $this->hydratePivotRelation($paginator->items());
 
@@ -229,16 +231,16 @@ class BelongsToMany extends Relation
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @return void
+     * @return bool
      */
     public function chunk($count, callable $callback)
     {
         $this->query->addSelect($this->getSelectColumns());
 
-        $this->query->chunk($count, function ($results) use ($callback) {
+        return $this->query->chunk($count, function ($results) use ($callback) {
             $this->hydratePivotRelation($results->all());
 
-            call_user_func($callback, $results);
+            return $callback($results);
         });
     }
 
@@ -327,11 +329,13 @@ class BelongsToMany extends Relation
     {
         $query->select(new Expression('count(*)'));
 
-        $query->from($this->table.' as '.$hash = $this->getRelationCountHash());
+        $query->from($this->related->getTable().' as '.$hash = $this->getRelationCountHash());
 
-        $key = $this->wrap($this->getQualifiedParentKeyName());
+        $this->related->setTable($hash);
 
-        return $query->where($hash.'.'.$this->foreignKey, '=', new Expression($key));
+        $this->setJoin($query);
+
+        return parent::getRelationCountQuery($query, $parent);
     }
 
     /**
@@ -528,7 +532,7 @@ class BelongsToMany extends Relation
     /**
      * Get all of the IDs for the related models.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getRelatedIds()
     {
@@ -559,11 +563,11 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  array  $models
+     * @param  \Illuminate\Support\Collection|array  $models
      * @param  array  $joinings
      * @return array
      */
-    public function saveMany(array $models, array $joinings = [])
+    public function saveMany($models, array $joinings = [])
     {
         foreach ($models as $key => $model) {
             $this->save($model, (array) Arr::get($joinings, $key), false);
@@ -608,6 +612,30 @@ class BelongsToMany extends Relation
         $this->whereIn($this->getRelated()->getQualifiedKeyName(), $ids);
 
         return $this->get($columns);
+    }
+
+    /**
+     * Find a related model by its primary key or throw an exception.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail($id, $columns = ['*'])
+    {
+        $result = $this->find($id, $columns);
+
+        if (is_array($id)) {
+            if (count($result) == count(array_unique($id))) {
+                return $result;
+            }
+        } elseif (! is_null($result)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel(get_class($this->parent));
     }
 
     /**
@@ -707,7 +735,7 @@ class BelongsToMany extends Relation
      *
      * @param  array  $records
      * @param  array  $joinings
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return array
      */
     public function createMany(array $records, array $joinings = [])
     {
@@ -725,7 +753,7 @@ class BelongsToMany extends Relation
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
-     * @param  array  $ids
+     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
      * @param  bool   $detaching
      * @return array
      */
@@ -754,7 +782,9 @@ class BelongsToMany extends Relation
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
 
-            $changes['detached'] = (array) array_map(function ($v) { return (int) $v; }, $detach);
+            $changes['detached'] = (array) array_map(function ($v) {
+                return is_numeric($v) ? (int) $v : (string) $v;
+            }, $detach);
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
@@ -782,7 +812,7 @@ class BelongsToMany extends Relation
         $results = [];
 
         foreach ($records as $id => $attributes) {
-            if (!is_array($attributes)) {
+            if (! is_array($attributes)) {
                 list($id, $attributes) = [$attributes, []];
             }
 
@@ -808,10 +838,10 @@ class BelongsToMany extends Relation
             // If the ID is not in the list of existing pivot IDs, we will insert a new pivot
             // record, otherwise, we will just update this existing record on this joining
             // table, so that the developers will easily update these records pain free.
-            if (!in_array($id, $current)) {
+            if (! in_array($id, $current)) {
                 $this->attach($id, $attributes, $touch);
 
-                $changes['attached'][] = (int) $id;
+                $changes['attached'][] = is_numeric($id) ? (int) $id : (string) $id;
             }
 
             // Now we'll try to update an existing pivot record with the attributes that were
@@ -819,7 +849,7 @@ class BelongsToMany extends Relation
             // list of updated pivot records so we return them back out to the consumer.
             elseif (count($attributes) > 0 &&
                 $this->updateExistingPivot($id, $attributes, $touch)) {
-                $changes['updated'][] = (int) $id;
+                $changes['updated'][] = is_numeric($id) ? (int) $id : (string) $id;
             }
         }
 
@@ -968,7 +998,7 @@ class BelongsToMany extends Relation
     {
         $fresh = $this->parent->freshTimestamp();
 
-        if (!$exists && $this->hasPivotColumn($this->createdAt())) {
+        if (! $exists && $this->hasPivotColumn($this->createdAt())) {
             $record[$this->createdAt()] = $fresh;
         }
 
@@ -1116,7 +1146,7 @@ class BelongsToMany extends Relation
     /**
      * Set the columns on the pivot table to retrieve.
      *
-     * @param  mixed  $columns
+     * @param  array|mixed  $columns
      * @return $this
      */
     public function withPivot($columns)

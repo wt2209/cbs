@@ -7,8 +7,8 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
@@ -17,6 +17,10 @@ use Illuminate\Database\Query\Processors\Processor;
 
 class Builder
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The database connection instance.
      *
@@ -49,6 +53,7 @@ class Builder
         'where'  => [],
         'having' => [],
         'order'  => [],
+        'union'  => [],
     ];
 
     /**
@@ -171,6 +176,13 @@ class Builder
     protected $backups = [];
 
     /**
+     * The binding backups currently in use.
+     *
+     * @var array
+     */
+    protected $bindingBackups = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var array
@@ -181,7 +193,7 @@ class Builder
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
-                'not similar to',
+        'not similar to',
     ];
 
     /**
@@ -211,7 +223,7 @@ class Builder
     /**
      * Set the columns to be selected.
      *
-     * @param  array  $columns
+     * @param  array|mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -270,7 +282,7 @@ class Builder
     /**
      * Add a new select column to the query.
      *
-     * @param  mixed  $column
+     * @param  array|mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -324,9 +336,13 @@ class Builder
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
         if ($one instanceof Closure) {
-            $this->joins[] = new JoinClause($type, $table);
+            $join = new JoinClause($type, $table);
 
-            call_user_func($one, end($this->joins));
+            call_user_func($one, $join);
+
+            $this->joins[] = $join;
+
+            $this->addBinding($join->bindings, 'join');
         }
 
         // If the column is simply a string, we can assume the join simply has a basic
@@ -338,6 +354,8 @@ class Builder
             $this->joins[] = $join->on(
                 $one, $operator, $two, 'and', $where
             );
+
+            $this->addBinding($join->bindings, 'join');
         }
 
         return $this;
@@ -457,7 +475,7 @@ class Builder
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
-        if (!in_array(strtolower($operator), $this->operators, true)) {
+        if (! in_array(strtolower($operator), $this->operators, true)) {
             list($value, $operator) = [$operator, '='];
         }
 
@@ -482,7 +500,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof Expression) {
+        if (! $value instanceof Expression) {
             $this->addBinding($value, 'where');
         }
 
@@ -639,7 +657,7 @@ class Builder
 
             $this->wheres[] = compact('type', 'query', 'boolean');
 
-            $this->mergeBindings($query);
+            $this->addBinding($query->getBindings(), 'where');
         }
 
         return $this;
@@ -667,7 +685,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'operator', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -693,7 +711,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -745,6 +763,12 @@ class Builder
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotIn' : 'In';
+
+        if ($values instanceof static) {
+            return $this->whereInExistingQuery(
+                $column, $values, $boolean, $not
+            );
+        }
 
         // If the value of the where in clause is actually a Closure, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
@@ -821,7 +845,27 @@ class Builder
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
-        $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a external sub-select to the query.
+     *
+     * @param  string   $column
+     * @param  \Illuminate\Database\Query\Builder|static  $query
+     * @param  string   $boolean
+     * @param  bool     $not
+     * @return $this
+     */
+    protected function whereInExistingQuery($column, $query, $boolean, $not)
+    {
+        $type = $not ? 'NotInSub' : 'InSub';
+
+        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
+
+        $this->addBinding($query->getBindings(), 'where');
 
         return $this;
     }
@@ -1042,7 +1086,7 @@ class Builder
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof Expression) {
+        if (! $value instanceof Expression) {
             $this->addBinding($value, 'having');
         }
 
@@ -1188,7 +1232,7 @@ class Builder
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
-        if ($value > 0) {
+        if ($value >= 0) {
             $this->$property = $value;
         }
 
@@ -1233,7 +1277,9 @@ class Builder
 
         $this->unions[] = compact('query', 'all');
 
-        return $this->mergeBindings($query);
+        $this->addBinding($query->getBindings(), 'union');
+
+        return $this;
     }
 
     /**
@@ -1256,6 +1302,10 @@ class Builder
     public function lock($value = true)
     {
         $this->lock = $value;
+
+        if ($this->lock) {
+            $this->useWritePdo();
+        }
 
         return $this;
     }
@@ -1351,7 +1401,11 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        return $this->getFresh($columns);
+        if (is_null($this->columns)) {
+            $this->columns = $columns;
+        }
+
+        return $this->processor->processSelect($this, $this->runSelect());
     }
 
     /**
@@ -1359,14 +1413,12 @@ class Builder
      *
      * @param  array  $columns
      * @return array|static[]
+     *
+     * @deprecated since version 5.1. Use get instead.
      */
     public function getFresh($columns = ['*'])
     {
-        if (is_null($this->columns)) {
-            $this->columns = $columns;
-        }
-
-        return $this->processor->processSelect($this, $this->runSelect());
+        return $this->get($columns);
     }
 
     /**
@@ -1376,7 +1428,7 @@ class Builder
      */
     protected function runSelect()
     {
-        return $this->connection->select($this->toSql(), $this->getBindings(), !$this->useWritePdo);
+        return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
     }
 
     /**
@@ -1385,11 +1437,12 @@ class Builder
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page')
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
     {
-        $page = Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination($columns);
 
@@ -1433,7 +1486,7 @@ class Builder
     {
         $this->backupFieldsForCount();
 
-        $this->aggregate = ['function' => 'count', 'columns' => $columns];
+        $this->aggregate = ['function' => 'count', 'columns' => $this->clearSelectAliases($columns)];
 
         $results = $this->get();
 
@@ -1460,6 +1513,26 @@ class Builder
 
             $this->{$field} = null;
         }
+
+        foreach (['order', 'select'] as $key) {
+            $this->bindingBackups[$key] = $this->bindings[$key];
+
+            $this->bindings[$key] = [];
+        }
+    }
+
+    /**
+     * Remove the column aliases since they will break count queries.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    protected function clearSelectAliases(array $columns)
+    {
+        return array_map(function ($column) {
+            return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
+                    ? substr($column, 0, $aliasPosition) : $column;
+        }, $columns);
     }
 
     /**
@@ -1473,7 +1546,12 @@ class Builder
             $this->{$field} = $this->backups[$field];
         }
 
+        foreach (['order', 'select'] as $key) {
+            $this->bindings[$key] = $this->bindingBackups[$key];
+        }
+
         $this->backups = [];
+        $this->bindingBackups = [];
     }
 
     /**
@@ -1481,7 +1559,7 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @return void
+     * @return bool
      */
     public function chunk($count, callable $callback)
     {
@@ -1492,50 +1570,47 @@ class Builder
             // developer take care of everything within the callback, which allows us to
             // keep the memory low for spinning through large result sets for working.
             if (call_user_func($callback, $results) === false) {
-                break;
+                return false;
             }
 
             $page++;
 
             $results = $this->forPage($page, $count)->get();
         }
+
+        return true;
     }
 
     /**
      * Get an array with the values of a given column.
      *
      * @param  string  $column
-     * @param  string  $key
+     * @param  string|null  $key
      * @return array
      */
     public function lists($column, $key = null)
     {
-        $columns = $this->getListSelect($column, $key);
+        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
-        $results = new Collection($this->get($columns));
-
-        return $results->pluck($columns[0], Arr::get($columns, 1))->all();
+        // If the columns are qualified with a table or have an alias, we cannot use
+        // those directly in the "pluck" operations since the results from the DB
+        // are only keyed by the column itself. We'll strip the table out here.
+        return Arr::pluck(
+            $results,
+            $this->stripTableForPluck($column),
+            $this->stripTableForPluck($key)
+        );
     }
 
     /**
-     * Get the columns that should be used in a list array.
+     * Strip off the table name or alias from a column identifier.
      *
      * @param  string  $column
-     * @param  string  $key
-     * @return array
+     * @return string|null
      */
-    protected function getListSelect($column, $key)
+    protected function stripTableForPluck($column)
     {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
-        // If the selected column contains a "dot", we will remove it so that the list
-        // operation can run normally. Specifying the table is not needed, since we
-        // really want the names of the columns as it is in this resulting array.
-        return array_map(function ($column) {
-            $dot = strpos($column, '.');
-
-            return $dot === false ? $column : substr($column, $dot + 1);
-        }, $select);
+        return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
     }
 
     /**
@@ -1545,12 +1620,8 @@ class Builder
      * @param  string  $glue
      * @return string
      */
-    public function implode($column, $glue = null)
+    public function implode($column, $glue = '')
     {
-        if (is_null($glue)) {
-            return implode($this->lists($column));
-        }
-
         return implode($glue, $this->lists($column));
     }
 
@@ -1561,13 +1632,17 @@ class Builder
      */
     public function exists()
     {
-        $limit = $this->limit;
+        $sql = $this->grammar->compileExists($this);
 
-        $result = $this->limit(1)->count() > 0;
+        $results = $this->connection->select($sql, $this->getBindings(), ! $this->useWritePdo);
 
-        $this->limit($limit);
+        if (isset($results[0])) {
+            $results = (array) $results[0];
 
-        return $result;
+            return (bool) $results['exists'];
+        }
+
+        return false;
     }
 
     /**
@@ -1578,7 +1653,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        if (!is_array($columns)) {
+        if (! is_array($columns)) {
             $columns = [$columns];
         }
 
@@ -1629,6 +1704,17 @@ class Builder
     public function avg($column)
     {
         return $this->aggregate(__FUNCTION__, [$column]);
+    }
+
+    /**
+     * Alias for the "avg" method.
+     *
+     * @param  string  $column
+     * @return float|int
+     */
+    public function average($column)
+    {
+        return $this->avg($column);
     }
 
     /**
@@ -1684,7 +1770,7 @@ class Builder
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient for building these
         // inserts statements by verifying the elements are actually an array.
-        if (!is_array(reset($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -1795,7 +1881,7 @@ class Builder
         // If an ID is passed to the method, we will set the where clause to check
         // the ID to allow developers to simply and quickly remove a single row
         // from their database without manually specifying the where clauses.
-        if (!is_null($id)) {
+        if (! is_null($id)) {
             $this->where('id', '=', $id);
         }
 
@@ -1849,7 +1935,7 @@ class Builder
     protected function cleanBindings(array $bindings)
     {
         return array_values(array_filter($bindings, function ($binding) {
-            return !$binding instanceof Expression;
+            return ! $binding instanceof Expression;
         }));
     }
 
@@ -1895,7 +1981,7 @@ class Builder
      */
     public function setBindings(array $bindings, $type = 'where')
     {
-        if (!array_key_exists($type, $this->bindings)) {
+        if (! array_key_exists($type, $this->bindings)) {
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
@@ -1915,7 +2001,7 @@ class Builder
      */
     public function addBinding($value, $type = 'where')
     {
-        if (!array_key_exists($type, $this->bindings)) {
+        if (! array_key_exists($type, $this->bindings)) {
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
@@ -1994,6 +2080,10 @@ class Builder
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         if (Str::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
         }

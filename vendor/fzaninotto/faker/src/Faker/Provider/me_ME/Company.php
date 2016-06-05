@@ -9,7 +9,7 @@ class Company extends \Faker\Provider\Company
     );
 
     /**
-     * Source: extracted from http://www.crps.me/index.scss/predraga
+     * Source: extracted from http://www.crps.me/index.php/predraga
      */
     protected static $names = array(
         '13 Jul - Plantaže ', '19 Decembar Podgorica',

@@ -49,7 +49,7 @@ class ProcessUtils
 
             $escapedArgument = '';
             $quote = false;
-            foreach (preg_split('/(")/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
                 } elseif (self::isSurroundedBy($part, '%')) {
@@ -80,7 +80,7 @@ class ProcessUtils
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
      *
-     * @return string The validated input
+     * @return mixed The validated input
      *
      * @throws InvalidArgumentException In case the input is not valid
      *
@@ -90,6 +90,9 @@ class ProcessUtils
     {
         if (null !== $input) {
             if (is_resource($input)) {
+                return $input;
+            }
+            if (is_string($input)) {
                 return $input;
             }
             if (is_scalar($input)) {

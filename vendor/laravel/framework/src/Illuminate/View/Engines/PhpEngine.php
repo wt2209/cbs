@@ -3,6 +3,8 @@
 namespace Illuminate\View\Engines;
 
 use Exception;
+use Throwable;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class PhpEngine implements EngineInterface
 {
@@ -31,7 +33,7 @@ class PhpEngine implements EngineInterface
 
         ob_start();
 
-        extract($__data);
+        extract($__data, EXTR_SKIP);
 
         // We'll evaluate the contents of the view inside a try/catch block so we can
         // flush out any stray output that might get out before an error occurs or
@@ -40,6 +42,8 @@ class PhpEngine implements EngineInterface
             include $__path;
         } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
+        } catch (Throwable $e) {
+            $this->handleViewException(new FatalThrowableError($e), $obLevel);
         }
 
         return ltrim(ob_get_clean());

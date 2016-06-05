@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class HasManyThrough extends Relation
 {
@@ -228,6 +229,23 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Execute the query and get the first result or throw an exception.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        throw new ModelNotFoundException;
+    }
+
+    /**
      * Find a related model by its primary key.
      *
      * @param  mixed  $id
@@ -261,6 +279,30 @@ class HasManyThrough extends Relation
         $this->whereIn($this->getRelated()->getQualifiedKeyName(), $ids);
 
         return $this->get($columns);
+    }
+
+    /**
+     * Find a related model by its primary key or throw an exception.
+     *
+     * @param  mixed  $id
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail($id, $columns = ['*'])
+    {
+        $result = $this->find($id, $columns);
+
+        if (is_array($id)) {
+            if (count($result) == count(array_unique($id))) {
+                return $result;
+            }
+        } elseif (! is_null($result)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel(get_class($this->parent));
     }
 
     /**
@@ -311,13 +353,14 @@ class HasManyThrough extends Relation
      * @param  int  $perPage
      * @param  array  $columns
      * @param  string  $pageName
+     * @param  int  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 
-        return $this->query->paginate($perPage, $columns, $pageName);
+        return $this->query->paginate($perPage, $columns, $pageName, $page);
     }
 
     /**
@@ -325,13 +368,14 @@ class HasManyThrough extends Relation
      *
      * @param  int  $perPage
      * @param  array  $columns
+     * @param  string  $pageName
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'])
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         $this->query->addSelect($this->getSelectColumns($columns));
 
-        return $this->query->simplePaginate($perPage, $columns);
+        return $this->query->simplePaginate($perPage, $columns, $pageName);
     }
 
     /**
@@ -342,5 +386,25 @@ class HasManyThrough extends Relation
     public function getHasCompareKey()
     {
         return $this->farParent->getQualifiedKeyName();
+    }
+
+    /**
+     * Get the qualified foreign key on the related model.
+     *
+     * @return string
+     */
+    public function getForeignKey()
+    {
+        return $this->related->getTable().'.'.$this->secondKey;
+    }
+
+    /**
+     * Get the qualified foreign key on the "through" model.
+     *
+     * @return string
+     */
+    public function getThroughKey()
+    {
+        return $this->parent->getTable().'.'.$this->firstKey;
     }
 }

@@ -100,7 +100,7 @@ class Text extends \Faker\Provider\Text
      * XXXV Pinocchio ritrova in corpo al Pesce-cane... Chi ritrova? Leggete questo capitolo e lo saprete.
      * XXXVI Finalmente Pinocchio cessa d’essere un burattino e diventa un ragazzo.
      *
-     * @see http://www.liberliber.it/libri/c/collodi/index.scss#elenco_opere
+     * @see http://www.liberliber.it/libri/c/collodi/index.php#elenco_opere
      * @var string
      */
     protected static $baseText = <<<'EOT'
