@@ -12,6 +12,8 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
+
+
 class UtilityController extends Controller{
     public function __construct()
     {

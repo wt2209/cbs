@@ -1,91 +1,100 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Laravel</title>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>承包商公寓管理 - 日程)</title>
+    <link rel="stylesheet" href="{{ asset('/bootstrap-3.3.5/css/bootstrap.css') }}"/>
+    <link rel="stylesheet" href="{{ url('/css/common.css') }}"/>
+    <link href='{{ url('/css/fullcalendar.min.css') }}' rel='stylesheet' />
+    <link href='{{ url('/css/fullcalendar.print.css') }}' rel='stylesheet' media='print' />
+    <style>
+        #calendar {
+            max-width: 900px;
+            margin: 5px auto;
+        }
+    </style>
+    <script src="{{ asset('js/jquery-1.11.3.js') }}"></script>
+    <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('/js/functions.js') }}"></script>
+    <script src='{{ asset('/js/moment.min.js') }}'></script>
+    <script type="text/javascript" src="{{ asset('/js/fullcalendar.min.js') }}"></script>
+    <script src='{{ asset('/js/lang-all.js') }}'></script>
+    <script>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                theme: false,
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek'
+                },
+                lang:'zh-cn',
+                // defaultDate: '2015-02-12',
+                selectable:true,
+                selectHelper: true,
+
+                select: function(start, end) {
 
 
-        <style>
-            html, body {
-                height: 100%;
-            }
+//                    $(this).ondblclick(alert(1));
+                    /* var title = prompt('Event Title:');
+                     var eventData;
+                     if (title) {
+                     eventData = {
+                     title: title,
+                     start: start,
+                     end: end
+                     };
+                     $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+                     }
+                     $('#calendar').fullCalendar('unselect');*/
+                },
+                minTime:'07:00:00',
+                maxTime:'18:00:00',
+                timeFormat:'H:mm',
+                views: {
+                    day: { // name of view
+                        titleFormat: 'YYYY, MM, DD',
+                        timeFormat:'H:mm'
 
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                display: table;
-                font-weight: 100;
-                font-family: 'Lato';
-            }
-            table{
-                background-color:#DBE6E3;}
-            tr{
-                background-color:#fff;}
-            td{
-                border:1px solid #DBE6E3;
-                line-height: 40px;
-            }
-            .left_title_1 {
-                background-color: #F3F8F7;
-                color:#73938E;
-                font-weight:bold;
-                line-height:30px;
-                text-align:right
-            }
-            .left_title_2 {
-                background-color: #fff;
-                color:#73938E;
-                font-weight:bold;
-                line-height:30px;
-                text-align:right;
-            }
-        </style>
-    </head>
-    <body>
-    <div class="man">
-        <table width="99%" border="0" align="center"  cellpadding="3" cellspacing="1" class="table_style">
-            <tr>
-                <td width="18%" class="left_title_1"><span class="left-title">11111111111</span></td>
-                <td width="82%">&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_2">22222222</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_1">3333333333</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_2">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_1">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_2">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_1">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_2">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td class="left_title_1">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr bgcolor="#FFFFFF">
-                <td class="left_title_2">&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-        </table>
-    </div>
+                        // other view-specific options here
+                    }
+                },
+                editable: false,
+                eventLimit: true, // allow "more" link when too many events
+                events: [
+                    {
+                        title: '当天的事情1',
+                        start: '2016-06-05'
+                    },
+                    {
+                        title: '几天内的事情',
+                        start: '2016-06-01',
+                        end: '2016-06-10'
+                    },
+                    {
+                        title: '测试2',
+                        start: '2016-06-07T10:30:00',
+                        end: '2016-06-07T12:30:00'
+                    },
+                    {
+                        title: '优先级高的事情',
+                        start: '2016-06-06T12:00:00',
+                        color:'#ff0000'
+                    }
+                ]
+            });
 
-    </body>
+        });
+
+    </script>
+</head>
+<body>
+<div id='calendar'></div>
+
+</body>
 </html>
+
+
+
+

@@ -31,7 +31,6 @@
     </nav>
     <div class="function-area">
         <button class="btn btn-success btn-sm" onclick="javascript:location='{{ url('room/add') }}';">新增房间</button>
-        <button class="btn btn-danger btn-sm">从文件导入</button>
         <button class="btn btn-info btn-sm">导出到文件</button>
     </div>
 @endsection

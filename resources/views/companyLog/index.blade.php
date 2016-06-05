@@ -25,7 +25,6 @@
         </div>
     </nav>
     <div class="function-area">
-        <button class="btn btn-danger btn-sm">从文件导入</button>
         <button class="btn btn-info btn-sm">导出到文件</button>
     </div>
 @endsection
@@ -34,13 +33,13 @@
         <table class="table table-bordered table-hover table-condensed">
             <thead>
             <tr class="active">
-                <th>承包商公司</th>
-                <th>操作人</th>
-                <th>操作类型</th>
-                <th>操作时间</th>
+                <th width="80">承包商公司</th>
+                <th width="50">操作人</th>
+                <th width="60">操作类型</th>
+                <th width="90">操作时间</th>
                 <th>老房间</th>
                 <th>新房间</th>
-                <th>操作</th>
+                <th width="50">操作</th>
             </tr>
             </thead>
             @foreach ($companyLogs as $companyLog)

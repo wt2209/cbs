@@ -35,3 +35,6 @@ Route::controller('utility','UtilityController');
 
 //罚款控制器
 Route::controller('punish','PunishController');
+
+//日程
+Route::controller('calendar','CalendarController');

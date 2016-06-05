@@ -35,13 +35,20 @@
         <div class="list_item active">
             <div id="left_main_nav">
                 <ul>
+                    <li class="left_back">个人日程</li>
                     <li class="left_back">承包商公司</li>
                     <li class="left_back">房间管理</li>
-                    <li class="left_back">水电费管理</li>
-                    <li class="left_back">罚单管理</li>
                 </ul>
             </div>
             <div id="right_main_nav">
+                <div class="list_title">
+                    <span>个人日程</span>
+                    <ul class="list_detail">
+                        <li>
+                            <a href="{{ url('calendar/index') }}" target="iframe">个人日程</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="list_title">
                     <span>承包商公司管理</span>
                     <ul class="list_detail">
@@ -67,6 +74,16 @@
                         </li>
                     </ul>
                 </div>
+
+            </div>
+        </div>
+        <div class="list_item">
+            <div id="left_main_nav">
+                <ul>
+                    <li class="left_back">水电相关</li>
+                </ul>
+            </div>
+            <div id="right_main_nav">
                 <div class="list_title">
                     <span>水电费管理</span>
                     <ul class="list_detail">
@@ -81,6 +98,16 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
+        <div class="list_item">
+            <div id="left_main_nav">
+                <ul>
+                    <li class="left_back">罚单管理</li>
+                </ul>
+            </div>
+            <div id="right_main_nav">
+
                 <div class="list_title">
                     <span>罚单管理</span>
                     <ul class="list_detail">
@@ -92,58 +119,6 @@
                         </li>
                         <li>
                             <a href="{{ url('punish/canceled-list') }}" target="iframe">已撤销</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="list_item">
-            <div id="left_main_nav">
-                <ul>
-                    <li class="left_back">退出系统</li>
-                    <li class="left_back">退出系统2</li>
-                </ul>
-            </div>
-            <div id="right_main_nav">
-                <div class="list_title">
-                    <span>退出系统1</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="" target="iframe">点击退出登录</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="list_title">
-                    <span>退出系统2</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="" target="iframe">点击退出登录2</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="list_item">
-            <div id="left_main_nav">
-                <ul>
-                    <li class="left_back">退出系统</li>
-                    <li class="left_back">退出系统2</li>
-                </ul>
-            </div>
-            <div id="right_main_nav">
-                <div class="list_title">
-                    <span>退出系统1</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="" target="iframe">点击退出登录</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="list_title">
-                    <span>退出系统2</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="" target="iframe">点击退出登录2</a>
                         </li>
                     </ul>
                 </div>
@@ -217,41 +192,41 @@
             <li class="man_nav active">
                 基础管理
                 <p class="sub_message">
-                    欢迎使用承包商公寓管理系统!!
+                    个人日程，承包商公司管理，房间管理等
                 </p>
             </li>
             <li class="man_nav" >
+                水电相关
+                <p class="sub_message">
+                    水电表录入、水电费计算、水电费明细等
+                </p>
+            </li>
+            <li class="man_nav">
+                罚款管理
+                <p class="sub_message">
+                    包含所有的罚款项目
+                </p>
+            </li>
+            <li class="man_nav">
+                文件共享
+                <p class="sub_message">
+                    可以使局域网内的成员共享文件
+                </p>
+            </li>
+            <li class="man_nav">
                 系统设置
-                <p class="sub_message">
-                    欢2
-                </p>
-            </li>
-            <li class="man_nav">
-                账户管理
-                <p class="sub_message">
-                    欢3
-                </p>
-            </li>
-            <li class="man_nav">
-                易货管理
-                <p class="sub_message">
-                    欢4
-                </p>
-            </li>
-            <li class="man_nav">
-                广告新闻
                 <p class="sub_message">
                     欢5
                 </p>
             </li>
         </ul>
-        <div class="right_nav">
+        {{--<div class="right_nav">
             <a href=""><img src="{{ asset('/images/return.gif') }}" width="13" height="21" />&nbsp;返回</a>
             <a href="">[待定1]</a>
             <a href="">[待定2]</a>
             <a href="">[待定3]</a>
             <a href="">[退出]</a>
-        </div>
+        </div>--}}
     </div>
     <div id="sub_info">
         &nbsp;&nbsp;
