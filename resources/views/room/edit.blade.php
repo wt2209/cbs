@@ -1,6 +1,6 @@
 @extends('header')
 
-@section('title', '修改房间')
+@section('title', '修改房间备注')
 
 
 @section('css')
@@ -9,10 +9,10 @@
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="">修改房间</a></li>
+        <li role="presentation" class="active"><a href="">修改房间备注</a></li>
     </ul>
     <div id="return-btn">
-        <a href="{{ url('room/index') }}"><< 返回列表页</a>
+        <a href="{{ url('room/living-room') }}"><< 返回列表页</a>
         <a href="" class="refresh"></a>
     </div>
 @endsection
@@ -21,11 +21,13 @@
         <form id="form">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <input type="hidden" name="room_id" value="{{ $room->room_id }}"/>
+            <input type="hidden" name="room_type" value="{{ $room->room_type }}"/>
+            <input type="hidden" name="room_name" value="{{ $room->room_name }}"/>
             <table class="table table-hover table-condensed">
                 <tr class="no-border">
                     <th width="10%">房间号</th>
                     <td width="20%">
-                        {{ $room->building.'-'.$room->room_number }}
+                        {{ $room->room_name }}
                     </td>
                     <td width="10%"></td>
                     <td></td>
@@ -61,7 +63,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('room/store') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('room/update') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             /*返回并刷新原页面*/
@@ -70,32 +72,8 @@
                         s = true;
                     }, 'json');
                 }
-
                 return false;
-            },
-            rules:{
-                room_number:{
-                    required:true,
-                    number:true,
-                    min:1,
-                    max:65535
-                },
-                building:{
-                    required:true
-                }
-            },
-            messages:{
-                room_number:{
-                    required:'失败：必须填写房间号！',
-                    number:'失败：房间号必须是一个数字！',
-                    max:'失败：房间号必须小于65535',
-                    min:'失败：房间号必须大于1'
-                },
-                building:{
-                    required:'必须填写！'
-                }
             }
-
         });
     </script>
 @endsection

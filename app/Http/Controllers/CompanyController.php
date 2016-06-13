@@ -116,6 +116,16 @@ class CompanyController extends Controller
      */
     public function postStore(Request $request)
     {
+        $living = $request->living;
+
+        foreach ($living as $item) {
+            if (isset($item['room_id'])) {
+                $return[] = $item;
+            }
+        }
+
+
+        return response()->json($return);
         //字段验证
         $validator = Validator::make($request->all(), [
             'company_id'=>'integer|min:1',

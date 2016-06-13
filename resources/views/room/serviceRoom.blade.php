@@ -1,14 +1,14 @@
 @extends('header')
-@section('title', '房间明细')
+@section('title', '服务用房明细')
 @section('css')
     <link rel="stylesheet" href="{{ url('/css/room/index.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="">房间明细</a></li>
+        <li role="presentation" class="active"><a href="">服务用房明细</a></li>
     </ul>
     <div id="return-btn">
-        <a href="{{ url('room/index') }}" class="refresh"></a>
+        <a href="" class="refresh"></a>
     </div>
     <nav class="navbar navbar-default navbar-small">
         <div class="container-fluid">
@@ -17,11 +17,12 @@
                 <form class="navbar-form navbar-left" role="search"  method="get" action="{{ url('room/search') }}">
                     <div class="form-group">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="hidden" name="room_type" value="3">
                         <input type="text" class="form-control"  value="{{ $_GET['room_name'] or '' }}" name="room_name" placeholder="房间号">&nbsp;或者
-                        <select name="room_type" class="form-control">
+                        <select name="room_status" class="form-control">
                             <option value="0">全部房间</option>
-                            <option value="1" @if(isset($_GET['room_type'])&&$_GET['room_type'] == 1) selected=""@endif>正在使用</option>
-                            <option value="2" @if(isset($_GET['room_type'])&&$_GET['room_type'] == 2) selected=""@endif>空房间</option>
+                            <option value="1" @if(isset($_GET['room_status'])&&$_GET['room_status'] == 1) selected=""@endif>正在使用</option>
+                            <option value="2" @if(isset($_GET['room_status'])&&$_GET['room_status'] == 2) selected=""@endif>空房间</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
@@ -39,7 +40,7 @@
         <table class="table table-bordered table-hover table-condensed">
             <thead>
                 <tr class="active">
-                    <th>房间号</th>
+                    <th>房间名</th>
                     <th>使用状态</th>
                     <th>所属公司</th> {{--允许有多个公司--}}
                     <th>公司联系人</th>{{--若有多个公司，则有多个联系人--}}
@@ -52,7 +53,7 @@
                 @if ($room->company_id == 0)
                     {{--空房--}}
                     <tr>
-                        <td>{{ $room->building }}-{{ $room->room_number }}</td>
+                        <td>{{ $room->room_name }}</td>
                         <td>空房间</td>
                         <td></td>
                         <td></td>
@@ -65,9 +66,8 @@
                     </tr>
                 @else
                     {{--正在使用--}}
-                {{--TODO 需要从数据库中调--}}
                     <tr>
-                        <td>{{ $room->building }}-{{ $room->room_number }}</td>
+                        <td>{{ $room->room_name }}</td>
                         <td><strong style="color:#0099cc">正在使用</strong></td>
                         <td>{{ $room->company->company_name }}</td>
                         <td>{{ $room->company->linkman }}</td>
@@ -82,8 +82,9 @@
             @endforeach
         </table>
         {!! $rooms->appends([
+                'room_type'=>isset($_GET['room_type']) ? $_GET['room_type'] : 1,
                 'room_name'=>isset($_GET['room_name']) ? $_GET['room_name'] : '',
-                'room_type'=>isset($_GET['room_type']) ? $_GET['room_type'] :0
+                'room_status'=>isset($_GET['room_status']) ? $_GET['room_status'] :0
             ])->render() !!}
     </div>
 @endsection

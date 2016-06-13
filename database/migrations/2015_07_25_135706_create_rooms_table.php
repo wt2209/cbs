@@ -15,8 +15,14 @@ class CreateRoomsTable extends Migration
         Schema::create('room', function (Blueprint $table) {
             $table->increments('room_id');
             $table->integer('company_id', false, true)->default(0);
-            $table->string('building', 3);
-            $table->smallInteger('room_number', false, true)->default(0);
+            //TODO  重新确定房间类型种类
+            //房间类型：1|住房， 2|餐厅， 3|服务用房 ......
+            $table->tinyInteger('room_type', false, true)->default(1);
+            $table->string('room_name', 20);//房间名称
+            //房间人数  房间人数决定了收费标准
+            //TODO 房间人数和收费标准由 另一张表 确定
+            $table->tinyInteger('person_number', false, true);
+            $table->tinyInteger('gender', false, true)->default(1);//性别 1|男， 2|女 默认男
             $table->string('room_remark');
             $table->timestamps();
         });

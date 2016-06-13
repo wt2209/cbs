@@ -28,6 +28,7 @@
                     </td>
                     <td width="10%"></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <th>描述</th>
@@ -35,12 +36,14 @@
                         <textarea name="company_description" class="form-control" cols="30" rows="3"></textarea>
                     </td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <th>日常联系人</th>
                     <td>
                         <input type="text" class="form-control input-sm" name="linkman"/>
                     </td>
+                    <td></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -51,12 +54,14 @@
                     </td>
                     <td></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <th>公司负责人</th>
                     <td>
                         <input type="text" class="form-control input-sm" name="manager"/>
                     </td>
+                    <td></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -67,6 +72,7 @@
                     </td>
                     <td></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <th>备注</th>
@@ -74,17 +80,43 @@
                         <textarea name="company_remark" class="form-control" cols="30" rows="3"></textarea>
                     </td>
                     <td></td>
+                    <td></td>
                 </tr>
 
                 <tr>
                     <th>选择房间</th>
-                    <td colspan="3">
-                        <label class="no-bold"><input type="radio" name="add_room_type" value="1" checked=""/>手动输入</label>&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="add_room_type" value="2" />从空房间选择</label>&nbsp;&nbsp;&nbsp;
-                        <div id="room_select">
-                            <textarea name="room_input" class="form-control"
-                                      placeholder="每个房间之间用空格间隔，例如：1-1101 2-1113。将自动过滤掉不存在和非空的房间"></textarea>
-                        </div>
+                    <td colspan="2" style="border-right: 1px #ddd solid" id="living">
+                        居住用房：<br>
+                        {{--<div class="col-lg-2">
+                            <div class="input-group">
+                                <label class="input-group-addon">
+                                    <input type="checkbox" name="living[_1][room_id]" value="111">&nbsp;101010
+                                 </label>
+                                <select class="form-control" name="living[_1][person_number]">
+                                    <option value="2">2人间</option>
+                                    <option value="4">4人间</option>
+                                    <option value="6">6人间</option>
+                                    <option value="8">8人间</option>
+                                </select>
+                                <span class="input-group-addon">
+                                    <label class="no-bold"><input type="radio" value="1" name="living[_1][gender]">男</label>&nbsp;
+                                    <label class="no-bold"><input type="radio" value="2" name="living[_1][gender]">女</label>
+                                </span>
+                            </div>
+                        </div>--}}
+
+                    </td>
+                    <td width="25%" style="border-right: 1px #ddd solid " id="dining">
+                        餐厅用房：<br>
+                            <label class="no-bold">
+                                <input type="checkbox" name="dining[room_id][]" value="222">101010
+                            </label>
+                    </td>
+                    <td  id="service">
+                        服务用房：<br>
+                        <label class="no-bold">
+                            <input type="checkbox" name="service[room_id][]" value="333">101010
+                        </label>
                     </td>
                 </tr>
             </table>
@@ -105,6 +137,36 @@
     <script src="{{ url('/js/functions.js') }}"></script>
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
+        $(function(){
+            $.get('{{ url('room/all-empty-room') }}', '', function(data){
+                var livingStr = '';
+                for (var i in data['living']) {
+                    var current = data['living'][i]
+                    livingStr += '<div class="col-lg-2">';
+                    livingStr += '<div class="input-group">';
+                    livingStr += '<label class="input-group-addon">';
+                    livingStr += '<input type="checkbox" name="living[' + current['room_id'] + '][room_id]" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                    livingStr += '</label>';
+                    livingStr += '<select class="form-control" name="living[' + current['room_id'] + '][person_number]">';
+                    livingStr += '<option value="2">2人间</option>;'
+                    livingStr += '<option value="4">4人间</option>';
+                    livingStr += '<option value="6">6人间</option>';
+                    livingStr += '<option value="8">8人间</option>';
+                    livingStr += '</select>';
+                    livingStr += '<span class="input-group-addon">';
+                    livingStr += '<label class="no-bold"><input type="radio" value="1" name="living[' + current['room_id'] + '][gender]">男</label>&nbsp;';
+                    livingStr += '<label class="no-bold"><input type="radio" value="2" name="living[' + current['room_id'] + '][gender]">女</label>';
+                    livingStr += '</span>';
+                    livingStr += '</div>';
+                    livingStr += '</div>';
+
+                }
+                $('#living').html(livingStr);
+            }, 'json')
+        })
+
+/*
+
         $('input[name=add_room_type]').change(function(){
             var value = $(this).val();
             var self = $(this);
@@ -122,7 +184,7 @@
                     var str = '';
                     for (var i in data) {
                         str += '<label class="no-bold"><input type="checkbox" name="room_select[]" value="';
-                        str += data[i]['room_name']; /*使用房间号不用id，以便与手动输入同步*/
+                        str += data[i]['room_name']; /!*使用房间号不用id，以便与手动输入同步*!/
                         str += '">&nbsp;' + data[i]['room_name'];
                         str += '</label>&nbsp;&nbsp;&nbsp;&nbsp;'
                     }
@@ -132,7 +194,7 @@
                     oRoomSelect.append('<p>' + str + '</p>');
                 }, 'json')
             }
-        })
+        })*/
 
 
         // 联系电话(手机/电话皆可)验证

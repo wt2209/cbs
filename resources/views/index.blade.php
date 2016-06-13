@@ -67,7 +67,13 @@
                     <span>房间管理</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="{{ url('room/index') }}" target="iframe">房间明细</a>
+                            <a href="{{ url('room/living-room') }}" target="iframe">房间明细</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('room/dining-room') }}" target="iframe">餐厅</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('room/service-room') }}" target="iframe">服务用房</a>
                         </li>
                         <li>
                             <a href="{{ url('room/add') }}" target="iframe">添加房间</a>

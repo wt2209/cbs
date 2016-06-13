@@ -18,19 +18,22 @@
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <table class="table table-hover table-condensed">
                 <tr class="no-border">
-                    <th width="10%">楼号</th>
+                    <th width="10%">房间名</th>
                     <td width="20%">
-                        <input type="text" class="form-control input-sm" name="building"
-                               placeholder="例如：1"/>
+                        <input type="text" class="form-control input-sm" name="room_name"
+                               placeholder="例如：10101"/>
                     </td>
                     <td width="10%"></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>房间号</th>
+                    <th>类型</th>
                     <td>
-                        <input type="text" class="form-control input-sm" name="room_number"
-                               placeholder="例如：1105"/>
+                        <select name="room_type" class="form-control">
+                            <option value="1" selected>居住用房</option>
+                            <option value="2">餐厅</option>
+                            <option value="3">服务用房</option>
+                        </select>
                     </td>
                     <td></td>
                     <td></td>
@@ -76,25 +79,13 @@
                 return false;
             },
             rules:{
-                room_number:{
-                    required:true,
-                    number:true,
-                    min:1,
-                    max:65535
-                },
-                building:{
+                room_name:{
                     required:true
                 }
             },
             messages:{
-                room_number:{
-                    required:'失败：必须填写房间号！',
-                    number:'失败：房间号必须是一个数字！',
-                    max:'失败：房间号必须小于65535',
-                    min:'失败：房间号必须大于1'
-                },
-                building:{
-                    required:'必须填写！'
+                room_name:{
+                    required:'失败：必须填写房间号！'
                 }
             }
         });

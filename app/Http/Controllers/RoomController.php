@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Model\Room;
@@ -17,55 +17,102 @@ class RoomController extends Controller
     }
 
     /**
+     * TODO
      * 获取空房间
      */
-    public function getEmptyRoom()
+    public function getAllEmptyRoom()
     {
         $rooms = Room::where('company_id', 0)->get();
         $return = [];
         foreach ($rooms as $room) {
-            $return[] = [
-                'room_id'=>$room->room_id,
-                'room_name'=>$room->building . '-' . $room->room_number,
-            ];
+            switch ($room['room_type']) {
+                case '1':
+                    $return['living'][] = [
+                        'room_id'=>$room->room_id,
+                        'room_name'=>$room->room_name,
+                    ];
+                    break;
+                case '2':
+                    $return['dining'][] = [
+                        'room_id'=>$room->room_id,
+                        'room_name'=>$room->room_name,
+                    ];
+                    break;
+                case '3':
+                    $return['service'][] = [
+                        'room_id'=>$room->room_id,
+                        'room_name'=>$room->room_name,
+                    ];
+                    break;
+            }
         }
         exit(json_encode($return));
     }
 
     /*
-     * TODO
-     * 1.分页
+     * 所有住房
      **/
-    public function getIndex()
+    public function getLivingRoom()
     {
         //TODO 分页中每一页的数量设置成一个配置项
-        $count = $this->setRoomCount();
-        return view('room.index', ['rooms' => Room::paginate(20), 'count'=>$count]);
+        $count = $this->countRoomNumber('living');
+        return view('room.livingRoom', ['rooms' => Room::where('room_type',1)->paginate(20), 'count'=>$count]);
     }
 
+    /*
+     * 所有服务用房
+     **/
+    public function getDiningRoom()
+    {
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->countRoomNumber('dining');
+        return view('room.diningRoom', ['rooms' => Room::where('room_type',2)->paginate(20), 'count'=>$count]);
+    }
+
+    /*
+     * 所有餐厅
+     **/
+    public function getServiceRoom()
+    {
+        //TODO 分页中每一页的数量设置成一个配置项
+        $count = $this->countRoomNumber('service');
+        return view('room.serviceRoom', ['rooms' => Room::where('room_type',3)->paginate(20), 'count'=>$count]);
+    }
+
+
+    /**
+     * 搜索
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getSearch(Request $request)
     {
         $roomName = trim(strip_tags(htmlspecialchars($request->room_name)));
+        $roomStatus = intval($request->room_status);
         $roomType = intval($request->room_type);
 
+        $pageType =  $roomType === 1 ? "living" : ($roomType === 2 ? 'dining' : 'service');
+
         if (!empty($roomName)) {
-            $tmpArr = explode('-', $roomName);
-            $where = "building = $tmpArr[0] and room_number = $tmpArr[1]";
-        } elseif ($roomType === 1) {
-            $where = "company_id != 0";
-        } elseif ($roomType === 2) { //空房间。company_id=0
-            $where = "company_id = 0";
-        } else {
-            $where = NULL;
+            $whereArr[] = "room_name = '{$roomName}'";
         }
+        if ($roomStatus === 1) {
+            $whereArr[] = "company_id != 0";
+        } elseif ($roomStatus === 2) { //空房间。company_id=0
+            $whereArr[] = "company_id = 0";
+        }
+        $whereArr[] = "room_type = {$roomType}";
+        $where = implode(' and ', $whereArr);
+
+
         //TODO 分页中每一页的数量设置成一个配置项
-        $count = $this->setRoomCount($where);
+        $count = $this->countRoomNumber($pageType, $where);
         if ($where) {
             $rooms =  Room::whereRaw($where)->paginate(1);
         } else {
             $rooms =  Room::paginate(1);
         }
-        return view('room.index', ['rooms' => $rooms, 'count'=>$count]);
+        return view('room.'. $pageType .'Room', ['rooms' => $rooms, 'count'=>$count]);
     }
 
     /**
@@ -92,6 +139,7 @@ class RoomController extends Controller
      * 根据room_id删除数据
      * @param Request $request
      */
+    // TODO
     public function getRemove(Request $request)
     {
         //验证房间id
@@ -104,7 +152,7 @@ class RoomController extends Controller
         if (Room::where('room_id', $roomId)
                 ->where('company_id', '>', 0)
                 ->count() > 0) {
-            exit(json_encode(['message'=>'失败：此房间有人居住，不能删除！', 'status'=>0]));
+            exit(json_encode(['message'=>'失败：此房间正在使用，不能删除！', 'status'=>0]));
         }
 
         if (Room::destroy($roomId)) {
@@ -115,7 +163,7 @@ class RoomController extends Controller
     }
 
     /**
-     * 存储数据，包括新增数据和修改数据
+     * 新增数据
      * @param Request $request
      */
     public function postStore(Request $request)
@@ -123,8 +171,7 @@ class RoomController extends Controller
         //字段验证
         $validator = Validator::make($request->all(), [
             'room_id'=>'integer|min:1',
-            'building' => 'required',
-            'room_number' => 'required|integer|max:65535|min:1',
+            'room_name' => 'required'
         ]);
 
         //验证不通过，返回第一个错误信息
@@ -133,23 +180,17 @@ class RoomController extends Controller
         }
 
         //检测是否已经录入过此房间
-        $count = Room::where('building', $request->building)
-            ->where('room_number', $request->room_number)
+        $count = Room::where('room_name', $request->room_name)
             ->count();
         //若添加的房间已存在，则返回错误
         if ($count > 0) {
             exit(json_encode(['message'=>'失败：此房间已经存在!', 'status'=>0]));
         }
 
-        //新建实例
-        if ($request->room_id) { // 存在room_id，修改数据。由于是魔术方法，因此不能使用isset($request->room_id)
-            $room = Room::findOrFail($request->room_id);//会自动进行错误处理
-        } else { //新增数据
-            //新建模型
-            $room = new Room();
-        }
-        $room->building = $request->building;
-        $room->room_number = $request->room_number;
+        //新建模型
+        $room = new Room();
+        $room->room_name = $request->room_name;
+        $room->room_type = $request->room_type;
         $room->room_remark = $request->room_remark;
 
         if ($room->save()) {
@@ -159,18 +200,41 @@ class RoomController extends Controller
         }
     }
 
+    public function postUpdate(Request $request)
+    {
+        $roomId = intval($request->room_id);
+        $roomRemark = trim(htmlspecialchars(strip_tags($request->room_remark)));
+
+        if (DB::table('room')->where('room_id', $roomId)->update(['room_remark'=>$roomRemark])) {
+            return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        }
+        return response()->json(['message'=>'失败：数据添加失败，请重试...', 'status'=>0]);
+    }
+
     /**
      * 统计房间总数及空房间数
      * @param null $where 必须满足laravel中where参数的要求
      * @return array
      */
-    private function setRoomCount($where = NULL)
+    private function countRoomNumber($type, $where = NULL)
     {
-        if ($where) {
-            $rooms = Room::whereRaw($where)->get();
-        } else {
-            $rooms = Room::get();
+        switch ($type) {
+            case 'living':
+                $whereArr[] = 'room_type = 1'; //所有住房
+                break;
+            case 'dining':
+                $whereArr[] = 'room_type = 2'; //所有住房
+                break;
+            case 'service':
+                $whereArr[] = 'room_type = 3'; //所有住房
+                break;
         }
+        if ($where) {
+            $whereArr[] = $where;
+        }
+        $whereStr = implode(' and ', $whereArr);
+
+        $rooms = Room::whereRaw($whereStr)->get();
         $count['all'] = count($rooms);
         $count['empty'] = 0;
         foreach ($rooms as $room) {
