@@ -22,4 +22,9 @@ class Room extends Model
         return $this->belongsTo('App\Model\Company', 'company_id', 'company_id');
     }
 
+    public function RentType()
+    {
+        return $this->belongsTo('App\Model\RentType', 'rent_type_id', 'rent_type_id');
+    }
+
 }

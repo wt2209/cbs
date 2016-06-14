@@ -108,15 +108,9 @@
                     </td>
                     <td width="25%" style="border-right: 1px #ddd solid " id="dining">
                         餐厅用房：<br>
-                            <label class="no-bold">
-                                <input type="checkbox" name="dining[room_id][]" value="222">101010
-                            </label>
                     </td>
                     <td  id="service">
                         服务用房：<br>
-                        <label class="no-bold">
-                            <input type="checkbox" name="service[room_id][]" value="333">101010
-                        </label>
                     </td>
                 </tr>
             </table>
@@ -127,7 +121,7 @@
         </form>
 
     </div>
-    {{-- <div id="mask">
+{{--     <div id="mask">
          <img src="{{ asset('images/load.gif') }}" width="40" alt=""/>
      </div>--}}
 @endsection
@@ -138,64 +132,58 @@
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
         $(function(){
-            $.get('{{ url('room/all-empty-room') }}', '', function(data){
-                var livingStr = '';
-                for (var i in data['living']) {
-                    var current = data['living'][i]
-                    livingStr += '<div class="col-lg-2">';
-                    livingStr += '<div class="input-group">';
-                    livingStr += '<label class="input-group-addon">';
-                    livingStr += '<input type="checkbox" name="living[' + current['room_id'] + '][room_id]" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
-                    livingStr += '</label>';
-                    livingStr += '<select class="form-control" name="living[' + current['room_id'] + '][person_number]">';
-                    livingStr += '<option value="2">2人间</option>;'
-                    livingStr += '<option value="4">4人间</option>';
-                    livingStr += '<option value="6">6人间</option>';
-                    livingStr += '<option value="8">8人间</option>';
-                    livingStr += '</select>';
-                    livingStr += '<span class="input-group-addon">';
-                    livingStr += '<label class="no-bold"><input type="radio" value="1" name="living[' + current['room_id'] + '][gender]">男</label>&nbsp;';
-                    livingStr += '<label class="no-bold"><input type="radio" value="2" name="living[' + current['room_id'] + '][gender]">女</label>';
-                    livingStr += '</span>';
-                    livingStr += '</div>';
-                    livingStr += '</div>';
-
-                }
-                $('#living').html(livingStr);
-            }, 'json')
-        })
-
-/*
-
-        $('input[name=add_room_type]').change(function(){
-            var value = $(this).val();
-            var self = $(this);
-            var oRoomSelect = $('#room_select')
-            var rooms = null;
-            oRoomSelect.find('p').remove();
-            if (value == 1) { //手动输入
-                oRoomSelect.find('textarea').show();
-            } else if (value == 2) {
-                oRoomSelect.find('textarea').hide();
-                oRoomSelect.find('label').remove();
-                maskShow();
-                $.get('{{ url('room/empty-room') }}', '', function(data){
-                    maskHide();
-                    var str = '';
-                    for (var i in data) {
-                        str += '<label class="no-bold"><input type="checkbox" name="room_select[]" value="';
-                        str += data[i]['room_name']; /!*使用房间号不用id，以便与手动输入同步*!/
-                        str += '">&nbsp;' + data[i]['room_name'];
-                        str += '</label>&nbsp;&nbsp;&nbsp;&nbsp;'
+            maskShow();
+            $.get('{{ url('room/all-rent-type') }}', '', function(rentTypeData){
+                var rentType = rentTypeData;
+                $.get('{{ url('room/all-empty-room') }}', '', function(data){
+                    var livingStr = '居住用房：<br>';
+                    var diningStr = '餐厅用房：<br>';
+                    var serviceStr = '服务用房：<br>';
+                    if (data['living']) {
+                        for (var i in data['living']) {
+                            var current = data['living'][i]
+                            livingStr += '<div class="col-lg-2">';
+                            livingStr += '<div class="input-group">';
+                            livingStr += '<label class="input-group-addon">';
+                            livingStr += '<input type="checkbox" name="rooms[' + current['room_id'] + '][room_id]" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            livingStr += '</label>';
+                            livingStr += '<select class="form-control" name="rooms[' + current['room_id'] + '][rent_type_id]">';
+                            for (i=0;i<rentType['length']; i++) {
+                                livingStr += '<option value="'+rentType[i]['rent_type_id']+'">'+rentType[i]['person_number']+'人间</option>;'
+                            }
+                            livingStr += '</select>';
+                            livingStr += '<span class="input-group-addon">';
+                            livingStr += '<label class="no-bold"><input type="radio" value="1" checked name="rooms[' + current['room_id'] + '][gender]">男</label>&nbsp;';
+                            livingStr += '<label class="no-bold"><input type="radio" value="2" name="rooms[' + current['room_id'] + '][gender]">女</label>';
+                            livingStr += '</span>';
+                            livingStr += '</div>';
+                            livingStr += '</div>';
+                        }
+                        $('#living').html(livingStr);
                     }
-                    if (data.length == 0) {
-                        str += '<span style="color:#666"> 没有多余空房间了...</span>';
+                    if (data['dining']) {
+                        for (var i in data['dining']) {
+                            var current = data['dining'][i];
+                            diningStr+='<label class="no-bold">';
+                            diningStr+='<input type="checkbox" name="rooms[' + current['room_id'] + '][room_id]" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            diningStr+='</label><br>';
+                        }
+                        $('#dining').html(diningStr);
                     }
-                    oRoomSelect.append('<p>' + str + '</p>');
+
+                    if (data['service']) {
+                        for (var i in data['service']) {
+                            var current = data['service'][i];
+                            serviceStr+='<label class="no-bold">';
+                            serviceStr+='<input type="checkbox" name="rooms[' + current['room_id'] + '][room_id]" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            serviceStr+='</label><br>';
+                        }
+                        $('#service').html(serviceStr);
+                    }
+                    maskHide()
                 }, 'json')
-            }
-        })*/
-
+            });
+        })
 
         // 联系电话(手机/电话皆可)验证
         $.validator.addMethod("isTel", function(value,element) {

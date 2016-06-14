@@ -25,7 +25,7 @@ class RoomTableSeeder extends Seeder
                         'company_id'=> $j,
                         'room_type'=> 1,
                         'room_name'=> $i*10000+$j*100+$m,
-                        'person_number'=>4,
+                        'rent_type_id'=>1,
                         'gender'=>random_int(1,2),
                         'room_remark'=> '房间备注'.str_random(10),
                         'created_at'=>date('Y-m-d H:i:s')

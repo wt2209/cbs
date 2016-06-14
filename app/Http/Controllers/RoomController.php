@@ -16,6 +16,12 @@ class RoomController extends Controller
         $this->middleware('fieldFilter', ['only'=>['postStore']]);
     }
 
+
+    public function getAllRentType()
+    {
+        $rentType = DB::table('rent_type')->get();
+        return response()->json($rentType);
+    }
     /**
      * TODO
      * 获取空房间
@@ -30,18 +36,24 @@ class RoomController extends Controller
                     $return['living'][] = [
                         'room_id'=>$room->room_id,
                         'room_name'=>$room->room_name,
+                        'rent_type_id'=>$room->rent_type_id,
+                        'person_number'=>$room->rentType->person_number
                     ];
                     break;
                 case '2':
                     $return['dining'][] = [
                         'room_id'=>$room->room_id,
                         'room_name'=>$room->room_name,
+                        'rent_type_id'=>$room->rent_type_id,
+                        'person_number'=>$room->rentType->person_number
                     ];
                     break;
                 case '3':
                     $return['service'][] = [
                         'room_id'=>$room->room_id,
                         'room_name'=>$room->room_name,
+                        'rent_type_id'=>$room->rent_type_id,
+                        'person_number'=>$room->rentType->person_number
                     ];
                     break;
             }

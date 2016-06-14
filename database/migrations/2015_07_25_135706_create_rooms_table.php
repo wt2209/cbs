@@ -21,7 +21,7 @@ class CreateRoomsTable extends Migration
             $table->string('room_name', 20);//房间名称
             //房间人数  房间人数决定了收费标准
             //TODO 房间人数和收费标准由 另一张表 确定
-            $table->tinyInteger('person_number', false, true);
+            $table->tinyInteger('rent_type_id', false, true);
             $table->tinyInteger('gender', false, true)->default(1);//性别 1|男， 2|女 默认男
             $table->string('room_remark');
             $table->timestamps();
