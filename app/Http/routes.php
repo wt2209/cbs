@@ -20,6 +20,10 @@ Route::get('/', function () {
 Route::get('/welcome', function(){
     return view('welcome');
 });
+//欢迎页
+Route::get('common/302', function(){
+    return view('common/302');
+});
 
 //房间管理
 Route::controller('room', 'RoomController');

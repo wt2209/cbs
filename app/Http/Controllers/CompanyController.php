@@ -97,7 +97,7 @@ class CompanyController extends Controller
      */
     public function getAdd()
     {
-        return view('company.add');
+        return view('company.addBasicInfo');
     }
 
     public function getEdit($companyId)
@@ -114,17 +114,8 @@ class CompanyController extends Controller
      * 存储数据
      * @param Request $request
      */
-    public function postStore(Request $request)
+    public function postStoreBasicInfo(Request $request)
     {
-        $rooms = $request->rooms;
-        foreach ($rooms as $item) {
-            if (isset($item['room_id'])) {
-                $return[] = $item;
-            }
-        }
-
-
-        return response()->json($return);
         //字段验证
         $validator = Validator::make($request->all(), [
             'company_id'=>'integer|min:1',
@@ -137,21 +128,14 @@ class CompanyController extends Controller
             'company_remark'=>'between:1,255',
             'type'=>'integer|min:1|max:3'
         ]);
-
         //验证不通过，返回第一个错误信息
         if ($validator->fails()) {
             exit(json_encode(['message'=>$validator->errors()->first(), 'status'=>0]));
         }
 
-        //新建实例，根据是否有companyId判断是修改还是新增
-        if ($request->company_id) { // 存在company_id，修改数据。由于是魔术方法，因此不能使用isset($request->room_id)
-            $company = Company::findOrFail($request->company_id);//会自动进行错误处理
-        } else { //新增数据
-            //入住
-            $this->type = 1;
-            $company = new Company();
-        }
-
+        //入住
+        $this->type = 1;
+        $company = new Company();
         $company->company_name = $request->company_name;
         $company->company_description = $request->company_description;
         $company->linkman = $request->linkman;
@@ -159,26 +143,38 @@ class CompanyController extends Controller
         $company->manager = $request->manager;
         $company->manager_tel = $request->manager_tel;
         $company->company_remark = $request->company_remark;
-
         //开启事务
         DB::beginTransaction();
         if ($company->save()) {
             //主键
-            $request->company_id = $company->getKey();
-            if ($this->setCompanyRoom($request)) {
-                //提交事务
-                DB::commit();
-            } else {
-                //错误，回滚事务
-                DB::rollBack();
-                exit(json_encode(['message'=>'失败：数据添加失败，请重试...', 'status'=>0]));
-            }
-            exit(json_encode(['message'=>'操作成功！', 'status'=>1]));
+            $companyId = $company->getKey();
+            //提交事务
+            DB::commit();
+            return $this->getSelectRooms($companyId);
         } else {
             //错误，回滚事务
             DB::rollBack();
-            exit(json_encode(['message'=>'失败：数据添加失败，请重试...', 'status'=>0]));
+            //TODO  好好研究一下response  重构一下302 等问题
+            return response()->redirectTo(url('common/302'));
         }
+    }
+
+
+    public function getSelectRooms($companyId)
+    {
+        if (!$companyId) {
+            return response()->redirectTo(url('common/302'));
+        }
+        return view('company.selectRooms',['company_id'=>$companyId]);
+    }
+
+    public function postStoreSelectedRooms(Request $request)
+    {
+        $roomIds = $request->roomIds;
+        $roomTypes = $request->roomTypes;
+        $roomIdArr = explode('_', $roomIds);
+        $roomTypeArr = explode('|', $roomTypes);
+        return response()->json($roomTypeArr);
     }
 
     /**
