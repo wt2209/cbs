@@ -140,8 +140,15 @@
                 sRoomId = sRoomId.substring(0, sRoomId.length - 1);
                 sRoomType = sRoomType.substring(0, sRoomType.length - 1);
                 var postStr = 'roomIds='+sRoomId+'&roomTypes='+sRoomType;
-                $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(){
-
+                maskShow();
+                $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(e){
+                    maskHide();
+                    popdown({'message':e.message, 'status': e.status, 'callback':function(){
+                        if (e.status) {
+                            /*返回并刷新原页面*/
+                            location.href = '{{ url("company/index") }}';
+                        }
+                    }});
                 }, 'json');
             })
         })

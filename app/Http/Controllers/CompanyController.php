@@ -54,11 +54,27 @@ class CompanyController extends Controller
      */
     public function getIndex()
     {
-        $companies = Company::all();
+        $companies = Company::where('is_quit', 0)->get();
+
         $count['company'] = count($companies);
-        $count['room'] = 0;
+        $count['livingRoom'] = $count['diningRoom'] = $count['serviceRoom'] = 0;
+        $companyIdArray = [];
         foreach ($companies as $company) {
-            $count['room'] += count($company->rooms);
+            $companyIdArray[] = $company->company_id;
+        }
+        $rooms = Room::whereIn('company_id', $companyIdArray)->get();
+        foreach ($rooms as $room) {
+            switch ($room->room_type) {
+                case '1':
+                    $count['livingRoom']++;
+                    break;
+                case '2':
+                    $count['diningRoom']++;
+                    break;
+                case '3':
+                    $count['serviceRoom']++;
+                    break;
+            }
         }
         return view('company.index', ['companies'=>$companies, 'count'=>$count]);
     }
@@ -111,8 +127,9 @@ class CompanyController extends Controller
     }
 
     /**
-     * 存储数据
+     * 存储公司基本数据
      * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
     public function postStoreBasicInfo(Request $request)
     {
@@ -170,11 +187,85 @@ class CompanyController extends Controller
 
     public function postStoreSelectedRooms(Request $request)
     {
-        $roomIds = $request->roomIds;
-        $roomTypes = $request->roomTypes;
+        //roomIds : 1_2_3
+        //roomTypes : 1_1_2|2_1_2|3_2_1
+        $roomIds = htmlspecialchars(strip_tags($request->roomIds));
+        $roomAndTypes = htmlspecialchars(strip_tags($request->roomTypes));
+        $companyId = intval($request->company_id);
+
         $roomIdArr = explode('_', $roomIds);
-        $roomTypeArr = explode('|', $roomTypes);
-        return response()->json($roomTypeArr);
+        $roomTypeArr = explode('|', $roomAndTypes);
+
+        //修改房间表
+        Room::whereIn('room_id', $roomIdArr)
+            ->update(['company_id' => $companyId]);
+        foreach ($roomTypeArr as $value) {
+            $currentArr = explode('_', $value);
+            Room::where('room_id', intval($currentArr[0]))
+                ->update([
+                    'rent_type_id'=>intval($currentArr[1]),
+                    'gender'=>intval($currentArr[2])
+                ]);
+        }
+
+        //记录改动日志
+        $rooms = Room::whereIn('room_id', $roomIdArr)->get();
+        $this->type = 1; //入住
+        $this->newRooms = [];
+        $this->oldRooms = [];
+        if (!empty($rooms)) {
+            foreach ($rooms as $room) {
+                $this->newRooms[] = $room->room_name;
+            }
+        }
+        CompanyLogController::log($this->type, $companyId, $this->oldRooms, $this->newRooms);
+
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
+    }
+
+    /**
+     * 返回指定的房间详情
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getLoadDetail(Request $request)
+    {
+        $result = [];
+        $companyId = intval($request->company_id);
+        $company = Company::where('company_id', $companyId)
+            ->where('is_quit', 0)
+            ->first();
+        $rooms = Room::where('company_id', $companyId)->get();
+
+        $result['name'] = $company->company_name;
+        $result['description'] = $company->company_description;
+        $result['link'] = $company->linkman;
+        $result['link_tel'] = $company->linkman_tel;
+        $result['manager'] = $company->manager;
+        $result['manager_tel'] = $company->manager_tel;
+        $result['remark'] = $company->company_remark;
+        $result['created_at'] = $company->created_at;
+        $result['livingRoom'] = '';
+        $result['diningRoom'] = '';
+        $result['serviceRoom'] = '';
+        foreach ($rooms as $room) {
+            switch (intval($room->room_type)){
+                case 1:
+                    $result['livingRoom'] .= $room->room_name . ' ';
+                    break;
+                case 2:
+                    $result['diningRoom'] .= $room->room_name . ' ';
+                    break;
+                case 3:
+                    $result['serviceRoom'] .= $room->room_name . ' ';
+                    break;
+            }
+        }
+        trim($result['livingRoom'], '|');
+        trim($result['diningRoom'], '|');
+        trim($result['serviceRoom'], '|');
+
+        return response()->json($result);
     }
 
     /**

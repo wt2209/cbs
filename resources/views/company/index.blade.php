@@ -34,103 +34,45 @@
     </div>
 @endsection
 @section('content')
-    <script>
-        //对于所居住房间超出显示范围的公司，设置一个全局数组，用于在底部显示全部房间
-        var oAllRooms = [];
-    </script>
-    @foreach($companies as $company)
-        <div class="company">
-            <div class="title">
-                <h3>
-                    {{ $company->company_name }}
-                </h3>
-                <span class="company-description">{{ $company->company_description }}</span>
-                <p class="operation">
-                    <a href="javascript:;" class="btn btn-success btn-xs">房租</a>
-                    <a href="{{ url('company/company-utility/'.$company->company_id) }}" class="btn btn-warning btn-xs">水电费</a>
-                    <a href="{{ url('punish/create/'.$company->company_id) }}" class="btn btn-danger btn-xs">处罚</a>
-                </p>
-            </div>
-            <div class="company-content">
-                {{--<p class="operation">
-                    <a href="javascript:;" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#confirmModal">缴费</a>
-                </p>--}}
-                <div class="l">
-                    <p>
-                        <strong>日常联系人：</strong>
-                        <span>{{ $company->linkman }}</span><br/>
-                    </p>
-                    <p>
-                        <strong>联系人电话：</strong>
-                        <span>{{ $company->linkman_tel }}</span>
-                    </p>
-                </div>
-                <div class="r">
-                    <p>
-                        <strong>公司负责人：</strong>
-                        <span>{{ $company->manager }}</span><br/>
-                    </p>
-                    <p>
-                        <strong>负责人电话：</strong>
-                        <span>{{ $company->manager_tel }}</span>
-                    </p>
-                </div>
-                <div class="down">
-                    <p><strong>入住时间：</strong><span>{{substr($company->created_at, 0, 10)}}</span></p>
-                    <strong>所居住房间：</strong>
-                    {{--<p class="all-rooms">
-                        @if (isset($rooms[$company->company_id]))
-                            @if (count($rooms[$company->company_id]) <= 8)
-                                @foreach($rooms[$company->company_id] as $room)
-                                    <a href="" class="company-room">{{ $room }}</a>
-                                @endforeach
-                            @else
-                                @for($i=0; $i<8; $i++)
-                                    <a href="" class="company-room">{{ $rooms[$company->company_id][$i] }}</a>
-                                @endfor
-                                <a href="" class="more">更多>></a>
-                            @endif
-                        @endif
-                    </p>--}}
-                    <p class="all-rooms">
-                        @if ($company->rooms)
-                            {{--房间多于8个--}}
-                            @if (count($company->rooms) > 8)
-                                <script>
-                                    oAllRooms['{{$company->company_id}}'] = [];
-                                </script>
-                                @foreach($company->rooms as $key=>$room)
-                                    @if ($key < 8)
-                                        <script>
-                                            oAllRooms['{{$company->company_id}}']['{{$key}}'] = '{{ $room->building.'-'.$room->room_number }}';
-                                        </script>
-                                        <a href="javascript:;" class="company-room">{{ $room->building.'-'.$room->room_number }}</a>
-                                    @else
-                                        <script>
-                                            oAllRooms['{{$company->company_id}}']['{{$key}}'] = '{{ $room->building.'-'.$room->room_number }}';
-                                        </script>
-                                    @endif
-                                @endforeach
-                                <a href="javascript:;" class="more" company="{{$company->company_name}}_{{$company->company_id}}" onclick="showBottom.call(this);">更多>></a>
-                            @else
-                                @foreach($company->rooms as $room)
-                                    <a href="javascript:;" class="company-room">{{ $room->building.'-'.$room->room_number }}</a>
-                                @endforeach
-                            @endif
-                        @endif
-                    </p>
-                    <strong>备注：</strong>
-                    <p class="company-remark">{{ $company->company_remark }}</p>
-                    <div class="func">
-                        <a href="{{ url('company/change-rooms/'.$company->company_id) }}" class="btn btn-success btn-xs">调整房间</a>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-condensed">
+            <thead>
+            <tr class="active">
+                <th>公司名</th>
+                <th>日常联系人</th>
+                <th>联系人电话</th>
+                <th>入住时间</th>
+                <th>居住房间个数</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            @foreach($companies as $company)
+                <tr>
+                    <td>
+                        {{ $company->company_name }}
+                    </td>
+                    <td>{{ $company->linkman }}</td>
+                    <td>{{ $company->linkman_tel }}</td>
+                    <td>{{ substr($company->created_at, 0, 10) }}</td>
+                    <td>
+{{--TODO 房间个数--}}
+                        3
+                    </td>
+                    <td>{{ $company->company_remark }}</td>
+                    <td>
+                        <button class="btn btn-info btn-xs detail" company_id="{{ $company->company_id }}">详细</button>
+                        <a href="{{ url('company/company-utility/'.$company->company_id) }}" class="btn btn-primary btn-xs">水电</a>
+                        <a href="{{ url('punish/create/'.$company->company_id) }}" class="btn btn-primary btn-xs">处罚</a>
+                        <a href="{{ url('company/change-rooms/'.$company->company_id) }}" class="btn btn-success btn-xs">调房</a>
                         <a href="{{ url('company/edit/'.$company->company_id) }}" class="btn btn-success btn-xs">修改</a>
-                        <a href="{{ url('company/.../'.$company->company_id) }}" class="btn btn-warning btn-xs">巡查状态</a>
-                        <a href="{{ url('company/quit/'.$company->company_id) }}" class="btn btn-danger btn-xs">退租</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
+                        <a href="" class="btn btn-danger btn-xs">退租</a>
+                    </td>
+                </tr>
+            @endforeach
+        </table>
+
+    </div>
 
     <!-- delete modal -->
     <div id="modal" class="modal bs-example-modal-sm">
@@ -156,19 +98,38 @@
 @endsection
 @section('bottom')
     <p>共有 {{ $count['company'] }} 个公司</p>
-    <p>共占用 {{ $count['room'] }} 个房间</p>
+    <p>共占用 {{ $count['livingRoom'] }} 个居住房间，{{ $count['diningRoom'] }} 个餐厅，{{ $count['serviceRoom'] }} 个服务用房</p>
 @endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script>
-        function showBottom(){
-            var oCompany = $(this).attr('company').split('_');
-            var str = '';
+        $(function(){
+            $('.detail').click(function(){
+                maskShow();
+                var iCompanyId = $(this).attr('company_id');
+                $.get('{{ url('company/load-detail/') }}', 'company_id='+iCompanyId, function(data){
+                    var sDetail = '<p><span style="color:red">' + data['name'] + '</span>：';
+                    sDetail += data['description'] + '</p>';
+                    sDetail += '<p>日常联系人：'+ data['link'] + ' ' + data['link_tel'];
+                    if (data['manager']) {
+                        sDetail += '，负责人：' + data['manager'] + ' ' + data['manager_tel'];
+                    }
+                    sDetail +=  '</p>';
+                    sDetail += '<p>&nbsp;&nbsp;&nbsp;居住房间：' + data['livingRoom'] + '</p>';
+                    sDetail += '<p>';
+                    if (data['diningRoom']) {
+                        sDetail += '&nbsp;&nbsp;&nbsp;餐厅：' + data['diningRoom'];
+                    }
+                    if (data['serviceRoom']) {
+                        sDetail += '&nbsp;&nbsp;&nbsp;服务用房：' + data['serviceRoom'];
+                    }
+                    sDetail += '</p>'
+                    $('#bottom').html(sDetail);
+                    maskHide();
+                }, 'json')
+            })
+        })
 
-            str += '<p><strong>'+oCompany[0]+'公司所居住的全部房间是：</strong></p>';
-            str += '<p>'+oAllRooms[oCompany[1]].join('， ')+'</p>';
-            $('#bottom').html(str);
-        }
     </script>
 @endsection
