@@ -56,12 +56,13 @@
                     <td>{{ $company->linkman_tel }}</td>
                     <td>{{ substr($company->created_at, 0, 10) }}</td>
                     <td>
-{{--TODO 房间个数--}}
-                        3
+                        {{ isset($count['livingRoomNumber'][$company->company_id]) ?
+                            $count['livingRoomNumber'][$company->company_id] :
+                            0 }}
                     </td>
                     <td>{{ $company->company_remark }}</td>
                     <td>
-                        <button class="btn btn-info btn-xs detail" company_id="{{ $company->company_id }}">详细</button>
+                        <a href="{{ url('company/company-detail/'.$company->company_id) }}" class="btn btn-info btn-xs" >详细</a>
                         <a href="{{ url('company/company-utility/'.$company->company_id) }}" class="btn btn-primary btn-xs">水电</a>
                         <a href="{{ url('punish/create/'.$company->company_id) }}" class="btn btn-primary btn-xs">处罚</a>
                         <a href="{{ url('company/change-rooms/'.$company->company_id) }}" class="btn btn-success btn-xs">调房</a>
@@ -103,33 +104,4 @@
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
-    <script>
-        $(function(){
-            $('.detail').click(function(){
-                maskShow();
-                var iCompanyId = $(this).attr('company_id');
-                $.get('{{ url('company/load-detail/') }}', 'company_id='+iCompanyId, function(data){
-                    var sDetail = '<p><span style="color:red">' + data['name'] + '</span>：';
-                    sDetail += data['description'] + '</p>';
-                    sDetail += '<p>日常联系人：'+ data['link'] + ' ' + data['link_tel'];
-                    if (data['manager']) {
-                        sDetail += '，负责人：' + data['manager'] + ' ' + data['manager_tel'];
-                    }
-                    sDetail +=  '</p>';
-                    sDetail += '<p>&nbsp;&nbsp;&nbsp;居住房间：' + data['livingRoom'] + '</p>';
-                    sDetail += '<p>';
-                    if (data['diningRoom']) {
-                        sDetail += '&nbsp;&nbsp;&nbsp;餐厅：' + data['diningRoom'];
-                    }
-                    if (data['serviceRoom']) {
-                        sDetail += '&nbsp;&nbsp;&nbsp;服务用房：' + data['serviceRoom'];
-                    }
-                    sDetail += '</p>'
-                    $('#bottom').html(sDetail);
-                    maskHide();
-                }, 'json')
-            })
-        })
-
-    </script>
 @endsection

@@ -95,40 +95,6 @@
     <script src="{{ url('/js/functions.js') }}"></script>
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
-
-
-/*
-
-        $('input[name=add_room_type]').change(function(){
-            var value = $(this).val();
-            var self = $(this);
-            var oRoomSelect = $('#room_select')
-            var rooms = null;
-            oRoomSelect.find('p').remove();
-            if (value == 1) { //手动输入
-                oRoomSelect.find('textarea').show();
-            } else if (value == 2) {
-                oRoomSelect.find('textarea').hide();
-                oRoomSelect.find('label').remove();
-                maskShow();
-                $.get('{{ url('room/empty-room') }}', '', function(data){
-                    maskHide();
-                    var str = '';
-                    for (var i in data) {
-                        str += '<label class="no-bold"><input type="checkbox" name="room_select[]" value="';
-                        str += data[i]['room_name']; /!*使用房间号不用id，以便与手动输入同步*!/
-                        str += '">&nbsp;' + data[i]['room_name'];
-                        str += '</label>&nbsp;&nbsp;&nbsp;&nbsp;'
-                    }
-                    if (data.length == 0) {
-                        str += '<span style="color:#666"> 没有多余空房间了...</span>';
-                    }
-                    oRoomSelect.append('<p>' + str + '</p>');
-                }, 'json')
-            }
-        })*/
-
-
         // 联系电话(手机/电话皆可)验证
         $.validator.addMethod("isTel", function(value,element) {
             var length = value.length;

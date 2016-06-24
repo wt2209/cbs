@@ -18,129 +18,180 @@
 @endsection
 @section('content')
     <div class="table-responsive">
-        <form id="form">
+        <form id="form" method="post" action="{{ url('company/store-basic-info') }}">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-            <table class="table table-hover table-condensed">
-                <tr class="no-border">
-                    <th width="10%">公司名称</th>
-                    <td width="20%">
-                        {{ $company->company_name }}
-                    </td>
-                    <td width="10%"></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th>选择房间</th>
-                    <td colspan="3">
-                        <label class="no-bold"><input type="radio" name="add_room_type" value="1" checked=""/>手动输入</label>&nbsp;&nbsp;&nbsp;
-                        <label class="no-bold"><input type="radio" name="add_room_type" value="2" />从空房间选择</label>&nbsp;&nbsp;&nbsp;
-                        <div id="room_select">
-                            <textarea name="room_input" class="form-control"
-                                      placeholder="每个房间之间用空格间隔，例如：1-1101 2-1113。将自动过滤掉不存在和非空的房间"></textarea>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <div class="form-submit">
-                <input type="hidden" name="company_id" value="{{$company->company_id}}"/>
-                <button class="btn btn-success" id="submit">提 交</button>
-            </div>
+            <input type="hidden" name="company_id" value="{{ $company->company_id }}">
+            <input type="hidden" name="is_edit" value="1">
         </form>
+        <table class="table table-hover table-condensed">
+            <tr>
+                <td width="30%" style="border-right: 1px #ddd solid" id="living">
+                    居住用房：<br>
+                </td>
+                <td width="25%" style="border-right: 1px #ddd solid " id="dining">
+                    餐厅用房：<br>
+                </td>
+                <td  id="service">
+                    服务用房：<br>
+                </td>
+            </tr>
+        </table>
     </div>
-    {{-- <div id="mask">
-         <img src="{{ asset('images/load.gif') }}" width="40" alt=""/>
-     </div>--}}
 @endsection
 
+@section('bottom')
+    <button class="btn btn-success" id="submit">保存并选择房间</button>
+@endsection
 @section('js')
     {{-- 加载气泡效果js --}}
     <script src="{{ url('/js/functions.js') }}"></script>
     <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
     <script>
-        //旧房间
-        var hiddenStr = '<div style="visibility:hidden">';
-        @foreach($rooms as $room)
-            hiddenStr += '<input type="hidden" name="old_rooms[]" value="';
-            hiddenStr += "{{ $room->building.'-'.$room->room_number }}";
-            hiddenStr += '"/>';
-        @endforeach
-        hiddenStr += '</div>';
-        $('.form-submit').append(hiddenStr);
+        var sRoomId = '';
+        var sRoomType = '';
+        var bStatus = false;
+        $(function(){
+            maskShow();
+            $.get('{{ url('room/all-rent-type') }}', '', function(rentTypeData){
+                var rentType = rentTypeData;
+                $.get('{{ url('room/all-empty-room') }}', '', function(data){
+                    var livingStr = '居住用房：<br>';
+                    var diningStr = '餐厅用房：<br>';
+                    var serviceStr = '服务用房：<br>';
+                    @if ($livingRooms)
+                        @foreach($livingRooms as $livingRoom)
+                            livingStr += '<div class="col-lg-2">';
+                            livingStr += '<div class="input-group">';
+                            livingStr += '<label class="input-group-addon">';
+                            livingStr += '<input type="checkbox" checked value="{{$livingRoom->room_id}}">&nbsp;{{$livingRoom->room_name}}';
+                            livingStr += '</label>';
+                            livingStr += '<select class="form-control" name="roomType[{{$livingRoom->company_id}}]">';
+                            for (i=0;i<rentType['length']; i++) {
+                                if (rentType[i]['rent_type_id'] == '{{$livingRoom->rent_type_id}}') {
+                                    livingStr += '<option selected value="'+rentType[i]['rent_type_id']+'">'+rentType[i]['person_number']+'人间</option>;'
+                                } else
+                                    livingStr += '<option value="'+rentType[i]['rent_type_id']+'">'+rentType[i]['person_number']+'人间</option>;'
+                            }
+                            livingStr += '</select>';
+                            livingStr += '<span class="input-group-addon">';
+                            if ('1' == '{{$livingRoom->gender}}') {
+                                livingStr += '<label class="no-bold"><input type="radio" checked value="1" checked name="gender[{{$livingRoom->room_id}}]">男</label>&nbsp;';
+                                livingStr += '<label class="no-bold"><input type="radio" value="2" name="gender[{{$livingRoom->room_id}}]">女</label>';
+                            } else if ('2' == '{{$livingRoom->gender}}') {
+                                livingStr += '<label class="no-bold"><input type="radio" value="1" checked name="gender[{{$livingRoom->room_id}}]">男</label>&nbsp;';
+                                livingStr += '<label class="no-bold"><input type="radio" checked value="2" name="gender[{{$livingRoom->room_id}}]">女</label>';
+                            }
+                            livingStr += '</span>';
+                            livingStr += '</div>';
+                            livingStr += '</div>';
+                        @endforeach
+                    @endif
+                    if (data['living']) {
+                        for (var i in data['living']) {
+                            var current = data['living'][i]
+                            livingStr += '<div class="col-lg-2">';
+                            livingStr += '<div class="input-group">';
+                            livingStr += '<label class="input-group-addon">';
+                            livingStr += '<input type="checkbox"  value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            livingStr += '</label>';
+                            livingStr += '<select class="form-control" name="roomType['+current['room_id']+']">';
+                            for (i=0;i<rentType['length']; i++) {
+                                livingStr += '<option value="'+rentType[i]['rent_type_id']+'">'+rentType[i]['person_number']+'人间</option>;'
+                            }
+                            livingStr += '</select>';
+                            livingStr += '<span class="input-group-addon">';
+                            livingStr += '<label class="no-bold"><input type="radio" value="1" checked name="gender['+current['room_id']+']">男</label>&nbsp;';
+                            livingStr += '<label class="no-bold"><input type="radio" value="2" name="gender['+current['room_id']+']">女</label>';
+                            livingStr += '</span>';
+                            livingStr += '</div>';
+                            livingStr += '</div>';
+                        }
+                    }
+                    $('#living').html(livingStr);
 
-        //手动输入房间号与自动获取房间号切换
-        $('input[name=add_room_type]').change(function(){
-            var value = $(this).val();
-            $('#room_select').find('p').remove();
-            if (value == 1) { //手动输入
-                setManualRoom();
-            } else if (value == 2) {
-                setAutoRoom();
-            }
-        })
+                    @if ($diningRooms)
+                        @foreach($diningRooms as $diningRoom)
+                            diningStr+='<label class="no-bold">';
+                            diningStr+='<input type="checkbox" checked value="{{$diningRoom->room_id}}">&nbsp;{{$diningRoom->room_name}}';
+                            diningStr+='</label><br>';
+                        @endforeach
+                    @endif
+                    if (data['dining']) {
+                        for (var i in data['dining']) {
+                            var current = data['dining'][i];
+                            diningStr+='<label class="no-bold">';
+                            diningStr+='<input type="checkbox" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            diningStr+='</label><br>';
+                        }
+                    }
+                    $('#dining').html(diningStr);
 
-        //开始时执行手动输入房间号
-        setManualRoom();
+                    @if ($serviceRooms)
+                        @foreach($serviceRooms as $serviceRoom)
+                            serviceStr+='<label class="no-bold">';
+                            serviceStr+='<input type="checkbox" checked value="{{$serviceRoom->room_id}}">&nbsp;{{$serviceRoom->room_name}}';
+                            serviceStr+='</label><br>';
+                        @endforeach
+                    @endif
+                    if (data['service']) {
+                        for (var i in data['service']) {
+                            var current = data['service'][i];
+                            serviceStr+='<label class="no-bold">';
+                            serviceStr+='<input type="checkbox" value="'+current['room_id']+'">&nbsp;'+current['room_name'];
+                            serviceStr+='</label><br>';
+                        }
+                    }
+                    $('#service').html(serviceStr);
+                    maskHide()
+                }, 'json')
+            });
 
-        //表单提交
-        $('#submit').click(function(){   //表单提交句柄,为一回调函数，带一个参数：form
-            var s = true;
-            if (s) {
-                s = false;
+            $('#submit').click(function(){
+                sRoomId = '';
+                sRoomType = '';
+                $('#living').find('input[type=checkbox]').each(function(){
+                    if ($(this).prop('checked')) {
+                        var iRoomId = $(this).val();
+                        var iType = $(this).parents('.input-group').find('select').val();
+                        var iGender;
+                        $(this).parents('.input-group').find('input[type=radio]').each(function(){
+                            if ($(this).prop('checked')) {
+                                iGender = $(this).val();
+                            }
+                        });
+                        sRoomId += iRoomId + '_';
+                        sRoomType += iRoomId+'_'+iType+'_'+iGender+'|';
+                    }
+                })
+                $('#dining').find('input[type=checkbox]').each(function(){
+                    if ($(this).prop('checked')) {
+                        sRoomId += $(this).val() + '_';
+                    }
+                })
+                $('#service').find('input[type=checkbox]').each(function(){
+                    if ($(this).prop('checked')) {
+                        sRoomId += $(this).val() + '_';
+                    }
+                })
+
+                sRoomId = sRoomId.substring(0, sRoomId.length - 1);
+                sRoomType = sRoomType.substring(0, sRoomType.length - 1);
+                var postStr = 'roomIds='+sRoomId+'&roomTypes='+sRoomType;
+                if (bStatus) {
+                    return false;
+                }
+                bStatus = true;
                 maskShow();
-                $.post('{{ url('company/change-rooms-store') }}', $('#form').serialize(), function(e){
+                $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(e){
                     maskHide();
                     popdown({'message':e.message, 'status': e.status, 'callback':function(){
                         if (e.status) {
                             /*返回并刷新原页面*/
-                            location.href = document.referrer;
+                            location.href = '{{ url("company/index") }}';
                         }
                     }});
-                    s = true;
                 }, 'json');
-            }
-
-            return false;
+            })
         })
-
-
-        //手动输入房间号
-        function setManualRoom(){
-            var oRoomSelect = $('#room_select');
-            var str = '';
-            @foreach($rooms as $room)
-                str += '{{$room->building.'-'.$room->room_number}} '; /*使用房间号不用id，以便与手动输入同步*/
-            @endforeach
-            oRoomSelect.find('textarea').html('').show().append(str);
-        }
-
-        //自动获取房间号
-        function setAutoRoom(){
-            var oRoomSelect = $('#room_select');
-            var str = '';
-            @foreach($rooms as $room)
-                str += '<label class="no-bold"><input type="checkbox" checked name="room_select[]" value="';
-                str += '{{$room->building.'-'.$room->room_number}}'; /*使用房间号不用id，以便与手动输入同步*/
-                str += '">&nbsp;' + '{{ $room->building.'-'.$room->room_number }}';
-                str += '</label>&nbsp;&nbsp;&nbsp;&nbsp;';
-            @endforeach
-            oRoomSelect.find('textarea').hide();
-            oRoomSelect.find('label').remove();
-            maskShow();
-            $.get('{{ url('room/empty-room') }}', '', function(data){
-                maskHide();
-                for (var i in data) {
-                    str += '<label class="no-bold"><input type="checkbox" name="room_select[]" value="';
-                    str += data[i]['room_name']; /*使用房间号不用id，以便与手动输入同步*/
-                    str += '">&nbsp;' + data[i]['room_name'];
-                    str += '</label>&nbsp;&nbsp;&nbsp;&nbsp;'
-                }
-                if (data.length == 0) {
-                    str += '<span style="color:#666"> 没有多余空房间了...</span>';
-                }
-                oRoomSelect.append('<p>' + str +'</p>');
-            }, 'json')
-        }
-
-
     </script>
 @endsection

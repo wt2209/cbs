@@ -56,6 +56,7 @@
     <script>
         var sRoomId = '';
         var sRoomType = '';
+        var bStatus = false;
         $(function(){
             maskShow();
             $.get('{{ url('room/all-rent-type') }}', '', function(rentTypeData){
@@ -140,6 +141,10 @@
                 sRoomId = sRoomId.substring(0, sRoomId.length - 1);
                 sRoomType = sRoomType.substring(0, sRoomType.length - 1);
                 var postStr = 'roomIds='+sRoomId+'&roomTypes='+sRoomType;
+                if (bStatus) {
+                    return false;
+                }
+                bStatus = true;
                 maskShow();
                 $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(e){
                     maskHide();
@@ -149,6 +154,7 @@
                             location.href = '{{ url("company/index") }}';
                         }
                     }});
+
                 }, 'json');
             })
         })

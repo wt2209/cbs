@@ -42,6 +42,7 @@
                     <th>房间名</th>
                     <th>使用状态</th>
                     <th>所属公司</th> {{--允许有多个公司--}}
+                    <th>性别</th> {{--允许有多个公司--}}
                     <th>公司联系人</th>{{--若有多个公司，则有多个联系人--}}
                     <th>联系人电话</th>{{--同上--}}
                     <th>房间备注</th>
@@ -57,6 +58,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
@@ -69,6 +71,7 @@
                         <td>{{ $room->room_name }}</td>
                         <td><strong style="color:#0099cc">正在使用</strong></td>
                         <td>{{ $room->company->company_name }}</td>
+                        <td>{{ $room->gender == 1 ? '男' : '女' }}</td>
                         <td>{{ $room->company->linkman }}</td>
                         <td>{{ $room->company->linkman_tel }}</td>
                         <td>{{ $room->room_remark }}</td>
