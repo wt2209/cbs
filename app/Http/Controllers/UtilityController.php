@@ -26,11 +26,10 @@ class UtilityController extends Controller{
      */
     public function getIndex()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
             ->join('company', 'company.company_id', '=', 'utility.company_id')
-            ->paginate(20);
+            ->paginate(config('cbs.pageNumber'));
 
         $count = $this->setUtilityCount();
         return view('utility.index', ['utilities'=>$utilities, 'count'=>$count]);
@@ -54,10 +53,7 @@ class UtilityController extends Controller{
                 $whereArr[] = "cbs_company.company_name like '%{$companyName}%'";
             }
         } else { //房间号不空，不用处理公司名
-            $tmpRoom = explode('-', $roomName);
-            if (count($tmpRoom) === 2) {//房间格式不对，给一个不能查出结果的条件
-                $whereArr[] = 'cbs_room.building = ' . $tmpRoom[0] . ' and cbs_room.room_number = ' . $tmpRoom[1];
-            }
+            $whereArr[] = 'cbs_room.building = ' . $roomName;
         }
         if (!empty($yearMonth)) {
             $tmp = explode('-', $yearMonth);
@@ -77,12 +73,12 @@ class UtilityController extends Controller{
         if (!$where) { //条件为空，显示所有结果
             $where = 'utility_id != 0';
         }
-        //TODO 分页
+
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
             ->join('company', 'company.company_id', '=', 'utility.company_id')
             ->whereRaw($where)
-            ->paginate(1);
+            ->paginate(config('cbs.pageNumber'));
 
         $count = $this->setUtilityCount($where);
         return view('utility.index', ['utilities'=>$utilities, 'count'=>$count]);
@@ -103,11 +99,10 @@ class UtilityController extends Controller{
      */
     public function getBase()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
         $count = $this->setBaseCount();
         $bases = DB::table('utility_base')
             ->join('room', 'utility_base.room_id', '=', 'room.room_id')
-            ->paginate(3);
+            ->paginate(config('cbs.pageNumber'));
         return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
     }
 
@@ -118,10 +113,7 @@ class UtilityController extends Controller{
 
         $whereArr = [];
         if (!empty($roomName)) { //房间号不空，不用处理公司名
-            $tmpRoom = explode('-', $roomName);
-            if (count($tmpRoom) === 2) {//房间格式不对，给一个不能查出结果的条件
-                $whereArr[] = 'cbs_room.building = ' . $tmpRoom[0] . ' and cbs_room.room_number = ' . $tmpRoom[1];
-            }
+            $whereArr[] = 'cbs_room.room_name = ' . $roomName;
         }
         if (!empty($yearMonth)) {
             $tmp = explode('-', $yearMonth);
@@ -134,12 +126,12 @@ class UtilityController extends Controller{
         if (!$where) { //条件为空，显示所有结果
             $where = 'u_base_id != 0';
         }
-        //TODO 分页中每一页的数量设置成一个配置项
-        $count = $this->setBaseCount();
+
+        $count = $this->setBaseCount($where);
         $bases = DB::table('utility_base')
             ->join('room', 'utility_base.room_id', '=', 'room.room_id')
             ->whereRaw($where)
-            ->paginate(3);
+            ->paginate(config('cbs.pageNumber'));
         return view('utility.base', ['bases'=>$bases, 'count'=>$count]);
     }
 
@@ -363,13 +355,14 @@ class UtilityController extends Controller{
      */
     private function setRoomToId()
     {
+        //todo 可以使用缓存
         $rooms = Room::all();
         if(!$rooms) {
             return false;
         }
         $roomToId = [];
         foreach ($rooms as $room) {
-            $roomToId[$room['building'] . '-' . $room['room_number']] = $room['room_id'];
+            $roomToId[$room->room_name] = $room->room_id;
         }
         return $roomToId;
     }
@@ -384,7 +377,7 @@ class UtilityController extends Controller{
     {
         $insert = [];
         $items = $this->setUtilityItem($year, $month);
-        //TODO 水电费单价以及精度应该设置配置项
+
         foreach ($items as $roomId => $item) {
             //必须两个月的水电的、底数都存在才能计算水电费
             if (!isset($item['current']) || !isset($item['pre'])) {
@@ -395,9 +388,9 @@ class UtilityController extends Controller{
                 'room_id'=>$roomId,
                 'company_id'=>$item['current']['company_id'],
                 'water_money'
-                =>round(3.35*($item['current']['water_base'] - $item['pre']['water_base']), 2),
+                =>round(3.35*($item['current']['water_base'] - $item['pre']['water_base']), config('cbs.precision')),
                 'electric_money'
-                =>round(0.55*($item['current']['electric_base'] - $item['pre']['electric_base']), 2),
+                =>round(0.55*($item['current']['electric_base'] - $item['pre']['electric_base']), config('cbs.precision')),
                 'year'=>$year,
                 'month'=>$month
             ];

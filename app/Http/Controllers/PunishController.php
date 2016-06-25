@@ -19,10 +19,9 @@ class PunishController extends Controller
     public function getChargedList()
     {
         //TODO 需要处理user_id 和cancel_user_id
-        //TODO 分页
         $chargedLists = Punish::where('is_charged', 1)
             ->where('is_canceled', 0)
-            ->paginate(2);
+            ->paginate(config('cbs.pageNumber'));
         $count = $this->setCountMessage('charged');
         return view('punish.charged', ['chargedLists'=>$chargedLists, 'count'=>$count]);
     }
@@ -34,10 +33,9 @@ class PunishController extends Controller
     public function getUnchargedList()
     {
         //TODO 需要处理user_id 和cancel_user_id
-        //TODO 分页
         $unchargedLists = Punish::where('is_charged', 0)
             ->where('is_canceled', 0)
-            ->paginate(2);
+            ->paginate(config('cbs.pageNumber'));
         $count = $this->setCountMessage('uncharged');
         return view('punish.uncharged', ['unchargedLists'=>$unchargedLists, 'count'=>$count]);
     }
@@ -49,9 +47,8 @@ class PunishController extends Controller
     public function getCanceledList()
     {
         //TODO 需要处理user_id 和cancel_user_id
-        //TODO 分页
         $canceledLists = Punish::where('is_canceled', 1)
-            ->paginate(2);
+            ->paginate(config('cbs.pageNumber'));
         $count = $this->setCountMessage('canceled');
         return view('punish.canceled', ['canceledLists'=>$canceledLists, 'count'=>$count]);
     }

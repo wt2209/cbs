@@ -66,9 +66,8 @@ class RoomController extends Controller
      **/
     public function getLivingRoom()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
         $count = $this->countRoomNumber('living');
-        return view('room.livingRoom', ['rooms' => Room::where('room_type',1)->paginate(20), 'count'=>$count]);
+        return view('room.livingRoom', ['rooms' => Room::where('room_type',1)->paginate(config('cbs.pageNumber')), 'count'=>$count]);
     }
 
     /*
@@ -76,9 +75,8 @@ class RoomController extends Controller
      **/
     public function getDiningRoom()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
         $count = $this->countRoomNumber('dining');
-        return view('room.diningRoom', ['rooms' => Room::where('room_type',2)->paginate(20), 'count'=>$count]);
+        return view('room.diningRoom', ['rooms' => Room::where('room_type',2)->paginate(config('cbs.pageNumber')), 'count'=>$count]);
     }
 
     /*
@@ -86,9 +84,8 @@ class RoomController extends Controller
      **/
     public function getServiceRoom()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
         $count = $this->countRoomNumber('service');
-        return view('room.serviceRoom', ['rooms' => Room::where('room_type',3)->paginate(20), 'count'=>$count]);
+        return view('room.serviceRoom', ['rooms' => Room::where('room_type',3)->paginate(config('cbs.pageNumber')), 'count'=>$count]);
     }
 
 
@@ -117,12 +114,11 @@ class RoomController extends Controller
         $where = implode(' and ', $whereArr);
 
 
-        //TODO 分页中每一页的数量设置成一个配置项
         $count = $this->countRoomNumber($pageType, $where);
         if ($where) {
             $rooms =  Room::whereRaw($where)->paginate(1);
         } else {
-            $rooms =  Room::paginate(1);
+            $rooms =  Room::paginate(config('cbs.pageNumber'));
         }
         return view('room.'. $pageType .'Room', ['rooms' => $rooms, 'count'=>$count]);
     }

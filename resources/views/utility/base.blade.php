@@ -49,7 +49,7 @@
 
             @foreach($bases as $base)
                 <tr>
-                    <td>{{ $base->building }}-{{ $base->room_number }}</td>
+                    <td>{{ $base->room_name }}</td>
                     <td>{{ $base->year }}-{{ $base->month }} </td>
                     <td>{{ $base->electric_base }}</td>
                     <td>{{ $base->water_base }}</td>

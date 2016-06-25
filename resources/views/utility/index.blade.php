@@ -55,7 +55,7 @@
             </thead>
             @foreach($utilities as $utility)
                 <tr>
-                    <td>{{ $utility->building }}-{{ $utility->room_number }}</td>
+                    <td>{{ $utility->room_name }}</td>
                     <td>{{ $utility->company_name }}</td>
                     <td>
                         @if($utility->is_quit === 1)

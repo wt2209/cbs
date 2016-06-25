@@ -73,9 +73,6 @@
     </div>
 
 @endsection
-@section('bottom')
-    <p></p>
-@endsection
 @section('js')
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
@@ -111,56 +108,6 @@
                     }, 'json');
                 }
                 return false;
-            },
-            rules:{
-                company_name:{
-                    required:true,
-                    maxlength:255
-                },
-                company_description:{
-                    maxlength:255
-                },
-                linkman:{
-                    required:true,
-                    maxlength:5
-                },
-                linkman_tel:{
-                    isTel:true
-                },
-                manager:{
-                    maxlength:5
-                },
-                manager_tel:{
-                    isTel:true
-                },
-                company_remark:{
-                    maxlength:255
-                }
-            },
-            messages:{
-                company_name:{
-                    required:'必须填写！',
-                    maxlength:'不能多于255个字符！'
-                },
-                company_description:{
-                    maxlength:'不能多于255个字符！'
-                },
-                linkman:{
-                    required:'必须填写！',
-                    maxlength:'不能多于5个字符！'
-                },
-                linkman_tel:{
-                    isTel:'请填写一个正确的电话号码！'
-                },
-                manager:{
-                    maxlength:'不能多于5个字符！'
-                },
-                manager_tel:{
-                    isTel:'请填写一个正确的电话号码！'
-                },
-                company_remark:{
-                    maxlength:'不能多于255个字符！'
-                }
             }
         });
     </script>

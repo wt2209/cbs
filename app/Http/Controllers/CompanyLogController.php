@@ -18,8 +18,8 @@ class CompanyLogController extends Controller
      */
     public function getIndex()
     {
-        //TODO 分页中每一页的数量设置成一个配置项
-        $companyLogs = DB::table('company_log')->paginate(20);
+
+        $companyLogs = DB::table('company_log')->paginate(config('cbs.pageNumber'));
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }
     public function getSearch(Request $request)

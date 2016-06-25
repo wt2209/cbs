@@ -260,18 +260,13 @@ class CompanyController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCompanyDetail(Request $request)
+    public function getCompanyDetail($companyId)
     {
-//        TODO
-        return view('company.companyDetail');
-
-
         $companyDetail = [];
-        $companyId = intval($request->company_id);
+        $companyId = intval($companyId);
         $company = Company::where('company_id', $companyId)
             ->where('is_quit', 0)
             ->first();
-        $rooms = Room::where('company_id', $companyId)->get();
 
         $companyDetail['name'] = $company->company_name;
         $companyDetail['description'] = $company->company_description;
@@ -281,27 +276,46 @@ class CompanyController extends Controller
         $companyDetail['manager_tel'] = $company->manager_tel;
         $companyDetail['remark'] = $company->company_remark;
         $companyDetail['created_at'] = $company->created_at;
-        $companyDetail['livingRoom'] = '';
+        $companyDetail['livingRoom'] = [];
         $companyDetail['diningRoom'] = '';
         $companyDetail['serviceRoom'] = '';
+        $companyDetail['count']['livingRoomNumber'] = 0;
+        $companyDetail['count']['livingPersonNumber'] = 0;
+        $companyDetail['count']['diningRoomNumber'] = 0;
+        $companyDetail['count']['serviceRoomNumber'] = 0;
+
+        $rooms = Room::where('company_id', $companyId)->get();
+        $allRentType = $rentType = DB::table('rent_type')->get();
+        foreach ($allRentType as $rentType) {
+            $rentTypeArr[$rentType->rent_type_id] = $rentType->person_number;
+        }
         foreach ($rooms as $room) {
             switch (intval($room->room_type)){
                 case 1:
-                    $companyDetail['livingRoom'] .= $room->room_name . ' ';
+                    if (isset($rentTypeArr[$room->rent_type_id])) {
+                        $companyDetail['count']['livingPersonNumber'] += $rentTypeArr[$room->rent_type_id];
+                        $companyDetail['count']['livingRoomNumber'] += 1;
+                        // $rentType['rent_type_id'] = 'person_number';
+                        if (isset($companyDetail['livingRoom'][$rentTypeArr[$room->rent_type_id]])) {
+                            $companyDetail['count'][$rentTypeArr[$room->rent_type_id]]++;
+                            $companyDetail['livingRoom'][$rentTypeArr[$room->rent_type_id]] .= $room->room_name . '&nbsp;&nbsp;&nbsp;';
+                        } else {
+                            $companyDetail['count'][$rentTypeArr[$room->rent_type_id]] = 1;
+                            $companyDetail['livingRoom'][$rentTypeArr[$room->rent_type_id]] = $room->room_name . '&nbsp;&nbsp;&nbsp;';
+                        }
+                    }
                     break;
                 case 2:
-                    $companyDetail['diningRoom'] .= $room->room_name . ' ';
+                    $companyDetail['diningRoom'] .= $room->room_name . '&nbsp;&nbsp;&nbsp;';
+                    $companyDetail['count']['diningRoomNumber']++;
                     break;
                 case 3:
-                    $companyDetail['serviceRoom'] .= $room->room_name . ' ';
+                    $companyDetail['serviceRoom'] .= $room->room_name . '&nbsp;&nbsp;&nbsp;';
+                    $companyDetail['count']['serviceRoomNumber']++;
                     break;
             }
         }
-        trim($companyDetail['livingRoom'], ' ');
-        trim($companyDetail['diningRoom'], ' ');
-        trim($companyDetail['serviceRoom'], ' ');
-
-        return response()->json($companyDetail);
+        return view('company.companyDetail', ['companyDetail'=>$companyDetail]);
     }
 
     /**
