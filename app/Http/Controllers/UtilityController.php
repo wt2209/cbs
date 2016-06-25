@@ -388,9 +388,9 @@ class UtilityController extends Controller{
                 'room_id'=>$roomId,
                 'company_id'=>$item['current']['company_id'],
                 'water_money'
-                =>round(3.35*($item['current']['water_base'] - $item['pre']['water_base']), config('cbs.precision')),
+                =>round(config('cbs.waterMoney')*($item['current']['water_base'] - $item['pre']['water_base']), config('cbs.precision')),
                 'electric_money'
-                =>round(0.55*($item['current']['electric_base'] - $item['pre']['electric_base']), config('cbs.precision')),
+                =>round(config('cbs.electricMoney')*($item['current']['electric_base'] - $item['pre']['electric_base']), config('cbs.precision')),
                 'year'=>$year,
                 'month'=>$month
             ];

@@ -210,7 +210,6 @@ class CompanyController extends Controller
         $roomIdArr = explode('_', $roomIds);
         $roomTypeArr = explode('|', $roomAndTypes);
 
-
         //旧房间
         $oldRooms = Room::where('company_id', $companyId)->get();
         // 清除所有旧房间
@@ -232,6 +231,7 @@ class CompanyController extends Controller
                 ]);
         }
         $newRooms = Room::whereIn('room_id', $roomIdArr)->get();
+
         //记录改动日志
         if ($request->is_edit) {// 修改
             $this->type = 2;
@@ -244,7 +244,6 @@ class CompanyController extends Controller
             $this->type = 1;
             $this->oldRooms = [];
         }
-
         if (!empty($newRooms)) {
             foreach ($newRooms as $newRoom) {
                 $this->newRooms[] = $newRoom->room_name;
@@ -256,9 +255,9 @@ class CompanyController extends Controller
     }
 
     /**
-     * 返回指定的房间详情
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * 指定公司明细
+     * @param $companyId
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getCompanyDetail($companyId)
     {

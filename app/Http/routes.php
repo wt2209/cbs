@@ -42,3 +42,6 @@ Route::controller('punish','PunishController');
 
 //日程
 Route::controller('calendar','CalendarController');
+
+//excel
+Route::controller('excel','ExcelController');
