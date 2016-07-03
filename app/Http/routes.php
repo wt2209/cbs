@@ -11,10 +11,20 @@
 |
 */
 
+Route::get('auth/login', 'Auth\AuthController@getLogin');
+Route::post('auth/login', 'Auth\AuthController@postLogin');
+Route::get('auth/logout', 'Auth\AuthController@getLogout');
+
+Route::get('auth/register', 'Auth\AuthController@getRegister');
+Route::post('auth/register', 'Auth\AuthController@postRegister');
+
 //首页
-Route::get('/', function () {
+Route::get('/', ['middleware'=>'auth', function () {
     return view('index');
-});
+}]);
+Route::get('/home', ['middleware'=>'auth', function () {
+    return view('index');
+}]);
 
 //欢迎页
 Route::get('/welcome', function(){

@@ -7,7 +7,7 @@ use App\Model\Company;
 use App\Model\Room;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CompanyLogController;
-
+use Auth;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -46,6 +46,7 @@ class CompanyController extends Controller
     {
         //使用中间件过滤字段
         $this->middleware('fieldFilter', ['only'=>['postStore']]);
+        $this->middleware('auth');
     }
 
     /**

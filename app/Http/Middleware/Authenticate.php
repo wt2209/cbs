@@ -38,10 +38,10 @@ class Authenticate
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
             } else {
-                return redirect()->guest('auth/login');
+                //主页面返回
+                return "<script>window.top.location.href='" . url("auth/login") . "'</script>";
             }
         }
-
         return $next($request);
     }
 }
