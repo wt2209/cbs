@@ -9,6 +9,11 @@ use App\Http\Controllers\Controller;
 
 class CalendarController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('my.auth');
+    }
+
     /**
      * Display a listing of the resource.
      *

@@ -11,18 +11,14 @@
 |
 */
 
-Route::get('auth/login', 'Auth\AuthController@getLogin');
-Route::post('auth/login', 'Auth\AuthController@postLogin');
-Route::get('auth/logout', 'Auth\AuthController@getLogout');
 
-Route::get('auth/register', 'Auth\AuthController@getRegister');
-Route::post('auth/register', 'Auth\AuthController@postRegister');
-
+Route::get('/login', 'Auth\AuthController@getMyLogin');
+Route::get('/logout', 'Auth\AuthController@getMyLogout');
+Route::post('/login', 'Auth\AuthController@postMyLogin');
+Route::get('/register', 'Auth\AuthController@getMyRegister');
+Route::post('/register', 'Auth\AuthController@postMyRegister');
 //首页
-Route::get('/', ['middleware'=>'auth', function () {
-    return view('index');
-}]);
-Route::get('/home', ['middleware'=>'auth', function () {
+Route::get('/', ['middleware'=>'my.auth' ,function () {
     return view('index');
 }]);
 

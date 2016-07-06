@@ -13,6 +13,7 @@ class RoomController extends Controller
 {
     public function __construct()
     {
+        $this->middleware('my.auth');
         $this->middleware('fieldFilter', ['only'=>['postStore']]);
     }
 

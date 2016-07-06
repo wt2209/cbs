@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Support\Facades\Hash;
+use Auth;
+use Illuminate\Http\Request;
 use App\User;
-use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpFoundation\Request;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
-use Auth;
 
 class AuthController extends Controller
 {
@@ -25,8 +25,6 @@ class AuthController extends Controller
     */
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
-
-    protected $redirectPath = '/';
 
     /**
      * Create a new authentication controller instance.
@@ -68,4 +66,51 @@ class AuthController extends Controller
         ]);
     }
 
+
+    public function getMyLogin()
+    {
+        return view('auth.login');
+    }
+
+    public function postMyLogin(Request $request)
+    {
+        if ($user = User::where('user_name', $request->user_name)->first()) {
+            if (Hash::check($request->password, $user->password)) {
+                Auth::login($user);
+                return redirect()->to('/');
+            }
+        }
+        return view('auth.login', ['message'=>'错误：用户名或密码错误！']);
+
+    }
+    public function getMyLogout()
+    {
+        Auth::logout();
+        return redirect()->to('/login');
+    }
+
+    public function getMyRegister()
+    {
+        return view('auth.register');
+    }
+
+    public function postMyRegister(Request $request)
+    {
+        if ($request->password !== $request->password_confirmation) {
+            return view('auth.register', ['message'=>'错误：两次密码不一致！']);
+        }
+        $username = $request->user_name;
+        if (User::where('user_name', $username)->count() > 0) {
+            return view('auth.register', ['message'=>'错误：用户名已存在！']);
+        }
+        $user = new User();
+        $user->user_name = $request->user_name;
+        $user->password = Hash::make($request->password);
+        $user->save();
+/*        User::create([
+            'user_name'=>$username,
+            'password'=>bcrypt($request->password)
+        ]);*/
+        return view('auth.register', ['message'=>'注册成功！']);
+    }
 }

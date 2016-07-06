@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use PHPExcel_Worksheet;
 use App\Model\Room;
 use Illuminate\Http\Request;
 use DB;
@@ -11,6 +12,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('my.auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -107,7 +113,7 @@ class ExcelController extends Controller
                     //2, 588, 2111, 1, 888, 1111, 3, 1088, 3333, 'heji', $company->company_remark];
                     $data[] = $tmpArr;
                 }
-
+                $sheet->setRowsToRepeatAtTop(['1','2','3','4']);
                 //设置表样式
                 $sheet->setPageMargin(array(
                     0.4, 0.4, 0.4, 0.4
@@ -234,9 +240,9 @@ class ExcelController extends Controller
                     ['', '', '水费（5.5元/吨）', '', '', '', '电费（1元/度）', '', '', '', '合计（元）', '', '', '', ''],
                     ['', '', '上期数', '本期数', '实用数', '费用', '上期数', '本期数', '实用数', '费用', '', '', '', '', '']
                 ];
-
+                $sheet->fromArray($data, null, 'A0', true);
+                $currentRow = 6;
                 $result = [];
-
                 foreach ($rooms as $room) {
                     $preWaterBase = isset($preBaseArr[$room->room_id]['water_base'])
                         ? $preBaseArr[$room->room_id]['water_base']
@@ -274,20 +280,23 @@ class ExcelController extends Controller
                     //TODO 服务费合计
                     $tmp[] = '';
                     $tmp[] = $room->room_remark;
-
                     $result[$room->company_id][] = $tmp;
                 }
 
+                //TODO 逻辑有错误，需重新设计！！！！
+
                 foreach ($result as $r) {
+                    $insertData = [];
                     $companyTotal = [''];
                     $total = [];
                     foreach ($r as $i) {
-                        $data[] = $i;
+                        $insertData[] = $i;
                         $total['companyName'] = $i[1].' 汇总';
                         $total['waterBaseTotal'] = isset($total['waterBaseTotal']) ? $total['waterBaseTotal'] + $i[4] : $i[4];
                         $total['waterMoneyTotal'] = isset($total['waterMoneyTotal']) ? $total['waterMoneyTotal'] + $i[5] : $i[5];
                         $total['electricBaseTotal'] = isset($total['electricBaseTotal']) ? $total['electricBaseTotal'] + $i[8] : $i[8];
                         $total['electricMoneyTotal'] = isset($total['electricMoneyTotal']) ? $total['electricMoneyTotal'] + $i[9] : $i[9];
+                        $currentRow++;
                     }
                     $companyTotal[] = $total['companyName'];
                     $companyTotal[] = '';
@@ -298,7 +307,11 @@ class ExcelController extends Controller
                     $companyTotal[] = '';
                     $companyTotal[] = $total['electricBaseTotal'];
                     $companyTotal[] = $total['electricMoneyTotal'];
-                    $data[] = $companyTotal;
+
+                    $currentRow++;
+                    $insertData[] = $companyTotal;
+                    $sheet->rows($insertData);
+                    $sheet->setBreak('A'.$currentRow, PHPExcel_Worksheet::BREAK_ROW);
                 }
                 $rowNumber = count($data);
                 $sheet->setBorder('A3:O'.$rowNumber, 'thin');
@@ -326,8 +339,12 @@ class ExcelController extends Controller
                     'O'=>20
                 ));
                 $sheet->setFreeze('A1');
-                // 生成表
-                $sheet->fromArray($data, null, 'A0', true);
+
+                //TODO 可以插入标题栏和分页符
+                //$sheet->setBreak('A10', PHPExcel_Worksheet::BREAK_ROW);
+                $sheet->setrowsToRepeatAtTop([1,6]);
+
+
             });
             })->download('xls');
 

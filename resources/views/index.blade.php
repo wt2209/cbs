@@ -30,7 +30,7 @@
 {{--头部区域结束--}}
 {{--左侧区域--}}
 <div id="left_content">
-    <div id="user_info">欢迎您，<strong>wt2209</strong><br />[系统管理员，<a href="{{ url('auth/logout') }}">退出</a>]</div>
+    <div id="user_info">欢迎您，<strong>wt2209</strong><br />[<a href="">系统管理员</a>，<a href="{{ url('/logout') }}">退出</a>]</div>
     <div id="main_nav">
         <div class="list_item active">
             <div id="left_main_nav">
@@ -258,7 +258,10 @@
         $('#left_content').height(iLeftHeight);
     }
     setContentHeight();
+
     $(window).resize(setContentHeight);
+
+
 </script>
 </body>
 </html>

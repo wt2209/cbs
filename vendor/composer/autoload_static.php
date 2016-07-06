@@ -287,7 +287,6 @@ class ComposerStaticInita933b8b226b61adf681e0cea42f35fb7
         'CreateCompanyLog' => __DIR__ . '/../..' . '/database/migrations/2015_08_15_174226_create_company_log.php',
         'CreateFireguidersTable' => __DIR__ . '/../..' . '/database/migrations/2015_07_25_151104_create_fireguiders_table.php',
         'CreatePasswordResetsTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
-        'CreatePermissionsAndRoles' => __DIR__ . '/../..' . '/database/migrations/2016_07_02_211913_create_permissions_and_roles.php',
         'CreatePersonTable' => __DIR__ . '/../..' . '/database/migrations/2015_07_25_151028_create_person_table.php',
         'CreatePunishTable' => __DIR__ . '/../..' . '/database/migrations/2016_06_03_220920_create_punish_table.php',
         'CreateRentTypeTable' => __DIR__ . '/../..' . '/database/migrations/2016_06_14_204655_create_rent_type_table.php',

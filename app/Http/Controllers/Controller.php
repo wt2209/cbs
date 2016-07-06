@@ -9,9 +9,4 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 abstract class Controller extends BaseController
 {
     use DispatchesJobs, ValidatesRequests;
-
-    protected function __construct()
-    {
-        //$this->middleware('auth');
-    }
 }

@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CompanyLogController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('my.auth');
+    }
     /**
      * 首页
      * @return \Illuminate\View\View
@@ -31,11 +36,11 @@ class CompanyLogController extends Controller
     }
 
     /**
-     * 记录房间操作的历史日志
+     * * 记录房间操作的历史日志
      * @param $type 操作类型，1|入住 2|调整房间 3|退房 4|删除
      * @param $companyId 房间id
-     * @param array $oldRooms 老房间
-     * @param array $newRooms 新房间
+     * @param $oldRooms 老房间
+     * @param null $newRooms 新房间
      * @return bool
      */
     static public function log($type, $companyId, $oldRooms=[], $newRooms=[])
