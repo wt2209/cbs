@@ -13,8 +13,8 @@ class CompanyTableSeeder extends Seeder
     {
         for ($i = 1; $i <= 16; $i++) {
             DB::table('company')->insert([
-                'company_name'=> '公司'.random_int(1, 10),
-                'company_description'=> '我是房间说明'.random_int(1, 10),
+                'company_name'=> '公司'.$i,
+                'company_description'=> '我是房间说明'.str_random(10),
                 'linkman'=> str_random(3),
                 'linkman_tel'=> 15236654125,
                 'manager'=> str_random(3),

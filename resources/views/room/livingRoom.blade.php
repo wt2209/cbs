@@ -62,7 +62,7 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                            {{--<a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>--}}
                         </td>
                     </tr>
                 @else
@@ -77,7 +77,7 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                            {{--<a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>--}}
                         </td>
                     </tr>
                 @endif

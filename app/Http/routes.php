@@ -12,20 +12,16 @@
 */
 
 
-Route::get('/login', 'Auth\AuthController@getMyLogin');
-Route::get('/logout', 'Auth\AuthController@getMyLogout');
-Route::post('/login', 'Auth\AuthController@postMyLogin');
-Route::get('/register', 'Auth\AuthController@getMyRegister');
-Route::post('/register', 'Auth\AuthController@postMyRegister');
+Route::get('/login', 'LoginController@getLogin');
+Route::get('/logout', 'LoginController@getLogout');
+Route::post('/login', 'LoginController@postLogin');
+Route::get('/register', 'LoginController@getRegister');
+Route::post('/register', 'LoginController@postRegister');
 //首页
-Route::get('/', ['middleware'=>'my.auth' ,function () {
-    return view('index');
-}]);
+Route::get('/', 'IndexController@getIndex');
 
 //欢迎页
-Route::get('/welcome', function(){
-    return view('welcome');
-});
+Route::get('/welcome' ,'IndexController@getWelcome');
 //欢迎页
 Route::get('common/302', function(){
     return view('common/302');

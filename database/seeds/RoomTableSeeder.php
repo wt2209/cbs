@@ -28,7 +28,8 @@ class RoomTableSeeder extends Seeder
                         'rent_type_id'=>1,
                         'gender'=>random_int(1,2),
                         'room_remark'=> '房间备注'.str_random(10),
-                        'created_at'=>date('Y-m-d H:i:s')
+                        'created_at'=>date('Y-m-d H:i:s'),
+                        'updated_at'=>date('Y-m-d H:i:s'),
                     ]);
                 }
             }
@@ -39,7 +40,8 @@ class RoomTableSeeder extends Seeder
                 'room_type'=> 2,
                 'room_name'=> '餐厅'.$i,
                 'room_remark'=> '餐厅备注'.str_random(10),
-                'created_at'=>date('Y-m-d H:i:s')
+                'created_at'=>date('Y-m-d H:i:s'),
+                'updated_at'=>date('Y-m-d H:i:s'),
             ]);
         }
         for ($i = 1; $i <= 5; $i++) {
@@ -48,7 +50,8 @@ class RoomTableSeeder extends Seeder
                 'room_type'=> 3,
                 'room_name'=> '办公'.$i,
                 'room_remark'=> '办公备注'.str_random(10),
-                'created_at'=>date('Y-m-d H:i:s')
+                'created_at'=>date('Y-m-d H:i:s'),
+                'updated_at'=>date('Y-m-d H:i:s'),
             ]);
         }
     }

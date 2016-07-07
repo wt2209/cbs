@@ -7,7 +7,7 @@ use App\Model\Company;
 use App\Model\Room;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CompanyLogController;
-
+use Route;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -44,6 +44,7 @@ class CompanyController extends Controller
      */
     public function __construct()
     {
+        //dd(Route::current()->getActionName());
         $this->middleware('my.auth');
         //使用中间件过滤字段
         $this->middleware('fieldFilter', ['only'=>['postStore']]);
@@ -155,8 +156,6 @@ class CompanyController extends Controller
             exit(json_encode(['message'=>$validator->errors()->first(), 'status'=>0]));
         }
 
-        //入住
-        $this->type = 1;
         $company = new Company();
         $company->company_name = $request->company_name;
         $company->company_description = $request->company_description;
@@ -179,6 +178,49 @@ class CompanyController extends Controller
             //TODO  好好研究一下response  重构一下302 等问题
             return response()->redirectTo(url('common/302'));
         }
+    }
+    public function postStoreEditInfo(Request $request)
+    {
+        //字段验证
+        $validator = Validator::make($request->all(), [
+            'company_id'=>'required|integer|min:1',
+            'company_name' => 'required|between:1,255',
+            'company_description'=>'between:1,255',
+            'linkman'=>'required|between:1,5',
+            'linkman_tel'=>'numeric',
+            'manager'=>'between:1,5',
+            'manager_tel'=>'numeric',
+            'company_remark'=>'between:1,255',
+            'type'=>'integer|min:1|max:3'
+        ]);
+        //验证不通过，返回第一个错误信息
+        if ($validator->fails()) {
+            exit(json_encode(['message'=>$validator->errors()->first(), 'status'=>0]));
+        }
+
+        $company = Company::find($request->company_id);
+        if ($company) {
+            $company->company_name = $request->company_name;
+            $company->company_description = $request->company_description;
+            $company->linkman = $request->linkman;
+            $company->linkman_tel = $request->linkman_tel;
+            $company->manager = $request->manager;
+            $company->manager_tel = $request->manager_tel;
+            $company->company_remark = $request->company_remark;
+            //开启事务
+            DB::beginTransaction();
+            if ($company->save()) {
+                //提交事务
+                DB::commit();
+                return response()->json(['message'=>'操作成功！', 'status'=>1]);
+            } else {
+                //错误，回滚事务
+                DB::rollBack();
+                //TODO  好好研究一下response  重构一下302 等问题
+                return response()->json(['message'=>'失败：请重试！', 'status'=>0]);;
+            }
+        }
+
     }
 
     /**
@@ -418,6 +460,22 @@ class CompanyController extends Controller
             'diningRooms'=>$diningRooms,
             'serviceRooms'=>$serviceRooms,
             'company'=>$company]);
+    }
+
+    public function getQuit(Request $request)
+    {
+        //有未交水电
+        if (DB::table('utility')
+            ->where('company_id', $request->delete_id)
+            ->where('is_charged', 0)
+            ->count() > 0) {
+            return response()->json(['message'=>'此公司有未缴水电费，无法退租！', 'status'=>0]);
+        }
+
+        $company = Company::find($request->delete_id);
+        $company->is_quit = 1;
+        $company->save();
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
     }
 
     private function validateCompanyId($companyId)

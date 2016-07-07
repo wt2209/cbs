@@ -143,7 +143,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('company/store') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('company/store-edit-info') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             if (e.status) {

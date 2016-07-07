@@ -23,9 +23,10 @@ class RoomController extends Controller
         $rentType = DB::table('rent_type')->get();
         return response()->json($rentType);
     }
+
     /**
-     * TODO
      * 获取空房间
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getAllEmptyRoom()
     {
@@ -59,7 +60,7 @@ class RoomController extends Controller
                     break;
             }
         }
-        exit(json_encode($return));
+        return response()->json($return);
     }
 
     /*

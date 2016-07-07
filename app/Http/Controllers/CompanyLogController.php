@@ -23,7 +23,6 @@ class CompanyLogController extends Controller
      */
     public function getIndex()
     {
-
         $companyLogs = DB::table('company_log')->paginate(config('cbs.pageNumber'));
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }

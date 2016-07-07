@@ -39,15 +39,15 @@
     <div class="table-responsive">
         <table class="table table-bordered table-hover table-condensed">
             <thead>
-                <tr class="active">
-                    <th>房间名</th>
-                    <th>使用状态</th>
-                    <th>所属公司</th> {{--允许有多个公司--}}
-                    <th>公司联系人</th>{{--若有多个公司，则有多个联系人--}}
-                    <th>联系人电话</th>{{--同上--}}
-                    <th>房间备注</th>
-                    <th>操作</th>
-                </tr>
+            <tr class="active">
+                <th>房间名</th>
+                <th>使用状态</th>
+                <th>所属公司</th> {{--允许有多个公司--}}
+                <th>公司联系人</th>{{--若有多个公司，则有多个联系人--}}
+                <th>联系人电话</th>{{--同上--}}
+                <th>房间备注</th>
+                <th>操作</th>
+            </tr>
             </thead>
             @foreach ($rooms as $room)
                 @if ($room->company_id == 0)
@@ -61,7 +61,7 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                            {{--<a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>--}}
                         </td>
                     </tr>
                 @else
@@ -75,7 +75,7 @@
                         <td>{{ $room->room_remark }}</td>
                         <td>
                             <a href="{{ url('room/edit/'.$room->room_id) }}" class="btn btn-success btn-xs">修改备注</a>
-                            <a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                            {{--<a href="javascript:;" delete_id="{{ $room->room_id }}" class="btn btn-danger btn-xs delete-button">删除</a>--}}
                         </td>
                     </tr>
                 @endif
@@ -87,9 +87,9 @@
                 'room_status'=>isset($_GET['room_status']) ? $_GET['room_status'] :0
             ])->render() !!}
     </div>
-@endsection
-@section('modal')
-    <!-- delete modal -->
+    @endsection
+    @section('modal')
+            <!-- delete modal -->
     <div id="delete-modal" class="modal fade bs-example-modal-sm">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
