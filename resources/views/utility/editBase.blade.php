@@ -4,7 +4,7 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/utility/editBase.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/utility/editBase.css') }}"/>
 
 @endsection
 @section('header')
@@ -87,8 +87,8 @@
 
 @section('js')
     {{-- 加载气泡效果js --}}
-    <script src="{{ url('/js/functions.js') }}"></script>
-    <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/functions.js') }}"></script>
+    <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
     <script>
         var s = true;
         var validate = $("#form").validate({

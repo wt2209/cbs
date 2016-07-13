@@ -4,7 +4,7 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/company/charge.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/company/charge.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small nav-fixed">

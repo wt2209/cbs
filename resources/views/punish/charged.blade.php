@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '已缴费罚款')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/common.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/common.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">

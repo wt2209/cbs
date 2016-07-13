@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '承包商公寓管理系统--公司房间变动记录')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/companyLog/index.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/companyLog/index.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
@@ -58,8 +58,8 @@
                         @endif
                     </td>
                     <td>{{substr($companyLog->created_at, 0, 10)}}</td>
-                    <td>{{$companyLog->old_rooms}}</td>
-                    <td>{{$companyLog->new_rooms}}</td>
+                    <td style="word-break: break-all">{{$companyLog->old_rooms}}</td>
+                    <td  style="word-break: break-all">{{$companyLog->new_rooms}}</td>
                     <td>
                         <button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>

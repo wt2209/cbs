@@ -47,3 +47,9 @@ Route::controller('calendar','CalendarController');
 
 //excel
 Route::controller('excel','ExcelController');
+
+//config
+Route::controller('config', 'ConfigController');
+
+//user and role
+Route::controller('user','UserController');

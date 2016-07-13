@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '录入底数')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/utility/add.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/utility/add.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
@@ -77,7 +77,7 @@
     <script src="{{ asset('/bootstrap-3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script src="{{ asset('/js/utility/add.js') }}"></script>
-    <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
 
     <script>
         /*表单验证*/

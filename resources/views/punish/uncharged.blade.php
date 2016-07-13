@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '未缴费罚款')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/punish/uncharged.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/punish/uncharged.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">

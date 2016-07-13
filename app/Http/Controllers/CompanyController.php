@@ -56,8 +56,20 @@ class CompanyController extends Controller
      */
     public function getIndex()
     {
-        $companies = Company::where('is_quit', 0)->get();
+        $companies = Company::where('is_quit', 0)->paginate(config('cbs.pageNumber'));
+        $count = $this->companyCount();
 
+        return view('company.index', ['companies'=>$companies, 'count'=>$count]);
+    }
+
+    private function companyCount($whereRaw = NULL)
+    {
+        $whereArr[] = 'is_quit=0';
+        if ($whereRaw) {
+            $whereArr[] = $whereRaw;
+        }
+        $companies = Company::whereRaw(implode(' and ', $whereArr))->get();
+        $count = [];
         $count['company'] = count($companies);
         $count['livingRoom'] = $count['diningRoom'] = $count['serviceRoom'] = 0;
         $companyIdArray = [];
@@ -82,7 +94,7 @@ class CompanyController extends Controller
                     break;
             }
         }
-        return view('company.index', ['companies'=>$companies, 'count'=>$count]);
+        return $count;
     }
 
     /**
@@ -95,21 +107,20 @@ class CompanyController extends Controller
         $companyName = trim(strip_tags(htmlspecialchars($request->company_name)));
         $personName = trim(strip_tags(htmlspecialchars($request->person_name)));
 
+        $whereArr = ['is_quit=0'];
         $company = new Company();
         if (!empty($companyName)) {
-            $companies = $company->where('company_name', 'like', '%' . $companyName . '%')->get();
+            $whereArr[] = 'company_name like "%'.$companyName.'%"';
+            //$companies = $company->where('company_name', 'like', '%' . $companyName . '%')->get();
         } elseif (!empty($personName)) {
-            $companies = $company->where("linkman", 'like', '%' . $personName . '%')
+            $whereArr[] = '(linkman like "%'.$personName.'%" or manager like "%'.$personName.'%")';
+            /*$companies = $company->where("linkman", 'like', '%' . $personName . '%')
                 ->orWhere('manager', 'like', '%' . $personName . '%')
-                ->get();
-        } else {
-            $companies = Company::all();
+                ->get();*/
         }
-        $count['company'] = count($companies);
-        $count['room'] = 0;
-        foreach ($companies as $company) {
-            $count['room'] += count($company->rooms);
-        }
+        $whereStr = implode(' and ', $whereArr);
+        $companies = Company::whereRaw($whereStr)->paginate(config('cbs.pageNumber'));
+        $count = $this->companyCount($whereStr);
         return view('company.index', ['companies'=>$companies, 'count'=>$count]);
     }
 

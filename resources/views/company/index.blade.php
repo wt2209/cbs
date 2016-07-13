@@ -4,7 +4,7 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/company/index.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/company/index.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small nav-fixed">
@@ -72,7 +72,10 @@
                 </tr>
             @endforeach
         </table>
-
+        {!! $companies->appends([
+                'company_name'=>isset($_GET['company_name']) ? $_GET['company_name'] : '',
+                'person_name'=>isset($_GET['person_name']) ? $_GET['person_name'] : ''
+            ])->render() !!}
     </div>
 @endsection
 @section('modal')

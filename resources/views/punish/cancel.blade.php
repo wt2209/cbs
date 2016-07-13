@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '撤销罚单')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/common.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/common.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
@@ -59,8 +59,8 @@
 
 @section('js')
     {{-- 加载气泡效果js --}}
-    <script src="{{ url('/js/functions.js') }}"></script>
-    <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/functions.js') }}"></script>
+    <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
     <script>
         /*表单验证*/
         var s = true;

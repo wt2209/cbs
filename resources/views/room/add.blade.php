@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '新增房间')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/room/add.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/room/add.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
@@ -54,8 +54,8 @@
 @endsection
 @section('js')
     {{-- 加载气泡效果js --}}
-    <script src="{{ url('/js/functions.js') }}"></script>
-    <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/functions.js') }}"></script>
+    <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
     <script>
         var s = true;
         var validate = $("#form").validate({

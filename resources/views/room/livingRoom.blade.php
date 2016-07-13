@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '房间明细')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/room/index.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/room/index.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">

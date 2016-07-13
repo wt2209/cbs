@@ -1,7 +1,7 @@
 @extends('header')
 @section('title', '水电费明细')
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/utility/index.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/utility/index.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">

@@ -4,7 +4,7 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/company/add.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/company/add.css') }}"/>
 
 @endsection
 @section('header')
@@ -47,12 +47,12 @@
 @endsection
 
 @section('bottom')
-    <button class="btn btn-success" id="submit">保存并选择房间</button>
+    <button class="btn btn-success" id="submit">保存</button>
 @endsection
 @section('js')
     {{-- 加载气泡效果js --}}
-    <script src="{{ url('/js/functions.js') }}"></script>
-    <script src="{{ url('/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('/js/functions.js') }}"></script>
+    <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
     <script>
         var sRoomId = '';
         var sRoomType = '';

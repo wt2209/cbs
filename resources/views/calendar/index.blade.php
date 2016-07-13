@@ -4,9 +4,9 @@
 
 
 @section('css')
-    <link rel="stylesheet" href="{{ url('/css/common.css') }}"/>
-    <link href='{{ url('/css/fullcalendar.min.css') }}' rel='stylesheet' />
-    <link href='{{ url('/css/fullcalendar.print.css') }}' rel='stylesheet' media='print' />
+    <link rel="stylesheet" href="{{ asset('/css/common.css') }}"/>
+    <link href='{{ asset('/css/fullcalendar.min.css') }}' rel='stylesheet' />
+    <link href='{{ asset('/css/fullcalendar.print.css') }}' rel='stylesheet' media='print' />
     <style>
         #calendar {
             max-width: 900px;

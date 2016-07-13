@@ -159,24 +159,33 @@
         <div class="list_item">
             <div id="left_main_nav">
                 <ul>
-                    <li class="left_back">退出系统</li>
-                    <li class="left_back">退出系统2</li>
+                    <li class="left_back">配置项</li>
+                    <li class="left_back">用户与权限</li>
                 </ul>
             </div>
             <div id="right_main_nav">
                 <div class="list_title">
-                    <span>退出系统1</span>
+                    <span>配置项</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="" target="iframe">点击退出登录</a>
+                            <a href="{{url('config/index')}}" target="iframe">系统配置</a>
                         </li>
                     </ul>
                 </div>
                 <div class="list_title">
-                    <span>退出系统2</span>
+                    <span>用户与权限</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="" target="iframe">点击退出登录2</a>
+                            <a href="{{ url('user/users') }}" target="iframe">用户列表</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('user/roles') }}" target="iframe">角色列表</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('user/create-user') }}" target="iframe">创建用户</a>
+                        </li>
+                        <li>
+                            <a href="{{ url('user/create-role') }}" target="iframe">创建角色</a>
                         </li>
                     </ul>
                 </div>
