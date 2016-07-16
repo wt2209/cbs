@@ -19,18 +19,27 @@
             <div class="navbar-header">
                 <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('company/search') }}">
                     <div class="form-group">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
                         <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name" placeholder="公司名称">&nbsp;或者
                         <input type="text" class="form-control" value="{{ $_GET['person_name'] or '' }}" name="person_name"  placeholder="负责人/联系人">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
+                    <button class="btn btn-info btn-sm export">导出到文件</button>
+                    <script>
+                        $('.export').click(function(){
+                            var sParam = 'is_export=1&'+$('form.navbar-form').serialize();
+                            var sUrl = '{{ url('company/search') }}' + '?' + sParam;
+                            maskShow();
+                            window.location = sUrl;
+                            setTimeout(maskHide,2000);
+                            return false;
+                        })
+                    </script>
                 </form>
             </div>
         </div>
     </nav>
     <div class="function-area">
         <button class="btn btn-success btn-sm" onclick="javascript:location='{{ url('company/add') }}';">新公司入住</button>
-        <button class="btn btn-info btn-sm">导出到文件</button>
     </div>
 @endsection
 @section('content')

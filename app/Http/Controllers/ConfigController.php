@@ -35,14 +35,12 @@ class ConfigController extends Controller
         ]);
 
         $config = '<?php';
-
         $config .= " return ['pageNumber'=>'{$request->page_number}',";
         $config .= "'precision'=>'{$request->precision}',";
         $config .= "'electricMoney'=>'{$request->electric_money}',";
         $config .= "'waterMoney'=>'{$request->water_money}',";
         $config .= "];";
 
-        //Storage::delete(config_path('cbs.php'));
         if (is_file(config_path('cbs.php'))) {
             unlink(config_path('cbs.php'));
         }

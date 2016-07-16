@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>承包商公寓管理 - @yield('title')</title>
     <link rel="stylesheet" href="{{ asset('/bootstrap-3.3.5/css/bootstrap.css') }}"/>
     @yield('css')

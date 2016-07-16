@@ -350,6 +350,70 @@ class ExcelController extends Controller
 
     }
 
+
+
+
+    public static function exportCompanies($companies)
+    {
+        Excel::create('公司明细-'.date('ymd'), function($excel) use($companies) {
+            $excel->sheet('公司明细', function($sheet) use($companies){
+                $chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+                //标题行
+                $titleRow = ['公司明细 - '.date('Ymd')];
+                //菜单第一行
+                $menuRow = ['序号','公司名','描述','入住时间','日常联系人','联系人电话','公司负责人','负责人电话','备注'];
+                $data = [
+                    $titleRow,
+                    $menuRow,
+                ];
+                // 序号
+                $serialNumber = 1;
+                foreach ($companies as $company) {
+                    $tmp = [
+                        $serialNumber++,
+                        $company->company_name,
+                        $company->company_description,
+                        substr($company->created_at,0,10),
+                        $company->linkman,
+                        $company->linkman_tel,
+                        $company->manager,
+                        $company->manager_tel,
+                        $company->company_remark,
+                    ];
+                    $data[] = $tmp;
+                }
+                $sheet->setAutoSize(true);
+                $sheet->setRowsToRepeatAtTop(['1','2']);
+                //设置表样式
+                $sheet->setPageMargin(array(
+                    0.4, 0.4, 0.4, 0.4
+                ));
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  '宋体',
+                        'size'      =>  11,
+                    )
+                ));
+                $sheet->cell('A1', function($cell) {
+                    $cell->setFont(array(
+                        'size'       => '16',
+                        'bold'       =>  true
+                    ));
+                });
+                $sheet->mergeCells('A1:I1');
+                $sheet->setBorder('A2:I'.($serialNumber + 1), 'thin');
+                $sheet->cells('A1:I'.($serialNumber + 1), function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('center');
+                });
+                // 生成表
+                $sheet->fromArray($data,  null, 'A0', true);
+            });
+
+        })->download('xls');
+    }
+
     /**
      * Show the form for creating a new resource.
      *

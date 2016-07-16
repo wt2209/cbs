@@ -11,6 +11,7 @@ use Route;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\ExcelController;
 
 class CompanyController extends Controller
 {
@@ -111,15 +112,17 @@ class CompanyController extends Controller
         $company = new Company();
         if (!empty($companyName)) {
             $whereArr[] = 'company_name like "%'.$companyName.'%"';
-            //$companies = $company->where('company_name', 'like', '%' . $companyName . '%')->get();
         } elseif (!empty($personName)) {
             $whereArr[] = '(linkman like "%'.$personName.'%" or manager like "%'.$personName.'%")';
-            /*$companies = $company->where("linkman", 'like', '%' . $personName . '%')
-                ->orWhere('manager', 'like', '%' . $personName . '%')
-                ->get();*/
         }
         $whereStr = implode(' and ', $whereArr);
         $companies = Company::whereRaw($whereStr)->paginate(config('cbs.pageNumber'));
+        //导出文件
+        if ($request->is_export == 1) {
+            ExcelController::exportCompanies($companies);
+            return response()->redirectTo('company/index');
+        }
+
         $count = $this->companyCount($whereStr);
         return view('company.index', ['companies'=>$companies, 'count'=>$count]);
     }
