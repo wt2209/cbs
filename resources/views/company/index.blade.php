@@ -22,7 +22,7 @@
                         <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name" placeholder="公司名称">&nbsp;或者
                         <input type="text" class="form-control" value="{{ $_GET['person_name'] or '' }}" name="person_name"  placeholder="负责人/联系人">&nbsp;&nbsp;&nbsp;
                     </div>
-                    <button type="submit" class="btn btn-primary">搜索</button>
+                    <button type="submit" class="btn btn-primary">搜索</button>&nbsp;&nbsp;或&nbsp;
                     <button class="btn btn-info btn-sm export">导出到文件</button>
                     <script>
                         $('.export').click(function(){

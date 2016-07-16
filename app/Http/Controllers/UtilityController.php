@@ -75,6 +75,17 @@ class UtilityController extends Controller{
             $where = 'utility_id != 0';
         }
 
+        //导出文件
+        if ($request->is_export == 1) {
+            $utilities = DB::table('utility')
+                ->join('room', 'utility.room_id', '=', 'room.room_id')
+                ->join('company', 'company.company_id', '=', 'utility.company_id')
+                ->whereRaw($where)
+                ->get();
+            $this->exportFile($utilities);
+            return response()->redirectTo('utility/index');
+        }
+
         $utilities = DB::table('utility')
             ->join('room', 'utility.room_id', '=', 'room.room_id')
             ->join('company', 'company.company_id', '=', 'utility.company_id')
@@ -126,6 +137,16 @@ class UtilityController extends Controller{
         $where = implode(' and ', $whereArr);
         if (!$where) { //条件为空，显示所有结果
             $where = 'u_base_id != 0';
+        }
+
+        //导出文件
+        if ($request->is_export == 1) {
+            $utilitiyBases = DB::table('utility_base')
+                ->join('room', 'utility_base.room_id', '=', 'room.room_id')
+                ->whereRaw($where)
+                ->get();
+            $this->exportBaseFile($utilitiyBases);
+            return response()->redirectTo('utility/base');
         }
 
         $count = $this->setBaseCount($where);
@@ -503,5 +524,66 @@ class UtilityController extends Controller{
                 ->join('room', 'utility_base.room_id', '=', 'room.room_id')
                 ->count();
         }
+    }
+
+    private function exportFile($utilities)
+    {
+        $filename = '水电费明细-'.date('Ymd');
+        //标题行
+        $titleRow = [$filename];
+        //菜单第一行
+        $menuRow = ['序号','房间号','所属公司','公司状态','费用月份','电费','水费','合计','是否缴费','缴费时间', '备注'];
+        $data = [
+            $titleRow,
+            $menuRow,
+        ];
+        // 序号
+        $serialNumber = 1;
+        foreach ($utilities as $utility) {
+            $tmp = [
+                $serialNumber++,
+                $utility->room_name,
+                $utility->company_name,
+                $utility->is_quit == 1 ? '已退租': '正常',
+                $utility->year . '-' . $utility->month,
+                $utility->electric_money,
+                $utility->water_money,
+                $utility->water_money + $utility->electric_money,
+                $utility->is_charged === 1 ? '是': '否',
+                $utility->is_charged === 1 ? substr($utility->charge_time, 0, 10): '',
+                $utility->utility_remark
+            ];
+            $data[] = $tmp;
+        }
+        ExcelController::exportFile($filename, $data);
+    }
+
+    private function exportBaseFile($utilityBases)
+    {
+        $filename = '水电底数明细-'.date('Ymd');
+        //标题行
+        $titleRow = [$filename];
+        //菜单第一行
+        $menuRow = ['序号','房间号','月份','电表底数','水表底数','抄表人','抄表时间', '备注'];
+        $data = [
+            $titleRow,
+            $menuRow,
+        ];
+        // 序号
+        $serialNumber = 1;
+        foreach ($utilityBases as $utilityBase) {
+            $tmp = [
+                $serialNumber++,
+                $utilityBase->room_name,
+                $utilityBase->year . '-' . $utilityBase->month,
+                $utilityBase->electric_base,
+                $utilityBase->water_base,
+                $utilityBase->recorder,
+                substr($utilityBase->record_time, 0, 10),
+                $utilityBase->u_base_remark
+            ];
+            $data[] = $tmp;
+        }
+        ExcelController::exportFile($filename, $data);
     }
 }

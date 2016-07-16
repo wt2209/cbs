@@ -109,19 +109,20 @@ class CompanyController extends Controller
         $personName = trim(strip_tags(htmlspecialchars($request->person_name)));
 
         $whereArr = ['is_quit=0'];
-        $company = new Company();
         if (!empty($companyName)) {
             $whereArr[] = 'company_name like "%'.$companyName.'%"';
         } elseif (!empty($personName)) {
             $whereArr[] = '(linkman like "%'.$personName.'%" or manager like "%'.$personName.'%")';
         }
         $whereStr = implode(' and ', $whereArr);
-        $companies = Company::whereRaw($whereStr)->paginate(config('cbs.pageNumber'));
         //导出文件
         if ($request->is_export == 1) {
-            ExcelController::exportCompanies($companies);
+            $companies = Company::whereRaw($whereStr)->get();
+            $this->exportFile($companies);
             return response()->redirectTo('company/index');
         }
+        $companies = Company::whereRaw($whereStr)->paginate(config('cbs.pageNumber'));
+
 
         $count = $this->companyCount($whereStr);
         return view('company.index', ['companies'=>$companies, 'count'=>$count]);
@@ -498,6 +499,36 @@ class CompanyController extends Controller
         if (!$companyId) {
             exit("<h2>参数错误</h2>");
         }
+    }
+
+    private function exportFile($companies)
+    {
+        $filename = '公司明细-'.date('Ymd');
+        //标题行
+        $titleRow = ['公司明细-'.date('Ymd')];
+        //菜单第一行
+        $menuRow = ['序号','公司名','描述','入住时间','日常联系人','联系人电话','公司负责人','负责人电话','备注'];
+        $data = [
+            $titleRow,
+            $menuRow,
+        ];
+        // 序号
+        $serialNumber = 1;
+        foreach ($companies as $company) {
+            $tmp = [
+                $serialNumber++,
+                $company->company_name,
+                $company->company_description,
+                substr($company->created_at,0,10),
+                $company->linkman,
+                $company->linkman_tel,
+                $company->manager,
+                $company->manager_tel,
+                $company->company_remark,
+            ];
+            $data[] = $tmp;
+        }
+        ExcelController::exportFile($filename, $data);
     }
 
 }

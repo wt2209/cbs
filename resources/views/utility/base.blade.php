@@ -20,14 +20,24 @@
                         <input type="text" class="form-control" value="{{ $_GET['room_name'] or '' }}" name="room_name" placeholder="房间号">&nbsp;&nbsp;&nbsp;
                         <input type="text" class="form-control" value="{{ $_GET['year_month'] or '' }}" name="year_month" placeholder="月份，格式为：2016-3">&nbsp;&nbsp;&nbsp;
                     </div>
-                    <button type="submit" class="btn btn-primary">搜索</button>
+                    <button type="submit" class="btn btn-primary">搜索</button>&nbsp;&nbsp;或&nbsp;
+                    <button class="btn btn-info btn-sm export">导出到文件</button>
+                    <script>
+                        $('.export').click(function(){
+                            var sParam = 'is_export=1&'+$('form.navbar-form').serialize();
+                            var sUrl = '{{ url('utility/base-search') }}' + '?' + sParam;
+                            maskShow();
+                            window.location = sUrl;
+                            setTimeout(maskHide,2000);
+                            return false;
+                        })
+                    </script>
                 </form>
             </div>
         </div>
     </nav>
     <div class="function-area">
         <button class="btn btn-success btn-sm" onclick="javascript:location='{{ url('utility/add') }}';">录入底数</button>
-        <button class="btn btn-info btn-sm">导出到文件</button>
     </div>
 @endsection
 @section('content')

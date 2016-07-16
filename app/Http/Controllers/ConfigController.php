@@ -51,4 +51,9 @@ class ConfigController extends Controller
             return response()->json(['message'=>'操作成功！', 'status'=>0]);
         }
     }
+
+    public function getRoomType()
+    {
+        return '房间类型';
+    }
 }

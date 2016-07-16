@@ -50,7 +50,7 @@
                     </ul>
                 </div>
                 <div class="list_title">
-                    <span>承包商公司管理</span>
+                    <span>公司管理</span>
                     <ul class="list_detail">
                         <li>
                             <a href="{{ url('company/index') }}" target="iframe">所有公司</a>
@@ -59,7 +59,7 @@
                             <a href="{{ url('company/add') }}" target="iframe">新公司入住</a>
                         </li>
                         <li>
-                            <a href="{{ url('company-log/index') }}" target="iframe">公司房间变动记录</a>
+                            <a href="{{ url('company-log/index') }}" target="iframe">公司变动记录</a>
                         </li>
                     </ul>
                 </div>
@@ -170,6 +170,9 @@
                         <li>
                             <a href="{{url('config/index')}}" target="iframe">系统配置</a>
                         </li>
+                        <li>
+                            <a href="{{url('config/room-type')}}" target="iframe">房间类型设置</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="list_title">
@@ -207,7 +210,7 @@
             <li class="man_nav active">
                 基础管理
                 <p class="sub_message">
-                    个人日程，承包商公司管理，房间管理等
+                    个人日程，公司管理，房间管理等
                 </p>
             </li>
             <li class="man_nav" >

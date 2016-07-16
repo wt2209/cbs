@@ -26,14 +26,25 @@
                             <option value="2" @if(isset($_GET['charge_type'])&&$_GET['charge_type'] == 2) selected=""@endif>未缴费</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">搜索</button>
+                    <button type="submit" class="btn btn-primary">搜索</button>&nbsp;&nbsp;或&nbsp;
+                    <button class="btn btn-info btn-sm export">导出到文件</button>
+                    <script>
+                        $('.export').click(function(){
+                            var sParam = 'is_export=1&'+$('form.navbar-form').serialize();
+                            var sUrl = '{{ url('utility/search') }}' + '?' + sParam;
+                            maskShow();
+                            window.location = sUrl;
+                            setTimeout(maskHide,2000);
+                            return false;
+                        })
+                    </script>
                 </form>
             </div>
         </div>
     </nav>
-    <div class="function-area">
-        <button class="btn btn-info btn-sm">导出到文件</button>
-    </div>
+{{--    <div class="function-area">
+
+    </div>--}}
 @endsection
 @section('content')
     <div class="table-responsive">

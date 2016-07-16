@@ -114,14 +114,14 @@ class RoomController extends Controller
         }
         $whereArr[] = "room_type = {$roomType}";
         $where = implode(' and ', $whereArr);
-
-
-        $count = $this->countRoomNumber($pageType, $where);
-        if ($where) {
-            $rooms =  Room::whereRaw($where)->paginate(1);
-        } else {
-            $rooms =  Room::paginate(config('cbs.pageNumber'));
+        //导出文件
+        if ($request->is_export == 1) {
+            $rooms =  Room::whereRaw($where)->get();
+            $this->exportFile($roomType, $rooms);
+            return response()->redirectTo('room/living-room');
         }
+        $rooms =  Room::whereRaw($where)->paginate(config('cbs.pageNumber'));
+        $count = $this->countRoomNumber($pageType, $where);
         return view('room.'. $pageType .'Room', ['rooms' => $rooms, 'count'=>$count]);
     }
 
@@ -253,5 +253,55 @@ class RoomController extends Controller
             }
         }
         return $count;
+    }
+
+    private function exportFile($roomType, $rooms)
+    {
+        if ($roomType == 1) {
+            $filename = '房间明细-'.date('Ymd');
+        }
+        if ($roomType == 2) {
+            $filename = '餐厅明细-'.date('Ymd');
+        }
+        if ($roomType == 3) {
+            $filename = '服务用房明细-'.date('Ymd');
+        }
+        //标题行
+        $titleRow = [$filename];
+        //菜单第一行
+        $menuRow = ['序号','房间名','状态','所属公司','性别','公司联系人','联系人电话','房间备注'];
+        $data = [
+            $titleRow,
+            $menuRow,
+        ];
+        // 序号
+        $serialNumber = 1;
+        foreach ($rooms as $room) {
+            if ($room->company_id > 0) {
+                $tmp = [
+                    $serialNumber++,
+                    $room->room_name,
+                    '正在使用',
+                    $room->company->company_name,
+                    $room->gender == 1 ? '男': '女',
+                    $room->company->linkman,
+                    $room->company->linkman_tel,
+                    $room->room_remark
+                ];
+            } else {
+                $tmp = [
+                    $serialNumber++,
+                    $room->room_name,
+                    '空房间',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $room->room_remark
+                ];
+            }
+            $data[] = $tmp;
+        }
+        ExcelController::exportFile($filename, $data);
     }
 }

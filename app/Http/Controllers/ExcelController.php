@@ -351,38 +351,17 @@ class ExcelController extends Controller
     }
 
 
-
-
-    public static function exportCompanies($companies)
+    /**
+     * 导出文件
+     * @param $filename
+     * @param $data
+     */
+    public static function exportFile($filename, $data)
     {
-        Excel::create('公司明细-'.date('ymd'), function($excel) use($companies) {
-            $excel->sheet('公司明细', function($sheet) use($companies){
+        Excel::create($filename, function($excel) use($data) {
+            $excel->sheet('公司明细', function($sheet) use($data){
                 $chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-
-                //标题行
-                $titleRow = ['公司明细 - '.date('Ymd')];
-                //菜单第一行
-                $menuRow = ['序号','公司名','描述','入住时间','日常联系人','联系人电话','公司负责人','负责人电话','备注'];
-                $data = [
-                    $titleRow,
-                    $menuRow,
-                ];
-                // 序号
-                $serialNumber = 1;
-                foreach ($companies as $company) {
-                    $tmp = [
-                        $serialNumber++,
-                        $company->company_name,
-                        $company->company_description,
-                        substr($company->created_at,0,10),
-                        $company->linkman,
-                        $company->linkman_tel,
-                        $company->manager,
-                        $company->manager_tel,
-                        $company->company_remark,
-                    ];
-                    $data[] = $tmp;
-                }
+                $columnChar = $chars[count($data[1]) - 1];
                 $sheet->setAutoSize(true);
                 $sheet->setRowsToRepeatAtTop(['1','2']);
                 //设置表样式
@@ -401,9 +380,9 @@ class ExcelController extends Controller
                         'bold'       =>  true
                     ));
                 });
-                $sheet->mergeCells('A1:I1');
-                $sheet->setBorder('A2:I'.($serialNumber + 1), 'thin');
-                $sheet->cells('A1:I'.($serialNumber + 1), function($cells) {
+                $sheet->mergeCells('A1:'.$columnChar.'1');
+                $sheet->setBorder('A2:'.$columnChar.count($data), 'thin');
+                $sheet->cells('A1:'.$columnChar.count($data), function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('center');
                 });
@@ -412,71 +391,5 @@ class ExcelController extends Controller
             });
 
         })->download('xls');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

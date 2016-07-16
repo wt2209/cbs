@@ -25,7 +25,18 @@
                             <option value="2" @if(isset($_GET['room_status'])&&$_GET['room_status'] == 2) selected=""@endif>空房间</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">搜索</button>
+                    <button type="submit" class="btn btn-primary">搜索</button>&nbsp;&nbsp;或&nbsp;
+                    <button class="btn btn-info btn-sm export">导出到文件</button>
+                    <script>
+                        $('.export').click(function(){
+                            var sParam = 'is_export=1&'+$('form.navbar-form').serialize();
+                            var sUrl = '{{ url('room/search') }}' + '?' + sParam;
+                            maskShow();
+                            window.location = sUrl;
+                            setTimeout(maskHide,2000);
+                            return false;
+                        })
+                    </script>
                 </form>
             </div>
         </div>

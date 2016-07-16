@@ -24,9 +24,9 @@
             </div>
         </div>
     </nav>
-    <div class="function-area">
+{{--    <div class="function-area">
         <button class="btn btn-info btn-sm">导出到文件</button>
-    </div>
+    </div>--}}
 @endsection
 @section('content')
     <div class="table-responsive">
@@ -61,7 +61,7 @@
                     <td style="word-break: break-all">{{$companyLog->old_rooms}}</td>
                     <td  style="word-break: break-all">{{$companyLog->new_rooms}}</td>
                     <td>
-                        <button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
+                        {{--<button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>--}}
                     </td>
                 </tr>
             @endforeach
