@@ -69,7 +69,7 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
 	private $_enclosure		= '"';
 
 	/**
-	 * Sheet index to read
+	 * sheet index to read
 	 *
 	 * @access	private
 	 * @var	int
@@ -352,7 +352,7 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
 	/**
 	 * Set sheet index
 	 *
-	 * @param	integer		$pValue		Sheet index
+	 * @param	integer		$pValue		sheet index
 	 * @return PHPExcel_Reader_CSV
 	 */
 	public function setSheetIndex($pValue = 0) {

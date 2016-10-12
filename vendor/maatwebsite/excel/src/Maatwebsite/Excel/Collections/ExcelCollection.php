@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 class ExcelCollection extends Collection {
 
     /**
-     * Sheet title
+     * sheet title
      * @var [type]
      */
     protected $title;

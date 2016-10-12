@@ -1024,20 +1024,20 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 					// print titles (repeating rows)
 					// Assuming BIFF8, there are 3 cases
 					// 1. repeating rows
-					//		formula looks like this: Sheet!$A$1:$IV$2
+					//		formula looks like this: sheet!$A$1:$IV$2
 					//		rows 1-2 repeat
 					// 2. repeating columns
-					//		formula looks like this: Sheet!$A$1:$B$65536
+					//		formula looks like this: sheet!$A$1:$B$65536
 					//		columns A-B repeat
 					// 3. both repeating rows and repeating columns
-					//		formula looks like this: Sheet!$A$1:$B$65536,Sheet!$A$1:$IV$2
+					//		formula looks like this: sheet!$A$1:$B$65536,sheet!$A$1:$IV$2
 
 					$ranges = explode(',', $definedName['formula']); // FIXME: what if sheetname contains comma?
 
 					foreach ($ranges as $range) {
 						// $range should look like this one of these
-						//		Sheet!$A$1:$B$65536
-						//		Sheet!$A$1:$IV$2
+						//		sheet!$A$1:$B$65536
+						//		sheet!$A$1:$IV$2
 
 						$explodes = explode('!', $range);
 
@@ -2537,7 +2537,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 	 * Substream  and represents a sheet inside the workbook.
 	 * One SHEET record is written for each sheet. It stores the
 	 * sheet name and a stream offset to the BOF record of the
-	 * respective Sheet Substream within the Workbook Stream.
+	 * respective sheet Substream within the Workbook Stream.
 	 *
 	 * --	"OpenOffice.org's Documentation of the Microsoft
 	 * 		Excel File Format"
@@ -3327,7 +3327,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 
 
 	/**
-	 * PROTECT - Sheet protection (BIFF2 through BIFF8)
+	 * PROTECT - sheet protection (BIFF2 through BIFF8)
 	 *   if this record is omitted, then it also means no sheet protection
 	 */
 	private function _readProtect()
@@ -3399,7 +3399,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 
 
 	/**
-	 * PASSWORD - Sheet protection (hashed) password (BIFF2 through BIFF8)
+	 * PASSWORD - sheet protection (hashed) password (BIFF2 through BIFF8)
 	 */
 	private function _readPassword()
 	{
@@ -4573,7 +4573,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 				// section 5.58.3: Hyperlink to local file
 				// examples:
 				//   mydoc.txt
-				//   ../../somedoc.xls#Sheet!A1
+				//   ../../somedoc.xls#sheet!A1
 
 				// offset: var; size: 16; GUI of File Moniker
 				$offset += 16;

@@ -54,7 +54,7 @@ class Html extends PHPExcel_Reader_HTML {
     protected $_inputEncoding = 'ANSI';
 
     /**
-     * Sheet index to read
+     * sheet index to read
      * @var int
      */
     protected $_sheetIndex = 0;

@@ -133,16 +133,16 @@
         <div class="list_item">
             <div id="left_main_nav">
                 <ul>
-                    <li class="left_back">退出系统</li>
+                    <li class="left_back">每月报表</li>
                     <li class="left_back">退出系统2</li>
                 </ul>
             </div>
             <div id="right_main_nav">
                 <div class="list_title">
-                    <span>退出系统1</span>
+                    <span>每月报表</span>
                     <ul class="list_detail">
                         <li>
-                            <a href="" target="iframe">点击退出登录</a>
+                            <a href="{{ url('sheet/index') }}" target="iframe">月报表</a>
                         </li>
                     </ul>
                 </div>
@@ -185,7 +185,7 @@
                             <a href="{{ url('user/roles') }}" target="iframe">角色列表</a>
                         </li>
                         <li>
-                            <a href="{{ url('user/create-user') }}" target="iframe">创建用户</a>
+                            <a href="{{ url('register') }}" target="iframe">创建用户</a>
                         </li>
                         <li>
                             <a href="{{ url('user/create-role') }}" target="iframe">创建角色</a>
@@ -226,15 +226,15 @@
                 </p>
             </li>
             <li class="man_nav">
-                文件共享
+                文件管理
                 <p class="sub_message">
-                    可以使局域网内的成员共享文件
+                    管理必要的文件，如月报表
                 </p>
             </li>
             <li class="man_nav">
                 系统设置
                 <p class="sub_message">
-                    欢5
+                    系统的各项配置
                 </p>
             </li>
         </ul>

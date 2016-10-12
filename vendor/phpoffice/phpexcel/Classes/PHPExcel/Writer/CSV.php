@@ -63,7 +63,7 @@ class PHPExcel_Writer_CSV extends PHPExcel_Writer_Abstract implements PHPExcel_W
 	private $_lineEnding	= PHP_EOL;
 
 	/**
-	 * Sheet index to write
+	 * sheet index to write
 	 *
 	 * @var int
 	 */
@@ -259,7 +259,7 @@ class PHPExcel_Writer_CSV extends PHPExcel_Writer_Abstract implements PHPExcel_W
 	/**
 	 * Set sheet index
 	 *
-	 * @param	int		$pValue		Sheet index
+	 * @param	int		$pValue		sheet index
 	 * @return PHPExcel_Writer_CSV
 	 */
 	public function setSheetIndex($pValue = 0) {

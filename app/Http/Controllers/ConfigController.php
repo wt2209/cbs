@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\RentType;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -54,6 +55,7 @@ class ConfigController extends Controller
 
     public function getRoomType()
     {
-        return '房间类型';
+        $rentTypes = RentType::all();
+        return view('config.rentType', ['rentTypes'=>$rentTypes]);
     }
 }

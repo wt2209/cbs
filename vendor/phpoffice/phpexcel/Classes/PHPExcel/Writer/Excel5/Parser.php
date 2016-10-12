@@ -60,14 +60,14 @@
 class PHPExcel_Writer_Excel5_Parser
 {
 	/**	Constants				*/
-	// Sheet title in unquoted form
+	// sheet title in unquoted form
 	// Invalid sheet title characters cannot occur in the sheet title:
 	// 		*:/\?[]
 	// Moreover, there are valid sheet title characters that cannot occur in unquoted form (there may be more?)
 	// +-% '^&<>=,;#()"{}
 	const REGEX_SHEET_TITLE_UNQUOTED = '[^\*\:\/\\\\\?\[\]\+\-\% \\\'\^\&\<\>\=\,\;\#\(\)\"\{\}]+';
 
-	// Sheet title in quoted form (without surrounding quotes)
+	// sheet title in quoted form (without surrounding quotes)
 	// Invalid sheet title characters cannot occur in the sheet title:
 	// *:/\?[]					(usual invalid sheet title characters)
 	// Single quote is represented as a pair ''
@@ -903,7 +903,7 @@ class PHPExcel_Writer_Excel5_Parser
 	 * PHPExcel_Writer_Excel5_Workbook class.
 	 *
 	 * @access	private
-	 * @param	string	$sheet_name		Sheet name
+	 * @param	string	$sheet_name		sheet name
 	 * @return	integer					The sheet index, -1 if the sheet was not found
 	 */
 	function _getSheetIndex($sheet_name)

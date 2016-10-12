@@ -839,6 +839,7 @@ class ComposerStaticInita933b8b226b61adf681e0cea42f35fb7
         'SessionHandlerInterface' => __DIR__ . '/..' . '/symfony/http-foundation/Resources/stubs/SessionHandlerInterface.php',
         'TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
+        'UserTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UserTableSeeder.php',
         'UtilityBaseTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UtilityBaseTableSeeder.php',
         'UtilityTableSeeder' => __DIR__ . '/../..' . '/database/seeds/UtilityTableSeeder.php',
     );

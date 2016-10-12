@@ -157,7 +157,7 @@ class PHPExcel_Reader_Gnumeric extends PHPExcel_Reader_Abstract implements PHPEx
 
 		$worksheetInfo = array();
 		while ($xml->read()) {
-			if ($xml->name == 'gnm:Sheet' && $xml->nodeType == XMLReader::ELEMENT) {
+			if ($xml->name == 'gnm:sheet' && $xml->nodeType == XMLReader::ELEMENT) {
 				$tmpInfo = array(
 					'worksheetName' => '',
 					'lastColumnLetter' => 'A',

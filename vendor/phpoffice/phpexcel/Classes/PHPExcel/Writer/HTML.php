@@ -42,7 +42,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 	protected $_phpExcel;
 
 	/**
-	 * Sheet index to write
+	 * sheet index to write
 	 *
 	 * @var int
 	 */
@@ -224,7 +224,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 	/**
 	 * Map border style
 	 *
-	 * @param	int		$borderStyle		Sheet index
+	 * @param	int		$borderStyle		sheet index
 	 * @return	string
 	 */
 	private function _mapBorderStyle($borderStyle) {
@@ -259,7 +259,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 	/**
 	 * Set sheet index
 	 *
-	 * @param	int		$pValue		Sheet index
+	 * @param	int		$pValue		sheet index
 	 * @return PHPExcel_Writer_HTML
 	 */
 	public function setSheetIndex($pValue = 0) {
@@ -1086,7 +1086,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 			// Construct HTML
 			$html = '';
 
-			// Sheet index
+			// sheet index
 			$sheetIndex = $pSheet->getParent()->getIndex($pSheet);
 
 			// DomPDF and breaks

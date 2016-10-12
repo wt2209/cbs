@@ -40,7 +40,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     const BREAK_ROW    = 1;
     const BREAK_COLUMN = 2;
 
-    /* Sheet state */
+    /* sheet state */
     const SHEETSTATE_VISIBLE    = 'visible';
     const SHEETSTATE_HIDDEN     = 'hidden';
     const SHEETSTATE_VERYHIDDEN = 'veryHidden';
@@ -116,7 +116,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     private $_title;
 
     /**
-     * Sheet state
+     * sheet state
      *
      * @var string
      */
@@ -144,7 +144,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     private $_headerFooter;
 
     /**
-     * Sheet view
+     * sheet view
      *
      * @var PHPExcel_Worksheet_SheetView
      */
@@ -436,7 +436,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     {
         $CharCount = PHPExcel_Shared_String::CountCharacters($pValue);
         if ($CharCount == 0) {
-            throw new PHPExcel_Exception('Sheet code name cannot be empty.');
+            throw new PHPExcel_Exception('sheet code name cannot be empty.');
         }
         // Some of the printable ASCII characters are invalid:  * : / \ ? [ ] and  first and last characters cannot be a "'"
         if ((str_replace(self::$_invalidCharacters, '', $pValue) !== $pValue) || 
@@ -889,7 +889,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     /**
      * Get sheet state
      *
-     * @return string Sheet state (visible, hidden, veryHidden)
+     * @return string sheet state (visible, hidden, veryHidden)
      */
 	public function getSheetState() {
         return $this->_sheetState;
@@ -898,7 +898,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
     /**
      * Set sheet state
      *
-     * @param string $value Sheet state (visible, hidden, veryHidden)
+     * @param string $value sheet state (visible, hidden, veryHidden)
      * @return PHPExcel_Worksheet
      */
 	public function setSheetState($value = PHPExcel_Worksheet::SHEETSTATE_VISIBLE) {
@@ -2652,7 +2652,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
      * @return mixed
      */
 	public static function extractSheetTitle($pRange, $returnRange = false) {
-        // Sheet title included?
+        // sheet title included?
         if (($sep = strpos($pRange, '!')) === false) {
             return '';
         }
@@ -2936,7 +2936,7 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
 		return $this->_codeName;
 	}
 	/**
-	 * Sheet has a code name ?
+	 * sheet has a code name ?
 	 * @return boolean
 	*/
 	public function hasCodeName(){

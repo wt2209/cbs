@@ -89,7 +89,7 @@ class PHPExcel_Reader_Excel2003XML extends PHPExcel_Reader_Abstract implements P
 
 		$signature = array(
 				'<?xml version="1.0"',
-				'<?mso-application progid="Excel.Sheet"?>'
+				'<?mso-application progid="Excel.sheet"?>'
 			);
 
 		// Open file

@@ -36,7 +36,7 @@
 class PHPExcel_Worksheet_Protection
 {
 	/**
-	 * Sheet
+	 * sheet
 	 *
 	 * @var boolean
 	 */
@@ -186,7 +186,7 @@ class PHPExcel_Worksheet_Protection
     }
 
     /**
-     * Get Sheet
+     * Get sheet
      *
      * @return boolean
      */
@@ -195,7 +195,7 @@ class PHPExcel_Worksheet_Protection
     }
 
     /**
-     * Set Sheet
+     * Set sheet
      *
      * @param boolean $pValue
      * @return PHPExcel_Worksheet_Protection

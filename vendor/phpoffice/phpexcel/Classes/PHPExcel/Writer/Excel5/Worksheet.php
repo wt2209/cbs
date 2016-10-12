@@ -173,7 +173,7 @@ class PHPExcel_Writer_Excel5_Worksheet extends PHPExcel_Writer_Excel5_BIFFwriter
 	private $_lastColumnIndex;
 
 	/**
-	 * Sheet object
+	 * sheet object
 	 * @var PHPExcel_Worksheet
 	 */
 	public $_phpSheet;

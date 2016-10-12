@@ -210,7 +210,7 @@ class PHPExcel_Writer_Excel2007_Worksheet extends PHPExcel_Writer_Excel2007_Writ
 		// sheetViews
 		$objWriter->startElement('sheetViews');
 
-			// Sheet selected?
+			// sheet selected?
 			$sheetSelected = false;
 			if ($this->getParentWriter()->getPHPExcel()->getIndex($pSheet) == $this->getParentWriter()->getPHPExcel()->getActiveSheetIndex())
 				$sheetSelected = true;
@@ -1061,7 +1061,7 @@ class PHPExcel_Writer_Excel2007_Worksheet extends PHPExcel_Writer_Excel2007_Writ
 			$objWriter->startElement('c');
 			$objWriter->writeAttribute('r', $pCellAddress);
 
-			// Sheet styles
+			// sheet styles
 			if ($pCell->getXfIndex() != '') {
 				$objWriter->writeAttribute('s', $pCell->getXfIndex());
 			}

@@ -336,7 +336,7 @@ class PHPExcel
 	/**
 	 * Get sheet by code name. Warning : sheet don't have always a code name !
 	 *
-	 * @param string $pName Sheet name
+	 * @param string $pName sheet name
 	 * @return PHPExcel_Worksheet
 	 */
 	public function getSheetByCodeName($pName = '')
@@ -566,7 +566,7 @@ class PHPExcel
     /**
      * Get sheet by index
      *
-     * @param  int $pIndex Sheet index
+     * @param  int $pIndex sheet index
      * @return PHPExcel_Worksheet
      * @throws PHPExcel_Exception
      */
@@ -595,7 +595,7 @@ class PHPExcel
     /**
      * Get sheet by name
      *
-     * @param  string $pName Sheet name
+     * @param  string $pName sheet name
      * @return PHPExcel_Worksheet
      */
     public function getSheetByName($pName = '')
@@ -625,13 +625,13 @@ class PHPExcel
             }
         }
 
-        throw new PHPExcel_Exception("Sheet does not exist.");
+        throw new PHPExcel_Exception("sheet does not exist.");
     }
 
     /**
      * Set index for sheet by sheet name.
      *
-     * @param  string $sheetName Sheet name to modify index for
+     * @param  string $sheetName sheet name to modify index for
      * @param  int $newIndex New index for the sheet
      * @return New sheet index
      * @throws PHPExcel_Exception
@@ -697,7 +697,7 @@ class PHPExcel
     /**
      * Set active sheet index by name
      *
-     * @param  string $pValue Sheet title
+     * @param  string $pValue sheet title
      * @return PHPExcel_Worksheet
      * @throws PHPExcel_Exception
      */

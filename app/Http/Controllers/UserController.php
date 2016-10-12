@@ -33,10 +33,7 @@ class UserController extends Controller
         return view('user.roles', ['roles'=>$roles]);
     }
 
-    public function getCreateUser()
-    {
 
-    }
     public function getCreateRole()
     {
 

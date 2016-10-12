@@ -399,7 +399,7 @@ return array(
 
         /*
         |--------------------------------------------------------------------------
-        | Sheet heading conversion
+        | sheet heading conversion
         |--------------------------------------------------------------------------
         |
         | Convert headings to ASCII

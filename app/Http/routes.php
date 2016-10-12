@@ -15,8 +15,8 @@
 Route::get('/login', 'LoginController@getLogin');
 Route::get('/logout', 'LoginController@getLogout');
 Route::post('/login', 'LoginController@postLogin');
-Route::get('/register', 'LoginController@getRegister');
-Route::post('/register', 'LoginController@postRegister');
+Route::get('/register', 'LoginController@getRegister')->middleware(['my.auth']);
+Route::post('/register', 'LoginController@postRegister')->middleware(['my.auth']);
 //首页
 Route::get('/', 'IndexController@getIndex');
 
@@ -53,3 +53,6 @@ Route::controller('config', 'ConfigController');
 
 //user and role
 Route::controller('user','UserController');
+
+//报表处理
+Route::controller('sheet', 'SheetController');
