@@ -2,38 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0afce94b-7493-45a2-b5e1-1fc25b65f231" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/views/config/rentType.blade.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/ConfigController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/ConfigController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/ExcelController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/ExcelController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/Http/routes.php" afterPath="$PROJECT_DIR$/app/Http/routes.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/views/auth/register.blade.php" afterPath="$PROJECT_DIR$/resources/views/auth/register.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/views/index.blade.php" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_static.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_static.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/fzaninotto/faker/src/Faker/Provider/en_US/Company.php" afterPath="$PROJECT_DIR$/vendor/fzaninotto/faker/src/Faker/Provider/en_US/Company.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/ExcelCollection.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/ExcelCollection.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/HtmlReader.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/HtmlReader.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/excel.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/excel.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/CSV.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/CSV.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Excel2003XML.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Excel2003XML.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Excel5.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Excel5.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Gnumeric.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/Gnumeric.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/HTML.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/HTML.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/SYLK.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Reader/SYLK.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet/Protection.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet/Protection.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet/SheetView.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Worksheet/SheetView.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/CSV.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/CSV.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel2007/Workbook.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel2007/Workbook.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel2007/Worksheet.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel2007/Worksheet.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Parser.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Parser.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Workbook.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Workbook.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Worksheet.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/Excel5/Worksheet.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/HTML.php" afterPath="$PROJECT_DIR$/vendor/phpoffice/phpexcel/Classes/PHPExcel/Writer/HTML.php" />
     </list>
     <ignored path="laravel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -578,7 +547,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="0" width="1370" height="744" extended-state="0" />
+    <frame x="-8" y="0" width="1370" height="744" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30839694" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
