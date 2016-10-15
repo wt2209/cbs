@@ -34,9 +34,36 @@ class UserController extends Controller
     }
 
 
+    /**
+     * 添加角色
+     */
     public function getCreateRole()
     {
 
+    }
+
+    /**
+     * 修改角色的权限
+     * @param $roleId
+     */
+    public function getEditRolePermission($roleId)
+    {
+        $roleId = (int) $roleId;
+        $roleName = Role::where('id', '=', $roleId)->value('role_name');
+
+        $tmpArr = DB::table('permission_role')->where('role_id', '=', $roleId)->get();
+        $rolePermissionIds = [];
+        foreach ($tmpArr as $tmp) {
+            $rolePermissionIds[] = $tmp->permission_id;
+        }
+
+        $allPermissions = DB::table('permissions')->get();
+
+        return view('user.editRolePermission', [
+            'roleName'=>$roleName,
+            'allPermissions'=>$allPermissions,
+            'rolePermissionIds'=>$rolePermissionIds
+        ]);
     }
 
     public function getRemoveUser(Request $request)
