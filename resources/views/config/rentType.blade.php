@@ -14,9 +14,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('company/search') }}">
-                   <p class="warning-message">注意：修改完成后，系统将会启用修改后的房间类型计算费用。</p>
-                </form>
+                <p class="warning-message">注意：修改完成后，系统将会启用修改后的房间类型计算费用。</p>
             </div>
         </div>
     </nav>
@@ -37,13 +35,11 @@
                 @foreach($rentTypes as $rentType)
                     <tr>
                         <td>
+                            <input class="form-control" type="hidden" name="rent_type_id[]" value="{{ $rentType->rent_type_id }}">
                             <input class="form-control" type="text" name="person_number[]" value="{{ $rentType->person_number }}">
                         </td>
                         <td>
                             <input class="form-control" type="text" name="rent_money[]" value="{{ $rentType->rent_money }}">
-                        </td>
-                        <td>
-                            <button  delete_id="{{ $rentType->rent_type_id }}" class="btn btn-danger btn-xs delete-button">退租</button>
                         </td>
                     </tr>
                 @endforeach
@@ -69,7 +65,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('config/...') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('config/store-rent-type') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status,'callback':function(){
                             if (e.status) {

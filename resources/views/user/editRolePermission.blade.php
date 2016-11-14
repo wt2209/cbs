@@ -20,6 +20,8 @@
     <div class="table-responsive">
         <p style="height:20px;"></p>
         <form id="form">
+            <input type="hidden" name="role_id" value="{{ $roleId }}">
+            <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             @foreach($allPermissions as $permission)
                 <p style="display: inline-block;width: 120px;">
                 @if (in_array($permission->id, $rolePermissionIds))
@@ -52,7 +54,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('room/update') }}', $('#form').serialize(), function(e){
+                    $.post('{{ url('user/edit-role-permission') }}', $('#form').serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             /*返回并刷新原页面*/

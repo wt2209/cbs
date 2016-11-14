@@ -24,8 +24,8 @@ class UtilityBaseTableSeeder extends Seeder
                 'room_id' => $i,
                 'water_base' => $arr[$i]['w'],
                 'electric_base' => $arr[$i]['e'],
-                'year' => 2015,
-                'month' => 1,
+                'year' => date('m') == 1 ? date('Y') - 1 : date('Y'),
+                'month' => date('m') == 1 ? 12 : date('m') - 1,
                 'recorder' => '张三',
                 'record_time' => date('Y-m-d', strtotime('-1 month')),
                 'u_base_remark' => '底数备注'
@@ -36,8 +36,8 @@ class UtilityBaseTableSeeder extends Seeder
                 'room_id'=> $i,
                 'water_base'=> $arr[$i]['w'] + random_int(1, 49),
                 'electric_base'=> $arr[$i]['e'] + random_int(1, 499),
-                'year'=>2015,
-                'month'=>2,
+                'year' => date('Y'),
+                'month' => date('m'),
                 'recorder'=>'张三',
                 'record_time'=>date('Y-m-d'),
                 'u_base_remark'=>'底数备注'

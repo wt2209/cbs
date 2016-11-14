@@ -1,11 +1,11 @@
 @extends('header')
-@section('title', '录入底数')
+@section('title', '从文件导入')
 @section('css')
     <link rel="stylesheet" href="{{ asset('/css/utility/add.css') }}"/>
 @endsection
 @section('header')
     <ul class="nav nav-pills nav-small">
-        <li role="presentation" class="active"><a href="">录入底数</a></li>
+        <li role="presentation" class="active"><a href="">从文件导入</a></li>
     </ul>
     <div id="return-btn">
         <a href="{{ url('utility/base') }}"><< 返回底数页</a>
@@ -30,45 +30,23 @@
             </div>
         </div>
     </nav>
-    <div class="function-area">
-        <button id="addRows" type="submit" class="btn btn-primary">添加栏位</button>&nbsp;&nbsp;&nbsp;或者&nbsp;&nbsp;&nbsp;
-        <a href="{{ url('utility/import-base-from-file') }}" class="btn btn-primary btn-sm">从文件导入</a>
+    <div class="bg-success" style="padding: 10px;font-size: 14px;"><strong style="color: red">请注意：</strong><br>
+        1.支持xls、xlsx格式<br>
+        2.确保EXCEL文件A-D列依次为：“房间号”、“电表底数”、“水表底数”、“备注”<br>
+        3.确保第一行是标题行，系统将从第二行数据开始导入
     </div>
+
 @endsection
 @section('content')
     <div class="table-responsive">
-        <form id="form">
+        <form id="form" method="post" enctype="multipart/form-data" action="{{ url('utility/import-base-file') }}">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <input type="hidden" name="year">
             <input type="hidden" name="month">
             <input type="hidden" name="recorder">
             <input type="hidden" name="record_time">
-            <table class="table table-bordered table-hover table-condensed">
-                <thead>
-                <tr class="active">
-                    <th  width="15%">房间号</th>
-                    <th  width="15%">电表底数</th>
-                    <th  width="15%">水表底数</th>
-                    <th>备注</th>
-                </tr>
-                </thead>
-                <tr id="trBase" _num="1">
-                    <td>
-                        <input type="text" class="form-control input-sm" name="1[room]">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control input-sm" name="1[electric_base]">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control input-sm" name="1[water_base]">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control input-sm" name="1[u_base_remark]">
-                    </td>
-                </tr>
-            </table>
+            <input type="file" style="margin:20px 0 20px 0;" name="import_file" >
             <button type="submit" class="btn btn-success">提交</button>
-            <div style="height:20px"></div>
         </form>
     </div>
 

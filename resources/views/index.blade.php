@@ -30,25 +30,25 @@
 {{--头部区域结束--}}
 {{--左侧区域--}}
 <div id="left_content">
-    <div id="user_info">欢迎您，<strong>wt2209</strong><br />[<a href="">系统管理员</a>，<a href="{{ url('/logout') }}">退出</a>]</div>
+    <div id="user_info">欢迎！{{--您，<strong></strong>--}}<br />[{{--<a href="">系统管理员</a>，--}}<a href="{{ url('/logout') }}">退出</a>]</div>
     <div id="main_nav">
         <div class="list_item active">
             <div id="left_main_nav">
                 <ul>
-                    <li class="left_back">个人日程</li>
+                    {{--<li class="left_back">个人日程</li>--}}
                     <li class="left_back">承包商公司</li>
                     <li class="left_back">房间管理</li>
                 </ul>
             </div>
             <div id="right_main_nav">
-                <div class="list_title">
+{{--                <div class="list_title">
                     <span>个人日程</span>
                     <ul class="list_detail">
                         <li>
                             <a href="{{ url('calendar/index') }}" target="iframe">个人日程</a>
                         </li>
                     </ul>
-                </div>
+                </div>--}}
                 <div class="list_title">
                     <span>公司管理</span>
                     <ul class="list_detail">
@@ -134,7 +134,6 @@
             <div id="left_main_nav">
                 <ul>
                     <li class="left_back">每月报表</li>
-                    <li class="left_back">退出系统2</li>
                 </ul>
             </div>
             <div id="right_main_nav">
@@ -143,14 +142,6 @@
                     <ul class="list_detail">
                         <li>
                             <a href="{{ url('sheet/index') }}" target="iframe">月报表</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="list_title">
-                    <span>退出系统2</span>
-                    <ul class="list_detail">
-                        <li>
-                            <a href="" target="iframe">点击退出登录2</a>
                         </li>
                     </ul>
                 </div>
@@ -171,7 +162,7 @@
                             <a href="{{url('config/index')}}" target="iframe">系统配置</a>
                         </li>
                         <li>
-                            <a href="{{url('config/room-type')}}" target="iframe">房间类型设置</a>
+                            <a href="{{url('config/rent-type')}}" target="iframe">房间类型设置</a>
                         </li>
                     </ul>
                 </div>
@@ -210,7 +201,7 @@
             <li class="man_nav active">
                 基础管理
                 <p class="sub_message">
-                    个人日程，公司管理，房间管理等
+                    公司管理，房间管理等
                 </p>
             </li>
             <li class="man_nav" >

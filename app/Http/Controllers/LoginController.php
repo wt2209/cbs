@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Hash;
 use Auth;
+use DB;
+use App\Model\Role;
 use Illuminate\Http\Request;
 use App\User;
 use Validator;
@@ -35,7 +37,8 @@ class LoginController extends Controller
 
     public function getRegister()
     {
-        return view('auth.register');
+        $roles = Role::get();
+        return view('auth.register', ['roles'=>$roles]);
     }
 
     public function postRegister(Request $request)
@@ -47,10 +50,17 @@ class LoginController extends Controller
         if (User::where('user_name', $username)->count() > 0) {
             return view('auth.register', ['message'=>'错误：用户名已存在！']);
         }
-        $user = new User();
-        $user->user_name = $request->user_name;
-        $user->password = Hash::make($request->password);
-        $user->save();
+        $id = User::insertGetId([
+            'user_name' => $request->user_name,
+            'password' => Hash::make($request->password),
+            'created_at'=>date('Y-m-d H:i:s'),
+            'updated_at'=>date('Y-m-d H:i:s')
+        ]);
+
+        DB::table('role_user')->insert([
+            'role_id'=>(int)$request->role_id,
+            'user_id'=>$id
+        ]);
         /*        User::create([
                     'user_name'=>$username,
                     'password'=>bcrypt($request->password)

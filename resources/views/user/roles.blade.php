@@ -40,8 +40,13 @@
                         {{ substr($role->created_at, 0, 10) }}
                     </td>
                     <td>
-                        <a href="{{ url('user/edit-role-permission/'.$role->id) }}" class="btn btn-success btn-xs">修改权限</a>
-                        <a href="javascript:;" delete_id="{{ $role->id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                        @if ($role->id == 1)
+                            <a href="{{ url('user/edit-role-permission/'.$role->id) }}" class="btn btn-success btn-xs" disabled="disabled">修改权限</a>
+                            <a href="javascript:;" delete_id="{{ $role->id }}" class="btn btn-danger btn-xs delete-button" disabled="disabled">删除</a>
+                        @else
+                            <a href="{{ url('user/edit-role-permission/'.$role->id) }}" class="btn btn-success btn-xs">修改权限</a>
+                            <a href="javascript:;" delete_id="{{ $role->id }}" class="btn btn-danger btn-xs delete-button">删除</a>
+                        @endif
                     </td>
                 </tr>
             @endforeach

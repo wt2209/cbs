@@ -34,8 +34,6 @@
                 selectHelper: true,
 
                 select: function(start, end) {
-
-
 //                    $(this).ondblclick(alert(1));
                     /* var title = prompt('Event Title:');
                      var eventData;
@@ -84,13 +82,15 @@
                     }
                 ]
             });
-
         });
-
     </script>
 </head>
 <body>
-<div id='calendar'></div>
+
+{{--日历--}}
+{{--<div id='calendar'></div>--}}
+
+<h1>欢迎使用 :)</h1>
 
 </body>
 </html>

@@ -105,6 +105,10 @@ class UtilityController extends Controller{
         return view('utility.add');
     }
 
+    public function getImportBaseFromFile()
+    {
+        return view('utility.importFromFile');
+    }
     /**
      * 水电表底数首页
      * @return \Illuminate\View\View

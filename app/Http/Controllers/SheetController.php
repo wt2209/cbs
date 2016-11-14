@@ -172,7 +172,7 @@ class SheetController extends Controller
                 $sheet->getStyle('A1:M3')->getAlignment()->setWrapText(true);
 
                 // 生成表
-                $sheet->fromArray($data,  null, 'A0', true);
+                 $sheet->fromArray($data, null, 'A1', true, false);
             })->sheet('明细',function ($sheet) use($date){
 
                 //TODO 只查询居住房间
@@ -252,10 +252,15 @@ class SheetController extends Controller
                     ['单位：服务中心', '', '', '', '', '', '', '', '', '', '', '', '日期：'.date('Y.m.d'), '', ''],
                     ['房间号', '单位', '水、电费用', '', '', '', '', '', '', '', '', '', '', '服务费合计（元）', '备注'],
                     ['', '', '住房水电费', '', '', '', '', '', '', '', '', '食堂水电费合计（元）', '水电费合计（元）', '', ''],
-                    ['', '', '水费（5.5元/吨）', '', '', '', '电费（1元/度）', '', '', '', '合计（元）', '', '', '', ''],
+                    ['', '', '水费（'. config('cbs.waterMoney') .'元/吨）', '', '', '', '电费（'.config('cbs.electricMoney').'元/度）', '', '', '', '合计（元）', '', '', '', ''],
                     ['', '', '上期数', '本期数', '实用数', '费用', '上期数', '本期数', '实用数', '费用', '', '', '', '', '']
                 ];
-                $sheet->fromArray($data, null, 'A0', true);
+
+
+                // 生成表
+
+                $sheet->fromArray($data, null, 'A1', true, false);
+
                 $currentRow = 6;
                 $result = [];
                 foreach ($rooms as $room) {

@@ -258,40 +258,44 @@ class CompanyController extends Controller
      */
     public function postStoreSelectedRooms(Request $request)
     {
-        //roomIds格式: 1_2_3
-        //roomTypes格式 : 1_1_2|2_1_2|3_2_1
-        $roomIds = htmlspecialchars(strip_tags($request->roomIds));
-        $roomAndTypes = htmlspecialchars(strip_tags($request->roomTypes));
+        //$roomDetails格式 : 1_1_2|2_1_2|3_2_1 ('room_id'_'rent_type_id'_'gender')
+        $this->newRooms = explode('|', htmlspecialchars(strip_tags($request->roomDetails)));
         $companyId = intval($request->company_id);
-
-
-        $roomIdArr = explode('_', $roomIds);
-        $roomTypeArr = explode('|', $roomAndTypes);
 
         //旧房间
         $oldRooms = Room::where('company_id', $companyId)->get();
+        foreach ($oldRooms as $oldRoom) {
+            $this->oldRooms[] = $oldRoom->room_id . '_' .$oldRoom->rent_type_id . '_' .$oldRoom->gender;
+        }
+
         // 清除所有旧房间
-        Room::where('company_id', $companyId)->update([
+        //TODO 有用  暂时注释
+       /* Room::where('company_id', $companyId)->update([
             'company_id'=>0,
             'rent_type_id'=>1,
             'gender'=>1
-        ]);
+        ]);*/
 
         //修改房间表
-        Room::whereIn('room_id', $roomIdArr)
-            ->update(['company_id' => $companyId]);
-        foreach ($roomTypeArr as $value) {
-            $currentArr = explode('_', $value);
-            Room::where('room_id', intval($currentArr[0]))
+        //TODO 有用  暂时注释
+        /*
+        foreach ($this->newRooms as $currentRoomDetail) {
+            $currentRoomDetailArr = explode('_', $value);
+            Room::where('room_id', intval($currentRoomDetailArr[0]))
                 ->update([
-                    'rent_type_id'=>intval($currentArr[1]),
-                    'gender'=>intval($currentArr[2])
+                    'company_id'=>$companyId,
+                    'rent_type_id'=>intval($currentRoomDetailArr[1]),
+                    'gender'=>intval($currentRoomDetailArr[2])
                 ]);
-        }
-        $newRooms = Room::whereIn('room_id', $roomIdArr)->get();
+        }*/
 
+
+
+
+        //TODO 没用啦
+        //$newRooms = Room::whereIn('room_id', $roomIdArr)->get();
         //记录改动日志
-        if ($request->is_edit) {// 修改
+/*        if ($request->is_edit) {// 修改
             $this->type = 2;
             if (!empty($oldRooms)) {
                 foreach ($oldRooms as $oldRoom) {
@@ -301,15 +305,14 @@ class CompanyController extends Controller
         } else { // 入住
             $this->type = 1;
             $this->oldRooms = [];
-        }
-        if (!empty($newRooms)) {
-            foreach ($newRooms as $newRoom) {
-                $this->newRooms[] = $newRoom->room_name;
-            }
-        }
-        CompanyLogController::log($this->type, $companyId, $this->oldRooms, $this->newRooms);
+        }*/
 
-        return response()->json(['message'=>'操作成功！', 'status'=>1]);
+
+
+
+        CompanyLogController::log($companyId, $this->oldRooms, $this->newRooms);
+
+        //return response()->json(['message'=>'操作成功！', 'status'=>1]);
     }
 
     /**

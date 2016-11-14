@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Model\RentType;
 use Illuminate\Http\Request;
-
+use DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -49,13 +49,27 @@ class ConfigController extends Controller
         if (file_put_contents(config_path('cbs.php'), $config)){
             return response()->json(['message'=>'操作成功！', 'status'=>1]);
         } else {
-            return response()->json(['message'=>'操作成功！', 'status'=>0]);
+            return response()->json(['message'=>'操作失败！', 'status'=>0]);
         }
     }
 
-    public function getRoomType()
+    public function getRentType()
     {
         $rentTypes = RentType::all();
         return view('config.rentType', ['rentTypes'=>$rentTypes]);
+    }
+
+    public function postStoreRentType(Request $request)
+    {
+        foreach ($request->rent_type_id as $k => $v) {
+            if (!empty($request->person_number[$k]) && !empty($request->rent_money[$k])) {
+                $data = [
+                    'person_number'=>$request->person_number[$k],
+                    'rent_money'=>$request->rent_money[$k]
+                ];
+                DB::table('rent_type')->where('rent_type_id', '=', $v)->update($data);
+            }
+        }
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
     }
 }

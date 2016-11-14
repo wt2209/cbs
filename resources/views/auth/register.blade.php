@@ -27,10 +27,12 @@
                             <label for="email" class="col-md-4 control-label">所属角色</label>
 
                             <div class="col-md-6">
-                                <select name="roles" class="form-control">
-                                    <option value="1" selected>111</option>
-                                    <option value="2">222</option>
-                                    <option value="3">333</option>
+                                <select name="role_id" class="form-control">
+                                    @foreach ($roles as $role)
+                                        @if ($role->id != 1)
+                                            <option value="{{ $role->id }}" >{{ $role->role_name }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

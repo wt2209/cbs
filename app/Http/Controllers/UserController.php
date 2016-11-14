@@ -39,12 +39,31 @@ class UserController extends Controller
      */
     public function getCreateRole()
     {
+        return view('user.createRole');
+    }
 
+    public function postCreateRole(Request $request)
+    {
+        if (empty($request->role_name)) {
+            return back()->withErrors(['createRoleFailed'=>'角色名不能为空！']);
+        }
+        if (Role::where('role_name', $request->role_name)->count() > 0) {
+            return back()->withErrors(['createRoleFailed'=>'角色名重复！']);
+        }
+        $data = [
+            'role_name'=>$request->role_name,
+            'role_description'=>$request->role_description,
+            'created_at'=>date('Y-m-d H:i:s'),
+            'updated_at'=>date('Y-m-d H:i:s')
+        ];
+        $roleId = Role::insertGetId($data);
+        return redirect()->action('UserController@getEditRolePermission', [$roleId]);
     }
 
     /**
-     * 修改角色的权限
+     * 修改权限
      * @param $roleId
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function getEditRolePermission($roleId)
     {
@@ -60,11 +79,29 @@ class UserController extends Controller
         $allPermissions = DB::table('permissions')->get();
 
         return view('user.editRolePermission', [
+            'roleId'=>$roleId,
             'roleName'=>$roleName,
             'allPermissions'=>$allPermissions,
             'rolePermissionIds'=>$rolePermissionIds
         ]);
     }
+
+    public function postEditRolePermission(Request $request)
+    {
+        $roleId = (int)$request->role_id;
+        //删除就有权限
+        DB::table('permission_role')->where('role_id', '=', $roleId)->delete();
+        $data = [];
+        foreach ($request->permission_id as $permissionId) {
+            $data[] = [
+                'role_id'=>$roleId,
+                'permission_id'=>intval($permissionId)
+            ];
+        }
+        DB::table('permission_role')->insert($data);
+        return response()->json(['message'=>'操作成功！','status'=>1]);
+    }
+
 
     public function getRemoveUser(Request $request)
     {

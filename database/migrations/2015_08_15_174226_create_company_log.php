@@ -14,14 +14,18 @@ class CreateCompanyLog extends Migration
     {
         Schema::create('company_log', function (Blueprint $table) {
             $table->increments('cl_id');
-            //TODO 还没有建立用户id，使用的是smallint
             $table->smallInteger('user_id',false, true);
-            $table->string('company_name', 60);
-            //操作类型，1|入住 2|调整房间 3|退房 4|删除
-            $table->tinyInteger('type', false, true);
-            $table->text('old_rooms');
-            $table->text('new_rooms');
-             $table->timestamps();
+            //房间变动类型： 1：增加房间， 2：减少房间， 3：人数变动， 4：性别变动， 5：性别和人数变动
+            $table->tinyInteger('room_change_type');
+            $table->integer('room_id');
+            $table->integer('company_id');
+            $table->tinyInteger('pre_rent_type');
+            $table->tinyInteger('new_rent_type');
+            $table->tinyInteger('pre_gender');
+            $table->tinyInteger('new_gender');
+            $table->integer('electric_base');
+            $table->integer('water_base');
+            $table->timestamps();
         });
     }
 

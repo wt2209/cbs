@@ -42,39 +42,62 @@ class CompanyLogController extends Controller
      * @param null $newRooms 新房间
      * @return bool
      */
-    static public function log($type, $companyId, $oldRooms=[], $newRooms=[])
+    static public function log($companyId, $oldRooms=[], $newRooms=[])
     {
-        $type = intval($type);
+        $newRoomsFlip = array_flip($newRooms);
+        $oldRoomsFlip = array_flip($oldRooms);
 
-        if ($type >=1 && $type <= 4) {
-            //根据公司id查找公司名
-            $company = Company::select('company_name')
-                ->find((int)$companyId);
-            //错误处理
-            if (!$company) {
-                return false;
+        foreach ($oldRooms as $oldRoom) {
+            if (isset($newRoomsFlip[$oldRoom])) {
+                unset($newRoomsFlip[$oldRoom]);
             }
-
-            //新建日志模型
-            //TODO user_id
-
-            $companyLog = new CompanyLog();
-            $companyLog->type = $type;
-            $companyLog->company_name = $company->company_name;
-            $companyLog->old_rooms = empty($oldRooms) ? '' : implode('|', $oldRooms);
-            $companyLog->new_rooms = empty($newRooms) ? '' : implode('|', $newRooms);
-            $companyLog->save();
-            /*
-             * 使用下面这种方式时间戳不会更新，应该是适用于精确的更新
-             * CompanyLog::insert([
-                'type'=>$type,
-                'company_name'=>$company->company_name,
-                'old_rooms'=>empty($oldRooms) ? '' : implode('|', $oldRooms),
-                'new_rooms'=>empty($newRooms) ? '' : implode('|', $newRooms)
-            ]);*/
-        } else {
-            return false;
         }
+        foreach ($newRooms as $newRoom) {
+            if (isset($oldRoomsFlip[$newRoom])) {
+                unset($oldRoomsFlip[$newRoom]);
+            }
+        }
+
+
+        if (empty($newRoomsFlip)) { //只减少房间
+            foreach ($oldRoomsFlip as $key) {
+                $tmpArr = explode('_', $key);
+                CompanyLog::insert([
+                    'room_change_type'=>2,
+                    'company_id'=>$companyId,
+                    'room_id'=>$tmpArr[0],
+                    'pre_rent_type'=>$tmpArr[1],
+                    'pre_gender'=>$tmpArr[2]
+                ]);
+            }
+        } elseif (empty($oldRoomsFlip)) { //只增加房间
+            foreach ($newRoomsFlip as $key) {
+                $tmpArr = explode('_', $key);
+                CompanyLog::insert([
+                    'room_change_type'=>1,
+                    'company_id'=>$companyId,
+                    'room_id'=>$tmpArr[0],
+                    'new_rent_type'=>$tmpArr[1],
+                    'new_gender'=>$tmpArr[2]
+                ]);
+            }
+        } else { //有可能人数变动，或性别变动，或两者均变动   也有可能只是餐厅和服务用房变动
+
+        }
+/*
+        echo '<pre>newRoomsFlip:<br>';
+        print_r($newRoomsFlip);
+        echo '<br>oldRoomsFlip:<br>';
+        print_r($oldRoomsFlip);
+        dd('end');*/
+
+
+
+
+
+
+        $change = array_diff(array_unique(array_merge($oldRooms, $newRooms)), $newRooms);
+        dd($change);
     }
 
     /**

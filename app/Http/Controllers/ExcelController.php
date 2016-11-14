@@ -17,16 +17,6 @@ class ExcelController extends Controller
     {
         $this->middleware('my.auth');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getIndex()
-    {
-
-    }
-
 
     /**
      * 导出文件
