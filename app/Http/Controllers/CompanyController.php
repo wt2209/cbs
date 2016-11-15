@@ -270,50 +270,32 @@ class CompanyController extends Controller
 
         // 清除所有旧房间
         //TODO 有用  暂时注释
-       /* Room::where('company_id', $companyId)->update([
+       Room::where('company_id', $companyId)->update([
             'company_id'=>0,
             'rent_type_id'=>1,
             'gender'=>1
-        ]);*/
+       ]);
 
         //修改房间表
         //TODO 有用  暂时注释
-        /*
+
         foreach ($this->newRooms as $currentRoomDetail) {
-            $currentRoomDetailArr = explode('_', $value);
+            $currentRoomDetailArr = explode('_', $currentRoomDetail);
             Room::where('room_id', intval($currentRoomDetailArr[0]))
                 ->update([
                     'company_id'=>$companyId,
                     'rent_type_id'=>intval($currentRoomDetailArr[1]),
                     'gender'=>intval($currentRoomDetailArr[2])
                 ]);
-        }*/
+        }
 
+        CompanyLogController::log($companyId, $request->user()->id, $this->oldRooms, $this->newRooms);
 
-
-
-        //TODO 没用啦
-        //$newRooms = Room::whereIn('room_id', $roomIdArr)->get();
-        //记录改动日志
-/*        if ($request->is_edit) {// 修改
-            $this->type = 2;
-            if (!empty($oldRooms)) {
-                foreach ($oldRooms as $oldRoom) {
-                    $this->oldRooms[] = $oldRoom->room_name;
-                }
-            }
-        } else { // 入住
-            $this->type = 1;
-            $this->oldRooms = [];
-        }*/
-
-
-
-
-        CompanyLogController::log($companyId, $this->oldRooms, $this->newRooms);
-
-        //return response()->json(['message'=>'操作成功！', 'status'=>1]);
+        //下一步：存储变动房间的水电底数
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
     }
+
+
 
     /**
      * 指定公司明细

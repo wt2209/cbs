@@ -183,12 +183,16 @@
                 maskShow();
                 $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(e){
                     maskHide();
-                    popdown({'message':e.message, 'status': e.status, 'callback':function(){
-                        if (e.status) {
+                    if(e.status) {
+                        //下一步：存储变动房间的水电底数
+                        location.href = '{{ url("company-log/utility-of-changed-rooms") }}';
+                    } else {
+                        popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             /*返回并刷新原页面*/
                             location.href = '{{ url("company/index") }}';
-                        }
-                    }});
+                        }});
+                    }
+
                 }, 'json');
             })
         })

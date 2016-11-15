@@ -33,35 +33,65 @@
         <table class="table table-bordered table-hover table-condensed">
             <thead>
             <tr class="active">
-                <th width="80">承包商公司</th>
-                <th width="50">操作人</th>
-                <th width="60">操作类型</th>
-                <th width="90">操作时间</th>
-                <th>老房间</th>
-                <th>新房间</th>
-                <th width="50">操作</th>
+                <th>房间号</th>
+                <th>房间类型</th>
+                <th>承包商公司</th>
+                <th>变动人</th>
+                <th>变动类型</th>
+                <th>变动时电表底数</th>
+                <th>变动时水表底数</th>
+                <th>变动时间</th>
+                <th>操作</th>
             </tr>
             </thead>
             @foreach ($companyLogs as $companyLog)
                 <tr>
-                    <td>{{$companyLog->company_name}}</td>
-                    <td>{{$companyLog->user_id}}</td>
+                    <td>{{ $companyLog->room->room_name}}</td>
                     <td>
-                        @if($companyLog->type == 1)
-                            入住
-                        @elseif($companyLog->type == 2)
-                            更改
-                        @elseif($companyLog->type == 3)
-                            退房
-                        @elseif($companyLog->type == 4)
-                            删除
+                        @if($companyLog->room->room_type == 1)
+                            居住
+                        @elseif($companyLog->room->room_type == 2)
+                            餐厅
+                        @elseif($companyLog->room->room_type == 3)
+                            服务
+                        @endif
+                    </td>
+                    <td>{{ $companyLog->company->company_name}}</td>
+                    <td>{{ $companyLog->user->user_name}}</td>
+                    <td>
+                        @if($companyLog->room->room_type == 1)
+                            @if($companyLog->room_change_type == 1)
+                                增加房间
+                            @elseif($companyLog->room_change_type == 2)
+                                减少房间
+                            @elseif($companyLog->room_change_type == 3)
+                                人数变动
+                            @elseif($companyLog->room_change_type == 4)
+                                性别变动
+                            @elseif($companyLog->room_change_type == 5)
+                                性别和人数变动
+                            @endif
+                        @else
+                            @if($companyLog->room_change_type == 1)
+                                增加房间
+                            @elseif($companyLog->room_change_type == 2)
+                                减少房间
+                            @endif
+                        @endif
+                    </td>
+                    <td>
+                        @if ($companyLog->room_change_type != 4)
+                            {{ $companyLog->electric_base == 0 ? '待填':  $companyLog->electric_base }}
+                        @endif
+                    </td>
+                    <td>
+                        @if ($companyLog->room_change_type != 4)
+                            {{ $companyLog->water_base == 0 ? '待填':  $companyLog->water_base }}
                         @endif
                     </td>
                     <td>{{substr($companyLog->created_at, 0, 10)}}</td>
-                    <td style="word-break: break-all">{{$companyLog->old_rooms}}</td>
-                    <td  style="word-break: break-all">{{$companyLog->new_rooms}}</td>
                     <td>
-                        {{--<button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>--}}
+                        <button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
                     </td>
                 </tr>
             @endforeach

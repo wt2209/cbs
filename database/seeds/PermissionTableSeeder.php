@@ -52,8 +52,8 @@ class PermissionTableSeeder extends Seeder
         ];
 
         foreach ($arr as $a) {
-            $a['created_at'] =  date('Y-m-d H:i:s');
-            $a['updated_at'] =  date('Y-m-d H:i:s');
+            $a['created_at'] = date('Y-m-d H:i:s');
+            $a['updated_at'] = date('Y-m-d H:i:s');
             Permission::insert($a);
         }
     }

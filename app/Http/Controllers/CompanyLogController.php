@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\Room;
 use DB;
 use App\Model\CompanyLog;
 use App\Model\Company;
@@ -23,7 +24,7 @@ class CompanyLogController extends Controller
      */
     public function getIndex()
     {
-        $companyLogs = DB::table('company_log')->paginate(config('cbs.pageNumber'));
+        $companyLogs = CompanyLog::paginate(config('cbs.pageNumber'));
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }
     public function getSearch(Request $request)
@@ -35,70 +36,96 @@ class CompanyLogController extends Controller
     }
 
     /**
-     * * 记录房间操作的历史日志
-     * @param $type 操作类型，1|入住 2|调整房间 3|退房 4|删除
-     * @param $companyId 房间id
-     * @param $oldRooms 老房间
-     * @param null $newRooms 新房间
-     * @return bool
+     * 生成房间变动日志
+     * @param $companyId
+     * @param $userId
+     * @param array $oldRooms
+     * @param array $newRooms
      */
-    static public function log($companyId, $oldRooms=[], $newRooms=[])
+    static public function log($companyId, $userId, $oldRooms=[], $newRooms=[])
     {
-        $newRoomsFlip = array_flip($newRooms);
-        $oldRoomsFlip = array_flip($oldRooms);
-
-        foreach ($oldRooms as $oldRoom) {
-            if (isset($newRoomsFlip[$oldRoom])) {
-                unset($newRoomsFlip[$oldRoom]);
-            }
+        $results = [];
+        foreach($oldRooms as $oldRoom) {
+            $tmpArr = explode('_', $oldRoom);
+            $results[$tmpArr[0]]['pre_rent_type'] = $tmpArr[1];
+            $results[$tmpArr[0]]['pre_gender'] = $tmpArr[2];
         }
-        foreach ($newRooms as $newRoom) {
-            if (isset($oldRoomsFlip[$newRoom])) {
-                unset($oldRoomsFlip[$newRoom]);
-            }
+        foreach($newRooms as $newRoom) {
+            $tmpArr = explode('_', $newRoom);
+            $results[$tmpArr[0]]['new_rent_type'] = $tmpArr[1];
+            $results[$tmpArr[0]]['new_gender'] = $tmpArr[2];
         }
 
+        foreach ($results as $roomId => $result) {
+            $companyLog = new CompanyLog();
+            $companyLog->company_id = $companyId;
+            $companyLog->user_id = $userId;
+            $companyLog->room_id = $roomId;
+            $companyLog->pre_rent_type = isset($result['pre_rent_type']) ? $result['pre_rent_type'] : '';
+            $companyLog->pre_gender = isset($result['pre_gender']) ? $result['pre_gender'] : '';
+            $companyLog->new_rent_type = isset($result['new_rent_type']) ? $result['new_rent_type'] : '';
+            $companyLog->new_gender = isset($result['new_gender']) ? $result['new_gender'] : '';
 
-        if (empty($newRoomsFlip)) { //只减少房间
-            foreach ($oldRoomsFlip as $key) {
-                $tmpArr = explode('_', $key);
-                CompanyLog::insert([
-                    'room_change_type'=>2,
-                    'company_id'=>$companyId,
-                    'room_id'=>$tmpArr[0],
-                    'pre_rent_type'=>$tmpArr[1],
-                    'pre_gender'=>$tmpArr[2]
-                ]);
-            }
-        } elseif (empty($oldRoomsFlip)) { //只增加房间
-            foreach ($newRoomsFlip as $key) {
-                $tmpArr = explode('_', $key);
-                CompanyLog::insert([
-                    'room_change_type'=>1,
-                    'company_id'=>$companyId,
-                    'room_id'=>$tmpArr[0],
-                    'new_rent_type'=>$tmpArr[1],
-                    'new_gender'=>$tmpArr[2]
-                ]);
-            }
-        } else { //有可能人数变动，或性别变动，或两者均变动   也有可能只是餐厅和服务用房变动
 
+            //跳过没有变动的项目
+            if (isset($result['new_rent_type']) && isset($result['pre_rent_type'])) {
+                if ($result['new_rent_type'] == $result['pre_rent_type']
+                    && $result['new_gender'] == $result['pre_gender']){
+                    continue;
+                }
+            }
+
+            if (!isset($result['new_rent_type'])
+                && isset($result['pre_rent_type'])) { //只减少房间
+                $companyLog->room_change_type = 2;
+            } elseif (!isset($result['pre_rent_type'])
+                && isset($result['new_rent_type'])) {//只增加房间
+                $companyLog->room_change_type = 1;
+            } else {
+                //跳过餐厅和服务用房
+                if (Room::where('room_id', $roomId)->value('room_type') != 1) {
+                    continue;
+                }
+                if ($result['new_rent_type'] != $result['pre_rent_type']
+                    && $result['new_gender'] != $result['pre_gender']) { //性别和人数变动
+                    $companyLog->room_change_type = 5;
+                } elseif ($result['new_gender'] == $result['pre_gender']) { //只是人数变动
+                    $companyLog->room_change_type = 3;
+                } else { // 只是性别变动
+                    $companyLog->room_change_type = 4;
+                }
+            }
+
+
+
+            $companyLog->save();
         }
-/*
-        echo '<pre>newRoomsFlip:<br>';
-        print_r($newRoomsFlip);
-        echo '<br>oldRoomsFlip:<br>';
-        print_r($oldRoomsFlip);
-        dd('end');*/
-
-
-
-
-
-
-        $change = array_diff(array_unique(array_merge($oldRooms, $newRooms)), $newRooms);
-        dd($change);
     }
+
+
+    public function getUtilityOfChangedRooms()
+    {
+        $companyLogs = CompanyLog::where('water_base', 0)
+            ->where('electric_base', 0)
+            ->whereIn('room_change_type', [1,2,3,5])
+            ->get();
+        return view('companyLog.utilityOfChangedRooms', ['companyLogs' => $companyLogs]);
+    }
+
+    public function postUtilityOfChangedRooms(Request $request)
+    {
+        foreach ($request->all() as $key => $value) {
+            if (is_array($value) && count($value) == 2) {
+                //TODO 有可能会找不到，从而出错
+                $companyLog = CompanyLog::find(intval($key));
+                $companyLog->water_base = intval($value['water_base']);
+                $companyLog->electric_base = intval($value['electric_base']);
+                $companyLog->save();
+            }
+        }
+        return response()->json(['message'=>'操作成功！','status'=>1]);
+    }
+
 
     /**
      * 删除操作记录
