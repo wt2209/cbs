@@ -222,11 +222,16 @@ class ExceptionHandler
     public function getContent(FlattenException $exception)
     {
         switch ($exception->getStatusCode()) {
-            case 404:
+            /*case 404:
                 $title = 'Sorry, the page you are looking for could not be found.';
                 break;
             default:
-                $title = 'Whoops, looks like something went wrong.';
+                $title = 'Whoops, looks like something went wrong.';*/
+            case 404:
+                $title = '页面不存在！';
+                break;
+            default:
+                $title = '出错了！';
         }
 
         $content = '';
@@ -267,7 +272,8 @@ EOF
                 if ($this->debug) {
                     $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $this->escapeHtml($e->getMessage()));
                 } else {
-                    $title = 'Whoops, looks like something went wrong.';
+//                    $title = 'Whoops, looks like something went wrong.';
+                    $title = '出错了！';
                 }
             }
         }

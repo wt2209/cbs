@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleTableSeeder::class);
         $this->call(RoleUserTableSeeder::class);
         $this->call(PermissionRoleTableSeeder::class);
+        $this->call(RoomTableSeeder::class);
         if (config('app.debug')) {
             $this->call(CompanyTableSeeder::class);
-            $this->call(RoomTableSeeder::class);
             $this->call(UtilityBaseTableSeeder::class);
             $this->call(UtilityTableSeeder::class);
         }
