@@ -19,9 +19,9 @@ class IndexController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getIndex()
+    public function getIndex(Request $request)
     {
-        return view('index');
+        return view('index', ['user'=>$request->user()]);
     }
 
     public function getWelcome()

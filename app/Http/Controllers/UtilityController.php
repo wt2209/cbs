@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Excel;
 use App\Model\Company;
 use App\Model\Utility;
 use App\Model\Room;
@@ -109,6 +110,61 @@ class UtilityController extends Controller{
     {
         return view('utility.importFromFile');
     }
+
+    public  function postImportBaseFile(Request $request)
+    {
+        $result = $request->all();
+        $option = [
+            'year'=>intval($result['year']),
+            'month'=>intval($result['month']),
+            'recorder'=>addslashes(strip_tags($result['recorder'])),
+            'recordTime'=> strtotime(str_replace('.', '-', $result['record_time'])) ?
+                str_replace('.', '-', $result['record_time']) : date('Y-m-d H:i:s')
+        ];
+        if (!($option['year'] && $option['month'])) {
+            return back()->withErrors(['errorMessage'=>'错误：必须填写年份和月份！']);
+        }
+
+        $pathInfo = pathinfo($_FILES['import_file']['name']);
+        //格式不对
+        if (!isset($pathInfo['extension']) ||
+            !in_array($pathInfo['extension'], ['xls', 'xlsx']) ||
+            !is_uploaded_file($_FILES['import_file']['tmp_name'])) {
+            return back()->withErrors(['errorMessage'=>'错误：请上传一个EXCEL文件！']);
+        }
+
+        $filePath = storage_path('app/import');
+        $fileName = date('YmdHis').'.'.$pathInfo['extension'];
+        if (move_uploaded_file($_FILES['import_file']['tmp_name'],$filePath.'/'.$fileName)) {
+            $result = Excel::load($filePath.'/'.$fileName, function($reader) {})->get();
+            $excel = $result->toArray();
+            $sheet = $excel[0];
+            $roomToId = $this->setRoomToId();
+            $insert = [];
+            foreach ($sheet as $row) {
+                if (isset($roomToId[$row[0]]) && !empty($roomToId[$row[0]])) {
+                    $insert[] = [
+                        'room_id'       =>intval($roomToId[$row[0]]),
+                        'electric_base'=>intval($row[1]),
+                        'water_base'    =>intval($row[2]),
+                        'u_base_remark' =>addslashes(strip_tags($row[3])),
+                        'recorder'      =>$option['recorder'],
+                        'record_time'   =>$option['recordTime'],
+                        'year'          =>$option['year'],
+                        'month'         =>$option['month']
+                    ];
+                }
+
+            }
+            if ($this->store($insert)) {
+                return back()->withErrors(['successMessage'=>'数据添加成功！']);
+            }
+            return back()->withErrors(['errorMessage'=>'错误：数据添加失败，请重试...']);
+        }
+
+        return back()->withErrors(['errorMessage'=>'错误：非法请求！']);
+
+    }
     /**
      * 水电表底数首页
      * @return \Illuminate\View\View
@@ -167,7 +223,7 @@ class UtilityController extends Controller{
      * @param  Request  $request
      * @return Response
      */
-    public function postStore(Request $request)
+    public function postInputBase(Request $request)
     {
         $result = $request->all();
         $year = intval($result['year']);
@@ -200,13 +256,29 @@ class UtilityController extends Controller{
             $i++;
         }
 
-        DB::beginTransaction();
-        if (DB::table('utility_base')->insert($insert)) {
-            DB::commit();
+        if ($this->store($insert)) {
             return response()->json(['message'=>'操作成功！', 'status'=>1]);
         }
-        DB::rollBack();
         return response()->json(['message'=>'错误：数据添加失败，请重试...', 'status'=>0]);
+
+    }
+
+    /**
+     * 存储数据
+     * @param $data
+     * @return bool
+     */
+    private function store($data)
+    {
+        DB::beginTransaction();
+
+        //TODO 查找某个房间是否已经录入过本月的数据
+        if (DB::table('utility_base')->insert($data)) {
+            DB::commit();
+            return true;
+        }
+        DB::rollBack();
+        return false;
     }
 
     /**

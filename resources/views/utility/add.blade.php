@@ -96,7 +96,7 @@
                 if (s) {
                     s = false;
                     maskShow();
-                    $.post('{{ url('utility/store') }}', oForm.serialize(), function(e){
+                    $.post('{{ url('utility/input-base') }}', oForm.serialize(), function(e){
                         maskHide();
                         popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             if (e.status) {

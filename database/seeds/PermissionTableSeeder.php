@@ -36,12 +36,19 @@ class PermissionTableSeeder extends Seeder
             ['permission_name'=>'App\Http\Controllers\UtilityController@getIndex', 'display_name'=>'水电费明细'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getBase', 'display_name'=>'水电表数'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getAdd', 'display_name'=>'录入底数'],
-            ['permission_name'=>'', 'display_name'=>'导入底数'],
+            ['permission_name'=>'App\Http\Controllers\UtilityController@getImportBaseFromFile', 'display_name'=>'导入底数'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getEdit', 'display_name'=>'修改水电费'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getEditBase', 'display_name'=>'修改底数'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getChargeSingleRoom', 'display_name'=>'房间缴费'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getDelete', 'display_name'=>'删除水电费'],
             ['permission_name'=>'App\Http\Controllers\UtilityController@getBaseDelete', 'display_name'=>'删除底数'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getUsers', 'display_name'=>'用户明细'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getRoles', 'display_name'=>'角色明细'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getChangePassword', 'display_name'=>'修改密码'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getCreateRole', 'display_name'=>'创建角色'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getEditRolePermission', 'display_name'=>'修改权限'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getRemoveUser', 'display_name'=>'删除用户'],
+            ['permission_name'=>'App\Http\Controllers\UserController@getRemoveRole', 'display_name'=>'删除角色'],
         ];
 
         foreach ($arr as $a) {

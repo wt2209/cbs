@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\User;
 use App\Model\Role;
@@ -11,6 +12,10 @@ use DB;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('my.auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -33,7 +38,27 @@ class UserController extends Controller
         return view('user.roles', ['roles'=>$roles]);
     }
 
+    public function getChangePassword(Request $request)
+    {
+        $user = $request->user();
+        return view('user.changePassword', ['user'=>$user]);
+    }
 
+    public function postChangePassword(Request $request)
+    {
+        if ($request->new_password !== $request->confirm_password) {
+            return response()->json(['message'=>'错误：两次密码不一致！', 'status'=>0]);
+        }
+        $user = User::where('id', $request->user_id)->first();
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['message'=>'错误：密码错误！', 'status'=>0]);
+        }
+
+        User::where('id', $request->user_id)->update(
+            ['password' => Hash::make($request->new_password)]
+        );
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
+    }
     /**
      * 添加角色
      */

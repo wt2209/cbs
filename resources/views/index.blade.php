@@ -30,7 +30,7 @@
 {{--头部区域结束--}}
 {{--左侧区域--}}
 <div id="left_content">
-    <div id="user_info">欢迎！{{--您，<strong></strong>--}}<br />[{{--<a href="">系统管理员</a>，--}}<a href="{{ url('/logout') }}">退出</a>]</div>
+    <div id="user_info">欢迎您，<strong>{{ $user->user_name }}</strong><br />[<a href="{{ url('/logout') }}">退出</a>]</div>
     <div id="main_nav">
         <div class="list_item active">
             <div id="left_main_nav">
@@ -169,6 +169,9 @@
                 <div class="list_title">
                     <span>用户与权限</span>
                     <ul class="list_detail">
+                        <li>
+                            <a href="{{ url('user/change-password') }}" target="iframe">修改密码</a>
+                        </li>
                         <li>
                             <a href="{{ url('user/users') }}" target="iframe">用户列表</a>
                         </li>

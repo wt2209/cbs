@@ -39,14 +39,24 @@
 @endsection
 @section('content')
     <div class="table-responsive">
-        <form id="form" method="post" enctype="multipart/form-data" action="{{ url('utility/import-base-file') }}">
+        <form id="form"  method="post" enctype="multipart/form-data" action="{{ url('utility/import-base-file') }}">
             <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
             <input type="hidden" name="year">
             <input type="hidden" name="month">
             <input type="hidden" name="recorder">
             <input type="hidden" name="record_time">
             <input type="file" style="margin:20px 0 20px 0;" name="import_file" >
-            <button type="submit" class="btn btn-success">提交</button>
+            @if ($errors->has('errorMessage'))
+                <span class="help-block">
+                    <strong style="color: red">{{ $errors->first('errorMessage') }}</strong>
+                </span>
+            @endif
+            @if ($errors->has('successMessage'))
+                <span class="help-block">
+                    <strong style="color: #5cb85c">{{ $errors->first('successMessage') }}</strong>
+                </span>
+            @endif
+            <button type="submit" id="submit" class="btn btn-success">提交</button>
         </form>
     </div>
 
@@ -56,37 +66,15 @@
     <script src="{{ asset('/js/functions.js') }}"></script>
     <script src="{{ asset('/js/utility/add.js') }}"></script>
     <script src="{{ asset('/js/jquery.validate.min.js') }}"></script>
+<script>
+    $('#submit').click(function(){
+        var oForm = $('#form');
+        oForm.children('input[name=year]').val($('#year').val());
+        oForm.children('input[name=month]').val($('#month').val());
+        oForm.children('input[name=recorder]').val($('#recorder').val());
+        oForm.children('input[name=record_time]').val($('#record_time').val());
+        return true;
+    })
 
-    <script>
-        /*表单验证*/
-        var validate = $("#form").validate({
-            debug: true, //调试模式取消submit的默认提交功能
-            errorClass: "validate_error", //默认为错误的样式类为：error
-            focusInvalid: false, //当为false时，验证无效时，没有焦点响应
-            onkeyup: false,
-            submitHandler: function(){   //表单提交句柄,为一回调函数，带一个参数：form
-                var oForm = $('#form');
-                oForm.children('input[name=year]').val($('#year').val());
-                oForm.children('input[name=month]').val($('#month').val());
-                oForm.children('input[name=recorder]').val($('#recorder').val());
-                oForm.children('input[name=record_time]').val($('#record_time').val());
-                var s = true;
-                if (s) {
-                    s = false;
-                    maskShow();
-                    $.post('{{ url('utility/store') }}', oForm.serialize(), function(e){
-                        maskHide();
-                        popdown({'message':e.message, 'status': e.status, 'callback':function(){
-                            if (e.status) {
-                                /*返回并刷新原页面*/
-                                location.href = '{{ url("utility/add") }}';
-                            }
-                        }});
-                        s = true;
-                    }, 'json');
-                }
-                return false;
-            }
-        });
-    </script>
+</script>
 @endsection
