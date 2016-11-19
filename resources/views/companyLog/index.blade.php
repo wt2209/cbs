@@ -17,7 +17,9 @@
                 <form class="navbar-form navbar-left" role="search" method="get" action="{{ url('company-log/search') }}">
                     <div class="form-group">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-                        <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name"  placeholder="公司名称">&nbsp;&nbsp;&nbsp;
+                        <input type="text" class="form-control" value="{{ $_GET['company_name'] or '' }}" name="company_name"  placeholder="公司名称">
+                        或者
+                        <input type="text" class="form-control" value="{{ $_GET['room_name'] or '' }}" name="room_name"  placeholder="房间号">&nbsp;&nbsp;&nbsp;
                     </div>
                     <button type="submit" class="btn btn-primary">搜索</button>
                 </form>
@@ -60,7 +62,9 @@
                     <td>{{ $companyLog->user->user_name}}</td>
                     <td>
                         @if($companyLog->room->room_type == 1)
-                            @if($companyLog->room_change_type == 1)
+                            @if($companyLog->room_change_type == 0)
+                                新公司入住
+                            @elseif($companyLog->room_change_type == 1)
                                 增加房间
                             @elseif($companyLog->room_change_type == 2)
                                 减少房间
@@ -72,7 +76,9 @@
                                 性别和人数变动
                             @endif
                         @else
-                            @if($companyLog->room_change_type == 1)
+                            @if($companyLog->room_change_type == 0)
+                                新公司入住
+                            @elseif($companyLog->room_change_type == 1)
                                 增加房间
                             @elseif($companyLog->room_change_type == 2)
                                 减少房间
@@ -80,23 +86,27 @@
                         @endif
                     </td>
                     <td>
-                        @if ($companyLog->room_change_type != 4)
+                        @unless($companyLog->room_change_type == 4 || $companyLog->room_change_type == 0)
                             {{ $companyLog->electric_base == 0 ? '待填':  $companyLog->electric_base }}
-                        @endif
+                        @endunless
                     </td>
                     <td>
-                        @if ($companyLog->room_change_type != 4)
+                        @unless($companyLog->room_change_type == 4 || $companyLog->room_change_type == 0)
                             {{ $companyLog->water_base == 0 ? '待填':  $companyLog->water_base }}
-                        @endif
+                        @endunless
                     </td>
                     <td>{{substr($companyLog->created_at, 0, 10)}}</td>
                     <td>
                         <button delete_id="{{ $companyLog->cl_id }}" class="btn btn-danger btn-xs delete-button">删除</button>
+                        <a href="{{ url('company-log/edit-base/'.$companyLog->cl_id) }}" class="btn btn-success btn-xs">修改底数</a>
                     </td>
                 </tr>
             @endforeach
         </table>
-        {!! $companyLogs->appends(['company_name' => isset($_GET['company_name']) ? $_GET['company_name'] : ''])->render() !!}
+        {!! $companyLogs->appends([
+            'company_name' => isset($_GET['company_name']) ? $_GET['company_name'] : '',
+            'room_name' => isset($_GET['room_name']) ? $_GET['room_name'] : '',
+            ])->render() !!}
     </div>
 @endsection
 @section('modal')

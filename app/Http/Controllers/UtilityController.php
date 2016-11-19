@@ -477,23 +477,45 @@ class UtilityController extends Controller{
         $items = $this->setUtilityItem($year, $month);
 
         foreach ($items as $roomId => $item) {
-            //必须两个月的水电的、底数都存在才能计算水电费
-            if (!isset($item['current']) || !isset($item['pre'])) {
-                continue;
+            if (isset($item['current']) && isset($item['pre'])) {
+                if ($item['current']['company_id'] == 0 && $item['pre']['company_id'] == 0) {
+                    continue;
+                } elseif ($item['current']['company_id'] == 0) {
+                    $companyId = $item['pre']['company_id'];
+                } else {
+                    $companyId = $item['current']['company_id'];
+                }
+
+                $insert[$roomId] = [
+                    'room_id'=>$roomId,
+                    'company_id'=>$companyId,
+                    'water_money'
+                    =>round(config('cbs.waterMoney')*($this->waterMinus($item['current']['water_base'], $item['pre']['water_base'])), config('cbs.precision')),
+                    'electric_money'
+                    =>round(config('cbs.electricMoney')*($this->electricMinus($item['current']['electric_base'], $item['pre']['electric_base'])), config('cbs.precision')),
+                    'year'=>$year,
+                    'month'=>$month
+                ];
             }
-            $allRoomIds[] = $roomId;
-            $insert[$roomId] = [
-                'room_id'=>$roomId,
-                'company_id'=>$item['current']['company_id'],
-                'water_money'
-                =>round(config('cbs.waterMoney')*($item['current']['water_base'] - $item['pre']['water_base']), config('cbs.precision')),
-                'electric_money'
-                =>round(config('cbs.electricMoney')*($item['current']['electric_base'] - $item['pre']['electric_base']), config('cbs.precision')),
-                'year'=>$year,
-                'month'=>$month
-            ];
         }
         return $insert;
+    }
+
+    //处理 99999 -> 10 的情况
+    private function waterMinus($currentWaterBase, $preWaterBase)
+    {
+        if ($currentWaterBase < $preWaterBase) {
+            return $currentWaterBase + intval(config('cbs.waterMax'))+1 - $preWaterBase ;
+        }
+        return $currentWaterBase - $preWaterBase ;
+    }
+    //处理 99999 -> 10 的情况
+    private function electricMinus($currentElectricBase, $preElectricBase)
+    {
+        if ($currentElectricBase < $preElectricBase) {
+            return $currentElectricBase + intval(config('cbs.waterMax'))+1 - $preElectricBase ;
+        }
+        return $currentElectricBase - $preElectricBase ;
     }
 
     /**
@@ -511,11 +533,9 @@ class UtilityController extends Controller{
             $preYear = $year;
             $preMonth = $month - 1;
         }
-        //相关的两个月的水电底数
-        //不计算空房间的水电费
+        //相关的两个月的水电底数，查找所有房间
         $utilityBases = DB::table('utility_base')
-            ->leftJoin('room', 'utility_base.room_id', '=', 'room.room_id')
-            ->where('room.company_id', '!=', 0)
+            ->join('room', 'room.room_id', '=', 'utility_base.room_id')
             ->whereIn('year', [$year, $preYear])
             ->whereIn('month', [$month, $preMonth])
             ->get();
@@ -537,6 +557,7 @@ class UtilityController extends Controller{
                 ];
             }
         }
+
         return $items;
     }
 

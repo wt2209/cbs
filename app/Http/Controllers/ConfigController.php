@@ -23,6 +23,8 @@ class ConfigController extends Controller
             'precision'=>config('cbs.precision'),
             'electricMoney'=>config('cbs.electricMoney'),
             'waterMoney'=>config('cbs.waterMoney'),
+            'electricMax'=>config('cbs.electricMax'),
+            'waterMax'=>config('cbs.waterMax'),
         ]);
     }
 
@@ -33,6 +35,8 @@ class ConfigController extends Controller
             'precision' => 'required|integer',
             'electric_money' => 'required|numeric',
             'water_money' => 'required|numeric',
+            'electric_max' => 'required|numeric',
+            'water_max' => 'required|numeric',
         ]);
 
         $config = '<?php';
@@ -40,6 +44,8 @@ class ConfigController extends Controller
         $config .= "'precision'=>'{$request->precision}',";
         $config .= "'electricMoney'=>'{$request->electric_money}',";
         $config .= "'waterMoney'=>'{$request->water_money}',";
+        $config .= "'electricMax'=>'{$request->electric_max}',";
+        $config .= "'waterMax'=>'{$request->water_max}',";
         $config .= "];";
 
         if (is_file(config_path('cbs.php'))) {

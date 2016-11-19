@@ -27,11 +27,25 @@ class CompanyLogController extends Controller
         $companyLogs = CompanyLog::paginate(config('cbs.pageNumber'));
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }
+
+    /**
+     * 搜索
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getSearch(Request $request)
     {
         $companyName = trim(strip_tags(htmlspecialchars($request->company_name)));
-        $companyLogs = DB::table('company_log')->where('company_name', 'like', '%' . $companyName . '%')
-            ->paginate(1);
+        $roomName = $request->room_name;
+        if (empty($companyName) && empty($roomName)) {
+            $companyLogs = CompanyLog::paginate(config('cbs.pageNumber'));
+        } elseif(empty($companyName)) {
+            $rooms = Room::where('room_name', 'like', '%'.$roomName.'%')->lists('room_id')->toArray();
+            $companyLogs = CompanyLog::whereIn('room_id', $rooms)->paginate(config('cbs.pageNumber'));
+        } else {
+            $companies = Company::where('company_name', 'like', '%'.$companyName.'%')->lists('company_id')->toArray();
+            $companyLogs = CompanyLog::whereIn('company_id', $companies)->paginate(config('cbs.pageNumber'));
+        }
         return view('companyLog/index', ['companyLogs'=>$companyLogs]);
     }
 
@@ -42,7 +56,7 @@ class CompanyLogController extends Controller
      * @param array $oldRooms
      * @param array $newRooms
      */
-    static public function log($companyId, $userId, $oldRooms=[], $newRooms=[])
+    static public function log($companyId,$isNewCompany,  $userId, $oldRooms=[], $newRooms=[])
     {
         $results = [];
         foreach($oldRooms as $oldRoom) {
@@ -66,7 +80,6 @@ class CompanyLogController extends Controller
             $companyLog->new_rent_type = isset($result['new_rent_type']) ? $result['new_rent_type'] : '';
             $companyLog->new_gender = isset($result['new_gender']) ? $result['new_gender'] : '';
 
-
             //跳过没有变动的项目
             if (isset($result['new_rent_type']) && isset($result['pre_rent_type'])) {
                 if ($result['new_rent_type'] == $result['pre_rent_type']
@@ -75,7 +88,9 @@ class CompanyLogController extends Controller
                 }
             }
 
-            if (!isset($result['new_rent_type'])
+            if($isNewCompany == 1){ //新公司入住
+                $companyLog->room_change_type = 0;
+            }elseif (!isset($result['new_rent_type'])
                 && isset($result['pre_rent_type'])) { //只减少房间
                 $companyLog->room_change_type = 2;
             } elseif (!isset($result['pre_rent_type'])
@@ -96,13 +111,14 @@ class CompanyLogController extends Controller
                 }
             }
 
-
-
             $companyLog->save();
         }
     }
 
-
+    /**
+     * 填写变动房间水电底数
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getUtilityOfChangedRooms()
     {
         $companyLogs = CompanyLog::where('water_base', 0)
@@ -112,6 +128,11 @@ class CompanyLogController extends Controller
         return view('companyLog.utilityOfChangedRooms', ['companyLogs' => $companyLogs]);
     }
 
+    /**
+     * 存储变动房间水电底数
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function postUtilityOfChangedRooms(Request $request)
     {
         foreach ($request->all() as $key => $value) {
@@ -126,6 +147,31 @@ class CompanyLogController extends Controller
         return response()->json(['message'=>'操作成功！','status'=>1]);
     }
 
+
+    /**
+     * 修改水电底数
+     * @param $companyLogId
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getEditBase($companyLogId)
+    {
+        $companyLog = CompanyLog::find($companyLogId);
+        return view('companyLog.editBase', ['companyLog'=>$companyLog]);
+    }
+
+    /**
+     * 存储水电底数
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postEditBase(Request $request)
+    {
+        $companyLog = CompanyLog::find($request->cl_id);
+        $companyLog->water_base = $request->water_base;
+        $companyLog->electric_base = $request->electric_base;
+        $companyLog->save();
+        return response()->json(['message'=>'操作成功！', 'status'=>1]);
+    }
 
     /**
      * 删除操作记录

@@ -68,7 +68,7 @@
                     if (data['living']) {
                         for (var i in data['living']) {
                             var current = data['living'][i]
-                            livingStr += '<div class="col-lg-2">';
+                            livingStr += '<div class="col-lg-2"  style="width:300px;">';
                             livingStr += '<div class="input-group">';
                             livingStr += '<label class="input-group-addon">';
                             livingStr += '<input type="checkbox"  value="'+current['room_id']+'">&nbsp;'+current['room_name'];
@@ -111,8 +111,7 @@
             });
 
             $('#submit').click(function(){
-                sRoomId = '';
-                sRoomType = '';
+                sRoomDetail = '';
                 $('#living').find('input[type=checkbox]').each(function(){
                     if ($(this).prop('checked')) {
                         var iRoomId = $(this).val();
@@ -123,24 +122,24 @@
                                 iGender = $(this).val();
                             }
                         });
-                        sRoomId += iRoomId + '_';
-                        sRoomType += iRoomId+'_'+iType+'_'+iGender+'|';
+                        //格式为：1_1_1 , 'room_id'_'rent_type_id'_'gender',
+                        sRoomDetail += iRoomId+'_'+iType+'_'+iGender+'|';
                     }
                 })
                 $('#dining').find('input[type=checkbox]').each(function(){
                     if ($(this).prop('checked')) {
-                        sRoomId += $(this).val() + '_';
+                        //格式为：1_1_1 , 'room_id'_'rent_type_id'_'gender', 后两位数字是几无所谓，只求统一格式
+                        sRoomDetail += $(this).val() + '_1_1|';
                     }
                 })
                 $('#service').find('input[type=checkbox]').each(function(){
                     if ($(this).prop('checked')) {
-                        sRoomId += $(this).val() + '_';
+                        sRoomDetail += $(this).val() + '_1_1|';
                     }
                 })
 
-                sRoomId = sRoomId.substring(0, sRoomId.length - 1);
-                sRoomType = sRoomType.substring(0, sRoomType.length - 1);
-                var postStr = 'roomIds='+sRoomId+'&roomTypes='+sRoomType;
+                sRoomDetail = sRoomDetail.substring(0, sRoomDetail.length - 1);
+                var postStr = 'newCompany=1&roomDetails='+sRoomDetail;
                 if (bStatus) {
                     return false;
                 }
@@ -148,12 +147,15 @@
                 maskShow();
                 $.post('{{ url('company/store-selected-rooms') }}', $('#form').serialize()+"&"+postStr, function(e){
                     maskHide();
-                    popdown({'message':e.message, 'status': e.status, 'callback':function(){
-                        if (e.status) {
+                    if(e.status) {
+                        //下一步：存储变动房间的水电底数
+                        location.href = '{{ url("company-log/utility-of-changed-rooms") }}';
+                    } else {
+                        popdown({'message':e.message, 'status': e.status, 'callback':function(){
                             /*返回并刷新原页面*/
                             location.href = '{{ url("company/index") }}';
-                        }
-                    }});
+                        }});
+                    }
 
                 }, 'json');
             })

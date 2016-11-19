@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\CompanyLog;
 use PHPExcel_Worksheet;
 use App\Model\Room;
+use App\Model\Company;
 use Illuminate\Http\Request;
 use DB;
 use Storage;
@@ -56,8 +58,18 @@ class SheetController extends Controller
         Excel::create($fileName, function($excel) use($date){
             $excel->sheet('房费', function($sheet) use($date){
                 $companies = DB::table('company')->where('is_quit', 0)->get();
-                $rooms = DB::table('room')->where('room_type', 1)->get();
+                $rooms = DB::table('room')->where('room_type', 1)->where('company_id', '!=', 0)->get();
                 $rentTypes = DB::table('rent_type')->get();
+
+                $currentMonthFirstDay = date('Y-m-01 00:00:00', strtotime($date['year'].'-'.$date['month'].'-01'));
+                $currentMonthLastDay = date('Y-m-d', strtotime($currentMonthFirstDay.' +1 month -1 day'));
+                $tmpChangedRooms = CompanyLog::whereIn('room_change_type', [0,1,2])
+                    ->where('created_at', '>', $currentMonthFirstDay)
+                    ->where('created_at', '<',$currentMonthLastDay)
+                    ->get();
+                foreach ($tmpChangedRooms as $tmpChangedRoom) {
+                    $changedRooms[$tmpChangedRoom->company_id][] = $tmpChangedRoom;
+                }
                 $chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 
                 foreach ($rooms as $room) {
@@ -67,6 +79,7 @@ class SheetController extends Controller
                         $count[$room->company_id][$room->rent_type_id] = 1 ;
                     }
                 }
+
                 //标题行
                 $titleRow = [$date['year'].'.'.$date['month'].'月份房费',''];
                 //菜单第一行
@@ -111,15 +124,37 @@ class SheetController extends Controller
                 foreach ($companies as $company) {
                     $tmpArr = [$serialNumber++, $company->company_name];
                     $companyTotalMoney = 0;
+                    $companyId = $company->company_id;
                     foreach ($rentTypes as $rentType) {
-                        $number = isset($count[$company->company_id][$rentType->rent_type_id]) ?
-                            $count[$company->company_id][$rentType->rent_type_id] :
+                        $number = isset($count[$companyId][$rentType->rent_type_id]) ?
+                            $count[$companyId][$rentType->rent_type_id] :
                             0;
-                        $money = $rentType->rent_money;
-                        $totalMoney = $number * $money;
+                        $oneMonthNumber = $number;
+                        $rentTypeMoney = $rentType->rent_money;
+                        $totalMoney = 0;
+                        if (isset($changedRooms[$companyId])){
+                            foreach ($changedRooms[$companyId] as $currentCompanyChangedRoom) {
+                                if ($currentCompanyChangedRoom->room_change_type == 2
+                                    && $currentCompanyChangedRoom->pre_rent_type == $rentType->rent_type_id
+                                ) {
+                                    $dayNumber = date('d', strtotime($currentCompanyChangedRoom['created_at']));
+                                    $totalMoney += min($dayNumber / 30, 1) * $rentTypeMoney;
+                                    $number++ ;
+                                }
+                                if ($currentCompanyChangedRoom->room_change_type == 1
+                                    && $currentCompanyChangedRoom->new_rent_type == $rentType->rent_type_id
+                                ) {
+                                    $dayNumber = 30 - date('d', strtotime($currentCompanyChangedRoom['created_at']));
+                                    $totalMoney += min($dayNumber / 30, 1) * $rentTypeMoney;
+                                    $oneMonthNumber--;
+                                }
+                            }
+                        }
+
+                        $totalMoney = $oneMonthNumber * $rentTypeMoney + $totalMoney;
                         $companyTotalMoney += $totalMoney;
                         $tmpArr[] = $number;
-                        $tmpArr[] = $money;
+                        $tmpArr[] = $rentTypeMoney;
                         $tmpArr[] = $totalMoney;
                     }
                     $tmpArr[] = $companyTotalMoney;
@@ -177,7 +212,7 @@ class SheetController extends Controller
 
                 //TODO 只查询居住房间
                 $rooms = Room::where('company_id', '!=', 0)
-                    ->where('room_type', 1)
+                    ->whereIn('room_type', [1, 2])
                     ->get();
                 //$rooms = Room::where('room_id', 4)->get();
 
@@ -276,45 +311,72 @@ class SheetController extends Controller
                     $currentElectricBase = isset($currentBaseArr[$room->room_id]['electric_base'])
                         ? $currentBaseArr[$room->room_id]['electric_base']
                         : 0;
+
+                    //处理 99999 -> 10 的情况
+                    if ($currentElectricBase < $preElectricBase) {
+                        $currentElectricBase = $currentElectricBase + intval(config('cbs.electricMax')) + 1 ;
+                    }
+                    if ($currentWaterBase < $preWaterBase) {
+                        $currentWaterBase = $currentWaterBase + intval(config('cbs.waterMax')) + 1 ;
+                    }
                     $waterMoney = round(config('cbs.waterMoney')*($currentWaterBase - $preWaterBase), config('cbs.precision'));
                     $electricMoney = round(config('cbs.electricMoney')*($currentElectricBase - $preElectricBase), config('cbs.precision'));
-                    //食堂水电费
-                    $diningMoney = 0;
                     //初始化
                     $tmp = [];
-                    $tmp[] = $room->room_name;
-                    $tmp[] = $room->company->company_name;
-                    $tmp[] = $preWaterBase;
-                    $tmp[] = $currentWaterBase;
-                    $tmp[] = $currentWaterBase - $preWaterBase;//index:4
-                    $tmp[] = $waterMoney; // index:5
-                    $tmp[] = $preElectricBase;
-                    $tmp[] = $currentElectricBase;
-                    $tmp[] = $currentElectricBase - $preElectricBase;//index:8
-                    $tmp[] = $electricMoney; //index:9
-                    $tmp[] = $waterMoney + $electricMoney; //index : 10
-                    // TODO 食堂水电费
-                    $tmp[] = '';;//index : 11
-                    //TODO 水电费合计
-                    $tmp[] = ''; // index 12
-                    //TODO 服务费合计
-                    $tmp[] = '';
-                    $tmp[] = $room->room_remark;
+                    $tmp['roomType'] = $room->room_type;
+                    $tmp['roomName'] = $room->room_name;
+                    $tmp['companyName'] = $room->company->company_name;
+                    $tmp['preWaterBase'] = $preWaterBase;
+                    $tmp['currentWaterBase'] = $currentWaterBase;
+                    $tmp['waterUsed'] = $currentWaterBase - $preWaterBase;//index:4
+                    $tmp['waterMoney'] = $waterMoney; // index:5
+                    $tmp['preElectricBase'] = $preElectricBase;
+                    $tmp['currentElectricBase'] = $currentElectricBase;
+                    $tmp['electricUsed'] = $currentElectricBase - $preElectricBase;//index:8
+                    $tmp['electricMoney'] = $electricMoney; //index:9
+                    $tmp['total'] = $waterMoney + $electricMoney; //index : 10
+                    $tmp['remark'] = $room->room_remark;
                     $result[$room->company_id][] = $tmp;
                 }
                 // 行数
                 $rowNumber = 6;
-                foreach ($result as $r) {
+                foreach ($result as $companyItem) {
                     $insertData = [];
                     $companyTotal = [''];
-                    $total = [];
-                    foreach ($r as $i) {
-                        $insertData[] = $i;
-                        $total['companyName'] = $i[1].' 汇总';
-                        $total['waterBaseTotal'] = isset($total['waterBaseTotal']) ? $total['waterBaseTotal'] + $i[4] : $i[4];
-                        $total['waterMoneyTotal'] = isset($total['waterMoneyTotal']) ? $total['waterMoneyTotal'] + $i[5] : $i[5];
-                        $total['electricBaseTotal'] = isset($total['electricBaseTotal']) ? $total['electricBaseTotal'] + $i[8] : $i[8];
-                        $total['electricMoneyTotal'] = isset($total['electricMoneyTotal']) ? $total['electricMoneyTotal'] + $i[9] : $i[9];
+                    $total = [
+                        'diningMoney'=>0,
+                        'waterBaseTotal'=>0,
+                        'waterMoneyTotal'=>0,
+                        'electricBaseTotal'=>0,
+                        'electricMoneyTotal'=>0,
+                    ];
+                    foreach ($companyItem as $roomItem) {
+                        if ($roomItem['roomType'] == 2) {
+                            $total['diningMoney'] = $total['diningMoney'] + $roomItem['waterMoney'] + $roomItem['electricMoney'];
+                            continue;
+                        }
+                        $insertData[] = [
+                            $roomItem['roomName'],
+                            $roomItem['companyName'],
+                            $roomItem['preWaterBase'],
+                            $roomItem['currentWaterBase'],
+                            $roomItem['waterUsed'],
+                            $roomItem['waterMoney'],
+                            $roomItem['preElectricBase'],
+                            $roomItem['currentElectricBase'],
+                            $roomItem['electricUsed'],
+                            $roomItem['electricMoney'],
+                            $roomItem['total'],
+                            '',
+                            '',
+                            '',
+                            $roomItem['remark']
+                        ];
+                        $total['companyName'] = $roomItem['companyName'].' 汇总';
+                        $total['waterBaseTotal'] = $total['waterBaseTotal'] + $roomItem['waterMoney'];
+                        $total['waterMoneyTotal'] =  $total['waterMoneyTotal'] + $roomItem['waterMoney'];
+                        $total['electricBaseTotal'] = $total['electricBaseTotal'] + $roomItem['electricUsed'];
+                        $total['electricMoneyTotal'] = $total['electricMoneyTotal'] + $roomItem['electricMoney'];
                         $currentRow++;
                         $rowNumber++;
                     }
@@ -327,6 +389,9 @@ class SheetController extends Controller
                     $companyTotal[] = '';
                     $companyTotal[] = $total['electricBaseTotal'];
                     $companyTotal[] = $total['electricMoneyTotal'];
+                    $companyTotal[] = $total['electricMoneyTotal'] + $total['electricBaseTotal'];
+                    $companyTotal[] = $total['diningMoney'];
+                    $companyTotal[] = $total['electricMoneyTotal'] + $total['waterMoneyTotal'] + $total['diningMoney'];
 
                     $currentRow++;
                     $rowNumber++;

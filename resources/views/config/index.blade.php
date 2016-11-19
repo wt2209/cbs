@@ -57,6 +57,20 @@
                         单位：元
                     </td>
                 </tr>
+                <tr>
+                    <th>电表最大值</th>
+                    <td>
+                        <input  class="form-control" type="text" name="electric_max" value="{{ $electricMax }}">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>水表最大值</th>
+                    <td>
+                        <input  class="form-control" type="text" name="water_max" value="{{ $waterMax }}">
+                    </td>
+                    <td></td>
+                </tr>
             </table>
             <div class="form-submit">
                 <button class="btn btn-success" id="submit">修 改</button>

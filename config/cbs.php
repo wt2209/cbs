@@ -1,1 +1,1 @@
-<?php return ['pageNumber'=>'20','precision'=>'2','electricMoney'=>'1','waterMoney'=>'3.55',];
+<?php return ['pageNumber'=>'20','precision'=>'2','electricMoney'=>'1','waterMoney'=>'3.55','electricMax'=>'99999','waterMax'=>'9999',];

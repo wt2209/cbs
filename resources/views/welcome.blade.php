@@ -90,7 +90,7 @@
 {{--日历--}}
 {{--<div id='calendar'></div>--}}
 
-<h1>欢迎使用 :)</h1>
+<h1 style="margin: 0 auto; text-align: center;padding-top: 200px;font-size: 60px;">欢迎使用</h1>
 
 </body>
 </html>

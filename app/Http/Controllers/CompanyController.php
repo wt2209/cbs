@@ -261,6 +261,8 @@ class CompanyController extends Controller
         //$roomDetails格式 : 1_1_2|2_1_2|3_2_1 ('room_id'_'rent_type_id'_'gender')
         $this->newRooms = explode('|', htmlspecialchars(strip_tags($request->roomDetails)));
         $companyId = intval($request->company_id);
+        //是否是新公司入住
+        $isNewCompany = (isset($request->newCompany) && $request->newCompany == 1) ? 1 : 0;
 
         //旧房间
         $oldRooms = Room::where('company_id', $companyId)->get();
@@ -289,7 +291,7 @@ class CompanyController extends Controller
                 ]);
         }
 
-        CompanyLogController::log($companyId, $request->user()->id, $this->oldRooms, $this->newRooms);
+        CompanyLogController::log($companyId, $isNewCompany, $request->user()->id, $this->oldRooms, $this->newRooms);
 
         //下一步：存储变动房间的水电底数
         return response()->json(['message'=>'操作成功！', 'status'=>1]);
