@@ -15,10 +15,13 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SheetController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('my.auth');
     }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -51,12 +54,12 @@ class SheetController extends Controller
                 $date['month'] = $date['month'] - 1;
             }
         }
-
+        $globalCompany = [];
         //文件名
-        $fileName = $date['year'].'.'.$date['month'].'月报表 - '.date('Ymd');
+        $fileName = (2147483648 - time()).'-'.$date['year'].'.'.$date['month'].'月报表 - '.date('Ymd');
 
-        Excel::create($fileName, function($excel) use($date){
-            $excel->sheet('房费', function($sheet) use($date){
+        Excel::create($fileName, function($excel) use(&$globalCompany, $date){
+            $excel->sheet('房费', function($sheet) use(&$globalCompany, $date){
                 $companies = DB::table('company')->where('is_quit', 0)->get();
                 $rooms = DB::table('room')->where('room_type', 1)->where('company_id', '!=', 0)->get();
                 $rentTypes = DB::table('rent_type')->get();
@@ -159,9 +162,12 @@ class SheetController extends Controller
                     }
                     $tmpArr[] = $companyTotalMoney;
                     $tmpArr[] = $company->company_remark;
+                    $globalCompany[$company->company_id]['roomRentMoney'] = $companyTotalMoney;
                     //2, 588, 2111, 1, 888, 1111, 3, 1088, 3333, 'heji', $company->company_remark];
                     $data[] = $tmpArr;
                 }
+
+
                 $sheet->setRowsToRepeatAtTop(['1','2','3','4']);
                 //设置表样式
                 $sheet->setPageMargin(array(
@@ -208,9 +214,8 @@ class SheetController extends Controller
 
                 // 生成表
                  $sheet->fromArray($data, null, 'A1', true, false);
-            })->sheet('明细',function ($sheet) use($date){
-
-                //TODO 只查询居住房间
+            })->sheet('明细',function ($sheet) use(&$globalCompany, $date){
+                //只查询居住房间和餐厅
                 $rooms = Room::where('company_id', '!=', 0)
                     ->whereIn('room_type', [1, 2])
                     ->get();
@@ -291,7 +296,6 @@ class SheetController extends Controller
                     ['', '', '上期数', '本期数', '实用数', '费用', '上期数', '本期数', '实用数', '费用', '', '', '', '', '']
                 ];
 
-
                 // 生成表
 
                 $sheet->fromArray($data, null, 'A1', true, false);
@@ -340,7 +344,7 @@ class SheetController extends Controller
                 }
                 // 行数
                 $rowNumber = 6;
-                foreach ($result as $companyItem) {
+                foreach ($result as $companyId => $companyItem) {
                     $insertData = [];
                     $companyTotal = [''];
                     $total = [
@@ -373,10 +377,10 @@ class SheetController extends Controller
                             $roomItem['remark']
                         ];
                         $total['companyName'] = $roomItem['companyName'].' 汇总';
-                        $total['waterBaseTotal'] = $total['waterBaseTotal'] + $roomItem['waterMoney'];
-                        $total['waterMoneyTotal'] =  $total['waterMoneyTotal'] + $roomItem['waterMoney'];
-                        $total['electricBaseTotal'] = $total['electricBaseTotal'] + $roomItem['electricUsed'];
-                        $total['electricMoneyTotal'] = $total['electricMoneyTotal'] + $roomItem['electricMoney'];
+                        $total['waterBaseTotal']  += $roomItem['waterUsed'];
+                        $total['waterMoneyTotal'] += $roomItem['waterMoney'];
+                        $total['electricBaseTotal'] += $roomItem['electricUsed'];
+                        $total['electricMoneyTotal'] += $roomItem['electricMoney'];
                         $currentRow++;
                         $rowNumber++;
                     }
@@ -389,9 +393,13 @@ class SheetController extends Controller
                     $companyTotal[] = '';
                     $companyTotal[] = $total['electricBaseTotal'];
                     $companyTotal[] = $total['electricMoneyTotal'];
-                    $companyTotal[] = $total['electricMoneyTotal'] + $total['electricBaseTotal'];
+                    $companyTotal[] = $total['electricMoneyTotal'] + $total['waterMoneyTotal'];
                     $companyTotal[] = $total['diningMoney'];
                     $companyTotal[] = $total['electricMoneyTotal'] + $total['waterMoneyTotal'] + $total['diningMoney'];
+                    $companyTotal[] = $globalCompany[$companyId]['roomRentMoney'];
+
+                    $globalCompany[$companyId]['livingRoomUtility'] = $total['electricMoneyTotal'] + $total['waterMoneyTotal'];
+                    $globalCompany[$companyId]['diningRoomUtility'] = $total['diningMoney'];
 
                     $currentRow++;
                     $rowNumber++;
@@ -420,10 +428,10 @@ class SheetController extends Controller
                     'H'=>7,
                     'I'=>7,
                     'J'=>7,
-                    'K'=>7,
-                    'L'=>7,
-                    'M'=>7,
-                    'N'=>7,
+                    'K'=>9,
+                    'L'=>9,
+                    'M'=>9,
+                    'N'=>10,
                     'O'=>20
                 ));
                 $sheet->cell('A1', function($cell) {
@@ -440,6 +448,118 @@ class SheetController extends Controller
                 $sheet->getStyle('A1:O6')->getAlignment()->setWrapText(true);
 
             });
+        })->sheet('汇总',function ($sheet) use(&$globalCompany, $date){
+            $companies = DB::table('company')->where('is_quit', 0)->get();
+            $data = [
+                [$date['year'].'.'.$date['month'].'月份承包商公寓水电及服务费汇总表','','','','','','',''],
+                ['单位：服务中心', '', '', '', '', '', '日期：'.date('Y-m-d'),''],
+                ['序号','单位名称','水电费(元)','','','住房服务费(元)','总计(元)','备 注'],
+                ['','','住宿水电费','餐厅水电费','合计','','',''],
+            ];
+            // 序号
+            $serialNumber = 1;
+            $total = [
+                'livingUtility' => 0,
+                'diningUtility' => 0,
+                'livingAndDiningUtility' => 0,
+                'rentMoney' => 0,
+                'companyTotal' => 0,
+            ];
+            foreach ($companies as $company) {
+                $livingUtility = isset($globalCompany[$company->company_id]['livingRoomUtility'])
+                    ? $globalCompany[$company->company_id]['livingRoomUtility']
+                    : 0;
+                $diningUtility = isset($globalCompany[$company->company_id]['diningRoomUtility'])
+                    ? $globalCompany[$company->company_id]['diningRoomUtility']
+                    : 0;
+                $livingAndDiningUtility = $livingUtility + $diningUtility;
+                $rentMoney = isset($globalCompany[$company->company_id]['roomRentMoney'])
+                    ? $globalCompany[$company->company_id]['roomRentMoney']
+                    : 0;
+                $companyTotal = $livingAndDiningUtility + $rentMoney;
+
+                $total['livingUtility'] += $livingUtility;
+                $total['diningUtility'] += $diningUtility;
+                $total['livingAndDiningUtility'] += $livingAndDiningUtility;
+                $total['rentMoney'] += $rentMoney;
+                $total['companyTotal'] += $companyTotal;
+
+                $data[] = [
+                    $serialNumber,
+                    $company->company_name,
+                    $livingUtility,
+                    $diningUtility,
+                    $livingAndDiningUtility,
+                    $rentMoney,
+                    $companyTotal,
+                    $company->company_remark,
+                ];
+                $serialNumber++;
+            }
+            $data[] = [
+                '合计',
+                '',
+                $total['livingUtility'],
+                $total['diningUtility'],
+                $total['livingAndDiningUtility'],
+                $total['rentMoney'],
+                $total['companyTotal'],
+                ''
+            ];
+
+
+            $sheet->setRowsToRepeatAtTop(['1','2','3','4', '5']);
+            //设置表样式 Set top, right, bottom, left
+            $sheet->setPageMargin(array(
+                0.4, 0.4, 0.4, 1
+            ));
+            $sheet->setStyle(array(
+                'font' => array(
+                    'name'      =>  '宋体',
+                    'size'      =>  12,
+                )
+            ));
+            $sheet->cell('A1', function($cell) {
+                $cell->setFont(array(
+                    'size'       => '16',
+                    'bold'       =>  true
+                ));
+
+            });
+            $sheet->mergeCells('A1:H1');
+            $sheet->mergeCells('A2:B2');
+            $sheet->mergeCells('G2:H2');
+            $sheet->mergeCells('C3:E3');
+            $sheet->mergeCells('A3:A4');
+            $sheet->mergeCells('B3:B4');
+            $sheet->mergeCells('F3:F4');
+            $sheet->mergeCells('G3:G4');
+            $sheet->mergeCells('H3:H4');
+            $sheet->mergeCells('A'.($serialNumber + 4).':B'.($serialNumber + 4));
+
+            $sheet->setWidth('A', 5);
+            $sheet->setWidth('B', 30);
+            $sheet->setWidth('C', 11);
+            $sheet->setWidth('D', 11);
+            $sheet->setWidth('E', 11);
+            $sheet->setWidth('F', 11);
+            $sheet->setWidth('G', 11);
+            $sheet->setWidth('H', 28);
+
+            $sheet->setHeight(1, 25);
+            $sheet->setBorder('A3:H'.($serialNumber + 4), 'thin');
+            $sheet->cells('A1:H' .($serialNumber + 4), function($cells) {
+                $cells->setAlignment('center');
+                $cells->setValignment('center');
+
+            });
+            //设置表头自动换行
+            $sheet->getStyle('A1:H5')->getAlignment()->setWrapText(true);
+
+            //页脚
+            $sheet->getHeaderFooter()->setOddFooter('部门负责人：                                               主管：                            制表：              ');  //页脚
+            // 生成表
+            $sheet->fromArray($data, null, 'A1', true, false);
         })->store('xls', storage_path('app/monthlySheet'));
         return response()->json(['message'=>'操作成功！', 'status'=>1]);
 
